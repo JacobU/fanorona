@@ -1,0 +1,20 @@
+{
+  "name": "fanorona",
+  "version": "1.0.0",
+  "main": "src/Board.js",
+  "scripts": {
+    "test": "jest",
+    "start": "node src/Board.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "jest": "^29.7.0"
+  },
+  "dependencies": {
+    "chalk": "^5.3.0"
+  },
+  "type": "module"
+}
