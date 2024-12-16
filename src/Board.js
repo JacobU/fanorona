@@ -2,25 +2,34 @@ import { Cell } from './Cell.js'
 import { PieceType, MoveType, Direction, AttackType, DirectionMoveMap } from './types.js';
 import chalk from 'chalk'
 
-class Board {
+export default class Board {
 
     #attackedPiece = null;
 
 
-    constructor() {
-        this.rows = 5; // Number of rows
-        this.columns = 9; // Number of columns
-        this.board = this.initializeBoard(); // Create the board
+    constructor(...args) {
+        // This should take the form of "rowLength (int), colLength (int), startingPieces (string)"
+        if (args.length === 3) {
+            this.rows = args[0]; // Number of rows
+            this.columns = args[1]; // Number of columns
+            if (this.rows * this.columns != args[2].length) {
+                throw new Error("The number starting positions does not match the board size.");
+            }
+            this.board = this.initializeBoard(args[2]); // Create the board
+        } else {
+            this.rows = 5; // Number of rows
+            this.columns = 9; // Number of columns
+            this.board = this.initializeBoard(); // Create the board
+        }
     }
 
     // Initialize the board with empty cells
-    initializeBoard() {
-        const piecePositions = '222222222222222222212102121111111111111111111';
+    initializeBoard(startingPiecePositions = "222222222222222222212102121111111111111111111") {
         const board = [];
         for (let i = 0; i < this.rows; i++) {
             const row = [];
             for (let j = 0; j < this.columns; j++) {
-                const pieceType = parseInt(piecePositions[i * this.columns + j]);
+                const pieceType = parseInt(startingPiecePositions[i * this.columns + j]);
                 row.push(new Cell(pieceType));
             }
             board.push(row);
@@ -28,19 +37,43 @@ class Board {
         return board;
     }
 
-    getCell(row, column) {
-        return this.board[row][column];
+    getCell(row, col) {
+        return this.board[row][col];
     }
 
-    movePiece(piece, direction) {
+    setCell(row, col, pieceType) {
+        this.board[row][col].setCell(pieceType);
+    }
+
+    movePiece(piece, position, direction) {
+        // Always check the input
+        if (!Direction.isValid(direction)) {
+            throw new Error("Invalid direction");
+        }
+
+        const newRow = position.row + DirectionMoveMap.get(direction).deltaRow;
+        const newCol = position.col + DirectionMoveMap.get(direction).deltaCol;
+
+        // Check the move is valid (i.e. that the position it is trying to move is indeed empty)
+        if (this.getCell(newRow, newCol).getPieceType() != PieceType.values.EMPTY)
+        {
+            throw new Error("The place the piece is being moved is occupied");
+        }        
+        this.setCell(position.row, position.col, piece);
+        this.board[position.row][position.col].removePiece();
+
+        
+    }
+
+    willMoveWithdraw(piece, position, direction) {
 
     }
 
-    willMoveWithdraw(piece, direction) {
+    willMoveApproach(piece, position, direction) {
 
     }
 
-    willMoveApproach(piece, direction) {
+    removeAttackedPieces() {
 
     }
 
@@ -49,8 +82,8 @@ class Board {
             throw new Error("Invalid direction");
         }
 
-        const willMoveCauseWithdraw = this.willMoveWithdraw(piece, direction);
-        const willMoveCauseApproach = this.willMoveApproach(piece, direction);
+        const willMoveCauseWithdraw = this.willMoveWithdraw(piece, position, direction);
+        const willMoveCauseApproach = this.willMoveApproach(piece, position, direction);
 
         var attackType = AttackType.values.NONE;
         // Right now, just ignore choosing the withdraw or approach, just go with approach
@@ -63,25 +96,14 @@ class Board {
         }
 
         this.removeAttackedPieces(piece, direction, attackType);
-        this.movePiece(piece, direction);
-
-
-        // Check if this move with WITHDRAW
-        // Check if this move will APPROACH
-        // Ask the user if they want to approach or withdraw if there are both
-        // Set whether the piece will APPROACH/WITHDRAW/DO NOTHING
-        // Move the piece
-        // If approach -> do approach removal
-        // If withdraw -> do withdraw removal
-
-
+        this.movePiece(piece, position, direction);
     }
 
-    getPiecesCellNeigbours(row, col) {
+    getCellNeigbours(row, col) {
         return this.getNeighbours(row, col, true);
     }
 
-    getPiecesPieceNeighbours(row, col) {
+    getPiecesNeighbours(row, col) {
         return this.getNeighbours(row, col, false);
     }
 
@@ -114,7 +136,6 @@ class Board {
 
     // Display the board in a readable format
     displayBoard() {
-        
         for (let row of this.board) {
             const rowDisplay = row.map(cell => {
                 if (cell.getPieceType() === PieceType.values.BLACK) return chalk.red("B"); // Black piece
@@ -122,8 +143,23 @@ class Board {
                 if (cell.getPieceType() === PieceType.values.EMPTY) return chalk.green("0");
                 return "."; // Empty cell
             }).join(" ");
-            console.log(rowDisplay);
         }
+    }
+
+    getBoardPositionsAsString() {
+        var boardString = '';
+        for (let row of this.board) {
+            const rowString = row
+            .map(cell => {
+                if (cell.getPieceType() === PieceType.values.WHITE) return '1'; // WHITE piece
+                if (cell.getPieceType() === PieceType.values.BLACK) return '2'; // BLACK piece
+                if (cell.getPieceType() === PieceType.values.EMPTY) return '0'; // EMPTY cell
+                return '.'; // Fallback for unknown types
+            })
+            .join('');
+            boardString += rowString;
+        }
+        return boardString;
     }
 
     // Reset the board to an empty state
@@ -132,6 +168,8 @@ class Board {
     }
 }
 
-const board = new Board();
-board.displayBoard();
-console.log(board.getPiecesCellNeigbours(0,0));
+
+const board = new Board(3,3,'120000000');
+
+// board.displayBoard();
+// console.log(board.getCellNeigbours(0,0));

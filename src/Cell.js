@@ -12,6 +12,10 @@ export class Cell {
         return this.#pieceType
     }
 
+    setPieceType(pieceType) {
+        this.#pieceType = pieceType;
+    }
+
     isPieceType(pieceType) {
         return pieceType === this.#pieceType;
     }
@@ -24,4 +28,6 @@ export class Cell {
     removePiece() {
         this.#pieceType = PieceType.values.EMPTY;
     }
+
+    
 }
