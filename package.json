@@ -1,21 +1,27 @@
 {
   "name": "fanorona",
   "version": "1.0.0",
-  "main": "src/Board.js",
+  "main": "src/Board.ts",
   "type": "module",
   "scripts": {
-    "test": "mocha 'tests/**/*.js'",
-    "start": "node src/Board.js"
+    "build": "tsc",
+    "test": "mocha --require ts-node/register 'tests/**/*.ts'",
+    "start": "node src/Board.ts"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "chalk": "^5.3.0"
+    "chalk": "^5.3.0",
+    "typescript": "^5.7.2"
   },
   "devDependencies": {
+    "@types/chai": "^5.0.1",
+    "@types/chalk": "^0.4.31",
+    "@types/mocha": "^10.0.10",
     "chai": "^5.1.2",
-    "mocha": "^11.0.1"
+    "mocha": "^11.0.1",
+    "ts-node": "^10.9.2"
   }
 }

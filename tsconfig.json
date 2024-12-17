@@ -1,0 +1,17 @@
+{
+    "compilerOptions": {
+      "target": "es6",                      // Target ECMAScript version
+      "module": "NodeNext",                      // Module system
+      "moduleResolution": "NodeNext",
+      "strict": true,                       // Enable strict type-checking
+      "allowImportingTsExtensions": true,   // Enable importing .ts extensions explicitly
+      "noEmit": true,
+      "esModuleInterop": true,              // Allow default imports
+      "forceConsistentCasingInFileNames": true,
+      "outDir": "./dist",                   // Output directory for compiled files
+      "rootDir": "./",                      // Root directory for source files
+      "skipLibCheck": true
+    },
+    "include": ["tests/**/*.ts", "src/**/*"],
+    "exclude": ["node_modules", "dist"]
+  }
