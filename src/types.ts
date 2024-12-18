@@ -28,6 +28,11 @@ export enum Direction {
     DOWNRIGHT = 7,
 }
 
+export interface Connection {
+    index: number,
+    direction: Direction,
+}
+
 // AttackType enum
 export enum AttackType {
     NONE = 0,

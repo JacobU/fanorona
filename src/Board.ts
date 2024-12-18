@@ -1,5 +1,5 @@
 import { Cell } from './Cell.ts';
-import { PieceType, MoveType, Direction, AttackType, StrongIntersectionMoveMap, WeakIntersectionMoveMap, CellType } from './types.js';
+import { PieceType, MoveType, Direction, AttackType, StrongIntersectionMoveMap, WeakIntersectionMoveMap, CellType, Connection } from './types.js';
 import chalk from 'chalk';
 
 // Define custom types
@@ -40,19 +40,48 @@ export default class Board {
         for (let i = 0; i < this.rows; i++) {
             const row: Cell[] = [];
             for (let j = 0; j < this.columns; j++) {
-                const stringIndex = i * this.columns + j;
-                const pieceType: PieceType = parseInt(startingPiecePositions[stringIndex], 10) as PieceType;
-                const cellType = stringIndex % 2 == 0 ? CellType.STRONG : CellType.WEAK;
-                row.push(new Cell(cellType, pieceType));
+                const index = i * this.columns + j;
+                const pieceType: PieceType = parseInt(startingPiecePositions[index], 10) as PieceType;
+                const cellType = index % 2 == 0 ? CellType.STRONG : CellType.WEAK;
+                row.push(new Cell(index, cellType, pieceType, this.getCellConnections(index, cellType)));
             }
             board.push(row);
         }
         return board;
     }
 
+
+
+    private canPieceAttack(index: number): boolean {
+        return true;
+    }
+
+    private getCellConnections(index: number, cellType: CellType): Connection[] {
+        let connections: Connection[] = [];
+        if (cellType == CellType.STRONG) {
+            let directionIndex = 0;
+            for (let i = -1; i < 1; i++) {
+                for (let j = -1; j < 1; j++) {
+                    connections.push({ index: index + j + i * this.columns, direction: Direction.UPLEFT + directionIndex});
+                    directionIndex++;
+                }
+            }
+        } else {
+            connections.push({ index: index - this.rows, direction: Direction.UP});
+            connections.push({ index: index - 1, direction: Direction.LEFT});
+            connections.push({ index: index + 1, direction: Direction.RIGHT});
+            connections.push({ index: index + this.rows, direction: Direction.DOWN});
+        }
+        // This makes sure that we are not adding any cell indexes that are outside of the board
+        connections = connections.filter(connection => connection.index >= 0 && connection.index < this.rows * this.columns);
+        return connections;
+    }
+
     public getCell(row: number, col: number): Cell {
         return this.board[row][col];
     }
+
+    public getCellByIndex()
 
     public setCell(row: number, col: number, pieceType: PieceType): void {
         this.board[row][col].setPieceType(pieceType);

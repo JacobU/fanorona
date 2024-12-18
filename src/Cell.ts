@@ -1,4 +1,4 @@
-import { PieceType, Direction, CellType, StrongIntersectionMoveMap, WeakIntersectionMoveMap } from "./types.ts";
+import { PieceType, Direction, CellType, StrongIntersectionMoveMap, WeakIntersectionMoveMap, Connection } from "./types.ts";
 
 // Define the structure for a neighbor
 interface Neighbour {
@@ -8,14 +8,22 @@ interface Neighbour {
 
 export class Cell {
     // Private class field for cell and piece types
+    #index: number;
     #cellType: CellType;
     #pieceType: PieceType;
+    #connections: Connection[];
 
-    constructor(cellType: CellType, pieceType: PieceType) {
+    constructor(index: number, cellType: CellType, pieceType: PieceType, connections: Connection[]) {
+        this.#index = index;
         this.#cellType = cellType;
         this.#pieceType = pieceType;
+        this.#connections = connections;
     }
 
+    public getIndex(): number {
+        return this.#index;
+    }
+    
     // Getter for the piece type
     public getPieceType(): PieceType {
         return this.#pieceType;
