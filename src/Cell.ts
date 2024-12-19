@@ -44,7 +44,7 @@ export default class Cell {
 
     /**
      * @param neighbours The neighbours of the cell we want the possible moves from.
-     * @returns The possible moves this piece could take, as Moves.
+     * @returns The neighbouring cells that are empty, as Moves.
      */
     public getPossibleMoves(neighbours: Neighbour[]): Move[] {
         return neighbours
