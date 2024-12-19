@@ -1,12 +1,7 @@
-import { PieceType, Direction, CellType, StrongIntersectionMoveMap, WeakIntersectionMoveMap, Connection } from "./types.ts";
+import { PieceType, Move, CellType, Neighbour, Connection } from "./types.ts";
 
-// Define the structure for a neighbor
-interface Neighbour {
-    pieceType: PieceType; // Use PieceType enum for strong typing
-    direction: Direction; // Use Direction enum for clarity
-}
 
-export class Cell {
+export default class Cell {
     // Private class field for cell and piece types
     #index: number;
     #cellType: CellType;
@@ -33,8 +28,8 @@ export class Cell {
         return this.#cellType;
     }
 
-    public getCellMoveMap(): Map<Direction, { deltaRow: number; deltaCol: number }> {
-        return this.#cellType === CellType.STRONG ? StrongIntersectionMoveMap : WeakIntersectionMoveMap;
+    public getCellConnections(): Connection[] {
+        return this.#connections;
     }
 
     // Setter for the piece type
@@ -47,11 +42,14 @@ export class Cell {
         return pieceType === this.#pieceType;
     }
 
-    // Gets possible moves by filtering neighbors with EMPTY cells
-    public getPossibleMoves(neighbours: Neighbour[]): Direction[] {
+    /**
+     * @param neighbours The neighbours of the cell we want the possible moves from.
+     * @returns The possible moves this piece could take, as Moves.
+     */
+    public getPossibleMoves(neighbours: Neighbour[]): Move[] {
         return neighbours
             .filter((neighbour) => neighbour.pieceType === PieceType.EMPTY)
-            .map(neighbour => neighbour.direction);
+            .map(neighbour => ({index: neighbour.index, direction: neighbour.direction}));
     }
 
     // Removes a piece by setting its type to EMPTY

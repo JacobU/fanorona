@@ -6,7 +6,7 @@
   "scripts": {
     "build": "tsc",
     "test": "mocha --require ts-node/register 'tests/**/*.ts'",
-    "start": "node src/Board.ts"
+    "start": "node --loader ts-node/esm src/Fanorona.ts"
   },
   "keywords": [],
   "author": "",
