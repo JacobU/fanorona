@@ -1,4 +1,4 @@
-import { PieceType, Move, CellType, Neighbour, Connection } from "./types.ts";
+import { PieceType, Move, CellType, Neighbour, Connection, Direction } from "./types.ts";
 
 
 export default class Cell {
@@ -8,11 +8,60 @@ export default class Cell {
     #pieceType: PieceType;
     #connections: Connection[];
 
-    constructor(index: number, cellType: CellType, pieceType: PieceType, connections: Connection[]) {
+    constructor(index: number, cellType: CellType, pieceType: PieceType, rows: number, columns: number) {
         this.#index = index;
         this.#cellType = cellType;
         this.#pieceType = pieceType;
-        this.#connections = connections;
+        this.#connections = this.createCellConnections(rows, columns);
+    }
+
+    private createCellConnections(rows: number, columns: number): Connection[] {
+        let connections: Connection[] = [];
+            
+        const isTopEdge = this.#index < columns;
+        const isLeftEdge = this.#index % columns === 0;
+        const isRightEdge = (this.#index + 1) % columns === 0;
+        const isBottomEdge = this.#index >= (rows - 1) * columns;
+    
+        if (this.#cellType === CellType.STRONG) {
+            let directionIndex = 0;
+            for (let i = -1; i < 2; i++) {
+                for (let j = -1; j < 2; j++) {
+                    // Skip the current cell itself
+                    if (i === 0 && j === 0) continue;
+    
+                    const direction = Direction.UPLEFT + directionIndex;
+                    const newIndex = this.#index + j + i * columns;
+    
+                    // Skip invalid directions based on edge constraints
+                    if ((isTopEdge && direction <= Direction.UPRIGHT) ||  // UP directions
+                        (isLeftEdge && (direction === Direction.UPLEFT || direction === Direction.LEFT || direction === Direction.DOWNLEFT)) ||  // LEFT directions
+                        (isRightEdge && (direction === Direction.UPRIGHT || direction === Direction.RIGHT || direction === Direction.DOWNRIGHT)) ||  // RIGHT directions
+                        (isBottomEdge && direction >= Direction.DOWNLEFT)) {  // DOWN directions
+                        directionIndex++;
+                        continue;
+                    }
+    
+                    connections.push({ index: newIndex, direction });
+                    directionIndex++;
+                }
+            }
+        } else {
+            // Handle weak connections with edge constraints
+            if (!isTopEdge) {
+                connections.push({ index: this.#index - columns, direction: Direction.UP });
+            }
+            if (!isLeftEdge) {
+                connections.push({ index: this.#index - 1, direction: Direction.LEFT });
+            }
+            if (!isRightEdge) {
+                connections.push({ index: this.#index + 1, direction: Direction.RIGHT });
+            }
+            if (!isBottomEdge) {
+                connections.push({ index: this.#index + columns, direction: Direction.DOWN });
+            }
+        }
+        return connections;
     }
 
     public getIndex(): number {
@@ -43,10 +92,11 @@ export default class Cell {
     }
 
     /**
+     * //TODO I DONT THINK THIS BELONGS HERE
      * @param neighbours The neighbours of the cell we want the possible moves from.
      * @returns The neighbouring cells that are empty, as Moves.
      */
-    public getPossibleMoves(neighbours: Neighbour[]): Move[] {
+    public getEmptyNeighbouringCellsAsMoves(neighbours: Neighbour[]): Move[] {
         return neighbours
             .filter((neighbour) => neighbour.pieceType === PieceType.EMPTY)
             .map(neighbour => ({index: neighbour.index, direction: neighbour.direction}));

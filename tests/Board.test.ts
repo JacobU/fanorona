@@ -35,8 +35,8 @@ describe('Board Tests', () => {
             { index: 8, direction: Direction.DOWN }
         ];
         
-        expect(board.getCell(3).getPossibleMoves(board.getCellNeighbours(3))).to.deep.equal(directionsForWhite);
-        expect(board.getCell(5).getPossibleMoves(board.getCellNeighbours(5))).to.deep.equal(directionsForBlack);
+        expect(board.getCell(3).getEmptyNeighbouringCellsAsMoves(board.getCellNeighbours(3))).to.deep.equal(directionsForWhite);
+        expect(board.getCell(5).getEmptyNeighbouringCellsAsMoves(board.getCellNeighbours(5))).to.deep.equal(directionsForBlack);
     });
 
     // it('should remove correct pieces after diagonal withdrawal', () => {
