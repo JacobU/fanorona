@@ -1,4 +1,4 @@
-import { PieceType, Move, CellType, Neighbour, Connection, Direction } from "./types.ts";
+import { PieceType, CellType, Connection, Direction } from "./types.ts";
 
 
 export default class Cell {
@@ -89,17 +89,6 @@ export default class Cell {
     // Checks if the current piece type matches the given type
     public isPieceType(pieceType: PieceType): boolean {
         return pieceType === this.#pieceType;
-    }
-
-    /**
-     * //TODO I DONT THINK THIS BELONGS HERE
-     * @param neighbours The neighbours of the cell we want the possible moves from.
-     * @returns The neighbouring cells that are empty, as Moves.
-     */
-    public getEmptyNeighbouringCellsAsMoves(neighbours: Neighbour[]): Move[] {
-        return neighbours
-            .filter((neighbour) => neighbour.pieceType === PieceType.EMPTY)
-            .map(neighbour => ({index: neighbour.index, direction: neighbour.direction}));
     }
 
     // Removes a piece by setting its type to EMPTY

@@ -49,7 +49,7 @@ export default class Board {
     public displayBoard(): void {
         let displayString: string = '';
         for (let i = 0; i < this.columns * this.rows; i++) {
-            switch (this.getCell(i).getPieceType()) {
+            switch (this.board[i].getPieceType()) {
                 case PieceType.BLACK:
                     displayString += chalk.red('B');
                     break;
@@ -146,17 +146,24 @@ export default class Board {
      * @param {number} index the index of the cell we want the moves from.
      * @returns {Move[]} an array of possible moves.
      */
-    public getCellPossibleMoves(index: number): Move[] {
-        const pieceType = this.getCell(index).getPieceType();
-        let moves: Move[] = this.getCell(index).getEmptyNeighbouringCellsAsMoves(this.getCellNeighbours(index));
-        // If any of the moves are attacking, just return those. Otherwise just return the complete list of moves.
-        if (moves.some(move => this.willMoveApproach(index, pieceType, move.direction) || this.willMoveWithdraw(index, pieceType, move.direction))) {
-            return moves.filter(move => this.willMoveApproach(index, pieceType, move.direction) || this.willMoveWithdraw(index, pieceType, move.direction));
+    public getPossibleMovesForCell(index: number): Move[] {
+        const pieceType = this.board[index].getPieceType();
+        let moves: Move[] = this.getEmptyNeighbouringCellsAsMoves(index);
+
+        // Return early if there are no moves
+        if (moves.length === 0) {
+            return [];
         }
-        return moves;
+    
+        // If any of the moves are attacking, just return those. Otherwise just return the complete list of moves.
+        const attackingMoves = moves.filter(move =>
+            this.willMoveApproach(index, pieceType, move.direction) ||
+            this.willMoveWithdraw(index, pieceType, move.direction)
+        );
+        return attackingMoves.length > 0 ? attackingMoves : moves;
     }
 
-    public getCellNeighbours(index: number): Neighbour[] {
+    private getCellNeighbours(index: number): Neighbour[] {
         return this.getNeighbours(index, true);
     }
 
@@ -168,7 +175,7 @@ export default class Board {
      */
     private willMoveApproach(currentIndex: number, attackPieceType: PieceType, attackDirection: Direction): boolean {
         const possibleAttackedPieceIndex: number = currentIndex + 2 * getDeltaIndex(attackDirection, this.columns);
-        if (this.isPositionOnBoard(possibleAttackedPieceIndex) && attackPieceType === getOppositePieceType(this.getCell(possibleAttackedPieceIndex).getPieceType())) {
+        if (this.isPositionOnBoard(possibleAttackedPieceIndex) && this.board[possibleAttackedPieceIndex].isPieceType(getOppositePieceType(attackPieceType))) {
             return true;
         }
         return false;
@@ -182,7 +189,7 @@ export default class Board {
      */
     private willMoveWithdraw(currentIndex: number, attackPieceType: PieceType, moveDirection: Direction): boolean {
         const possibleAttackedPieceIndex: number = currentIndex + getDeltaIndex(getOppositeDirection(moveDirection), this.columns);
-        if (this.isPositionOnBoard(possibleAttackedPieceIndex) && attackPieceType === getOppositePieceType(this.getCell(possibleAttackedPieceIndex).getPieceType())) {
+        if (this.isPositionOnBoard(possibleAttackedPieceIndex) && this.board[possibleAttackedPieceIndex].isPieceType(getOppositePieceType(attackPieceType))) {
             return true;
         }
         return false;
@@ -195,7 +202,7 @@ export default class Board {
     private doesPieceHaveEmptyNeighbours(index: number): boolean {
         // TODO might be good to store the results so you dont have to calculate them again
         // Early return if we have accidentally asked to move a cell that is empty
-        if (this.getCell(index).getPieceType() === PieceType.EMPTY) {
+        if (this.board[index].getPieceType() === PieceType.EMPTY) {
             return false;
         }
         return this.getCellNeighbours(index).some(cell => cell.pieceType === PieceType.EMPTY);
@@ -207,11 +214,11 @@ export default class Board {
      */
     private canPieceAttack(index: number): boolean {
         // Early return if we have accidentally asked to move a cell that is empty
-        if (this.getCell(index).getPieceType() === PieceType.EMPTY) {
+        if (this.board[index].getPieceType() === PieceType.EMPTY) {
             return false;
         }
-        const possibleMoves: Move[] = this.getCell(index).getEmptyNeighbouringCellsAsMoves(this.getCellNeighbours(index));
-        const attackingPieceType = this.getCell(index).getPieceType();
+        const possibleMoves: Move[] = this.getEmptyNeighbouringCellsAsMoves(index);
+        const attackingPieceType = this.board[index].getPieceType();
         const canApproach: boolean = possibleMoves.some(move => this.willMoveApproach(move.index, attackingPieceType, move.direction));
         const canWithdraw: boolean = possibleMoves.some(move => this.willMoveWithdraw(index, attackingPieceType, move.direction));
         return (canApproach || canWithdraw);
@@ -229,8 +236,7 @@ export default class Board {
         // We check that there is at least a single neighbour of the current index of the piece that meet all of the following criteria:
         // 1) EMPTY, 2) not the original index of the piece in this turn, 3) in a different direction the last directon's move,
         // and 4) are attacking moves.
-        return this.getCell(currentIndex)
-            .getEmptyNeighbouringCellsAsMoves(this.getCellNeighbours(currentIndex)) // possible moves already eliminate all EMPTY cells
+        return this.getEmptyNeighbouringCellsAsMoves(currentIndex) // possible moves already eliminate all EMPTY cells
             .some(move => 
                 move.index !== this.originalCellIndexForCurrentTurn &&
                 move.direction !== previousAttackdirection &&
@@ -255,8 +261,8 @@ export default class Board {
             currentIndex += deltaIndexFromDirection;
         }
         currentIndex += deltaIndexFromDirection;
-        while (this.isPositionOnBoard(currentIndex) && this.getCell(currentIndex).getPieceType() === getOppositePieceType(pieceType)) {
-            this.getCell(currentIndex).removePiece();
+        while (this.isPositionOnBoard(currentIndex) && this.board[currentIndex].getPieceType() === getOppositePieceType(pieceType)) {
+            this.board[currentIndex].removePiece();
             currentIndex += deltaIndexFromDirection;
         }
     }
@@ -272,21 +278,27 @@ export default class Board {
         // TODO some move validation
         const newIndex = index + getDeltaIndex(direction, this.columns);
         
-        if (this.getCell(newIndex).getPieceType() !== PieceType.EMPTY) {
+        if (this.board[newIndex].getPieceType() !== PieceType.EMPTY) {
             throw new Error('The place the piece is being moved is occupied');
         }
 
         this.setCell(newIndex, piece);
-        this.getCell(index).removePiece();
+        this.board[index].removePiece();
         return newIndex;
+    }
+
+    private getEmptyNeighbouringCellsAsMoves(index: number): Move[] {
+        return this.getCellNeighbours(index)
+            .filter((neighbour) => neighbour.pieceType === PieceType.EMPTY)
+            .map(neighbour => ({index: neighbour.index, direction: neighbour.direction}));
     }
 
     private getNeighbours(index: number, includeEmptyCells: boolean): Neighbour[] {
         const cellNeighbours: Neighbour[] = [];
 
-        const connections: Connection[] = this.getCell(index).getCellConnections();
+        const connections: Connection[] = this.board[index].getCellConnections();
         for (const connection of connections) {
-            const neighborCell = this.getCell(connection.index);
+            const neighborCell = this.board[connection.index];
             const isEmpty = neighborCell.getPieceType() === PieceType.EMPTY;
 
             if (includeEmptyCells || (!includeEmptyCells && !isEmpty)) {
@@ -309,12 +321,8 @@ export default class Board {
         return index >= 0 && index < this.rows * this.columns;
     }
 
-    public getCell(index: number): Cell {
-        return this.board[index];
-    }
-
     private setCell(index: number, pieceType: PieceType): void {
-        this.getCell(index).setPieceType(pieceType);
+        this.board[index].setPieceType(pieceType);
     }
 
 }

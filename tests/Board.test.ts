@@ -25,19 +25,51 @@ describe('Board Tests', () => {
         const board = new Board(3, 3, boardPositionString);
 
         const directionsForWhite: Move[] = [
-            { index: 0, direction: Direction.UP },
             { index: 4, direction: Direction.RIGHT },
-            { index: 6, direction: Direction.DOWN }
         ];
         const directionsForBlack: Move[] = [
-            { index: 2, direction: Direction.UP },
             { index: 4, direction: Direction.LEFT },
-            { index: 8, direction: Direction.DOWN }
         ];
         
-        expect(board.getCell(3).getEmptyNeighbouringCellsAsMoves(board.getCellNeighbours(3))).to.deep.equal(directionsForWhite);
-        expect(board.getCell(5).getEmptyNeighbouringCellsAsMoves(board.getCellNeighbours(5))).to.deep.equal(directionsForBlack);
+        expect(board.getPossibleMovesForCell(3)).to.deep.equal(directionsForWhite);
+        expect(board.getPossibleMovesForCell(5)).to.deep.equal(directionsForBlack);
     });
+
+    // it('should provide all the possible moves a piece can make on a strong intersection', () => {
+    //     const expectedEmptyBoardMoves: Move[] = [
+    //         { index: 0, direction: Direction.UPLEFT },
+    //         { index: 1, direction: Direction.UP },
+    //         { index: 2, direction: Direction.UPRIGHT },
+    //         { index: 3, direction: Direction.LEFT },
+    //         { index: 5, direction: Direction.RIGHT },
+    //         { index: 6, direction: Direction.DOWNLEFT },
+    //         { index: 7, direction: Direction.DOWN },
+    //         { index: 8, direction: Direction.DOWNRIGHT },
+    //     ]
+        
+    //     const board = new Board(3, 3, emptyRow3 + '010' + emptyRow3);
+
+    //     expect(board.getPossibleMovesForCell(4)).to.deep.equal(expectedEmptyBoardMoves);
+
+    //     // Situation 2: Completely surrounded by pieces of its own type. Shouldnt be able to move anywhere.
+        
+    //     const whiteFilledBoard = new Board(3, 3, '111111111');
+    //     expect(whiteFilledBoard.getPossibleMovesForCell(4)).to.be.empty;
+
+    //     // Situation 3: Completely surrounded by pieces of its opponents type. Should be able to move anywhere.
+    //     const blackFilledBoard = new Board(3, 3, '222212222');
+    //     expect(blackFilledBoard.getPossibleMovesForCell(4)).to.be.empty;
+
+    //     // Situation 4: Surrounded on the sides except for two piaka moves (up or down). Should have only those two options.
+    //     // NOTE: When debugging remember the indexes of the Move[] and Neighbour[] arrays wont match.
+    //     const piakaMovesBoard = new Board(3, 3, '202212202')
+    //     const expectedUpDownPaikaMoves: Move[] = [
+    //         { index: 1, direction: Direction.UP },
+    //         { index: 7, direction: Direction.DOWN },
+    //     ]
+
+    //     expect(piakaMovesBoard.getPossibleMovesForCell(4)).to.deep.equal(expectedUpDownPaikaMoves)
+    // });
 
     // it('should remove correct pieces after diagonal withdrawal', () => {
     //     // Withdraw diagonal
