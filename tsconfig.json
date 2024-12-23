@@ -1,8 +1,8 @@
 {
     "compilerOptions": {
-      "target": "es6",                      // Target ECMAScript version
-      "module": "NodeNext",                      // Module system
-      "moduleResolution": "NodeNext",
+      "target": "es2022",                      // Target ECMAScript version
+      "module": "esnext",                      // Module system
+      "moduleResolution": "node",
       "strict": true,                       // Enable strict type-checking
       "allowImportingTsExtensions": true,   // Enable importing .ts extensions explicitly
       "noEmit": true,

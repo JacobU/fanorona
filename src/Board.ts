@@ -8,6 +8,7 @@ export default class Board {
     private board: Cell[];
 
     private cellIndexesPieceHasBeenInCurrentTurn: number[]; 
+    private currentlyMovingPiece: number | null;
 
     constructor(rows: number = 5, columns: number = 9, startingPieces?: string) {
         if (startingPieces) {
@@ -23,6 +24,7 @@ export default class Board {
             this.board = this.initializeBoard();
         }
         this.cellIndexesPieceHasBeenInCurrentTurn = [];
+        this.currentlyMovingPiece = null;
     }
 
     // Initialize the board with empty cells
@@ -65,13 +67,13 @@ export default class Board {
         for (let i = 0; i < this.columns * this.rows; i++) {
             switch (this.board[i].getPieceType()) {
                 case PieceType.BLACK:
-                    displayString += chalk.red('B');
+                    displayString += chalk.red('B ');
                     break;
                 case PieceType.WHITE:
-                    displayString += chalk.white('W');
+                    displayString += chalk.white('W ');
                     break;
                 case PieceType.EMPTY:
-                    displayString += chalk.green('0');
+                    displayString += chalk.black('0 ');
                     break;
             }
             if ((i + 1) % this.columns == 0) {
@@ -112,6 +114,12 @@ export default class Board {
         if (pieceType === PieceType.EMPTY) {
             throw new Error('Empty pieces cannot move');
         }
+        // Early return for if we are already moving a piece, since only this piece can be moved.
+        if (this.currentlyMovingPiece !== null) {
+            return [this.currentlyMovingPiece];
+        } 
+
+        // Otherwise, search for our available options
         const attackingPieces: number[] = this.board
             .filter(cell => cell.isPieceType(pieceType) && this.canPieceAttack(cell.getIndex()))
             .map(cell => cell.getIndex());
@@ -126,16 +134,15 @@ export default class Board {
     }
 
     /**
-     * Perform a single move (which may be just one of several in a turn). We should set the original move index,
-     * if this is the first move in the players turn, calculate whether the move will APPROACH or WITHDRAW
-     * from an opponents piece, remove the pieces if needed, make the move, and then determine if 
-     * another move can be made.
+     * Perform a single move (which may be just one of several in a turn). We should update the index the piece 
+     * has moved, calculate whether the move will APPROACH or WITHDRAW from an opponents piece, 
+     * remove the pieces if needed, make the move, and then determine if another move can be made.
+     * If the movedPiece is set, then we can only get possible moves from that piece.
      * @param {number} index the index of the piece to move. 
      * @param {Direction} direction the direction of the piece to move.
      * @returns {boolean} whether the player can move again.
      */
     public performMove(index: number, direction: Direction): boolean {
-        // TODO
         if (!(direction in Direction)) {
             throw new Error('Invalid direction when trying to mover a piece.');
         }
