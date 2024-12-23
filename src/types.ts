@@ -5,6 +5,12 @@ export enum PieceType {
     BLACK = 2,
 }
 
+export enum Winner {
+    NONE = 0,
+    WHITE = 1,
+    BLACK = 2,
+}
+
 export enum CellType {
     STRONG = 0,
     WEAK = 1,

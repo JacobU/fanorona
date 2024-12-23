@@ -1,5 +1,5 @@
 import Cell  from './Cell.ts';
-import { PieceType, getDeltaIndex, getOppositePieceType, getOppositeDirection, Direction, Move, AttackType, CellType, Connection, Neighbour } from './types.js';
+import { Winner, PieceType, getDeltaIndex, getOppositePieceType, getOppositeDirection, Direction, Move, AttackType, CellType, Connection, Neighbour } from './types.js';
 import chalk from 'chalk';
 
 export default class Board {
@@ -36,11 +36,25 @@ export default class Board {
         return board;
     }
 
-    /**
-     * The board is recreated, with all the pieces in their original positions.
-     */
-    public resetBoard(): void {
-        this.board = this.initializeBoard();
+    public getWinner(): Winner {
+        let numWhitePieces = 0;
+        let numBlackPieces = 0;
+    
+        for (const cell of this.board) {
+            const pieceType = cell.getPieceType();
+            if (pieceType === PieceType.WHITE) {
+                numWhitePieces++;
+            } else if (pieceType === PieceType.BLACK) {
+                numBlackPieces++;
+            }
+            
+            // Exit early if there is more than 1 piece for each player
+            if (numWhitePieces > 0 && numBlackPieces > 0) {
+                return Winner.NONE;
+            }
+        }
+    
+        return numWhitePieces === 0 ? Winner.BLACK : Winner.WHITE;
     }
 
     /**

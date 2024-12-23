@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import Board from '../src/Board.ts';
-import { Direction, Move, PieceType } from '../src/types.ts';
+import { Direction, Move, PieceType, Winner } from '../src/types.ts';
 
 describe('Board Tests', () => {
 
@@ -118,6 +118,7 @@ describe('Board Tests', () => {
 
         const boardPositionsAfterDiagonalWithdrawal: string = emptyRow5 + emptyRow5 + emptyRow5 + '00010' + emptyRow5;
         expect(board.getBoardPositionsAsString()).to.equal(boardPositionsAfterDiagonalWithdrawal);
+        expect(board.getWinner()).to.be.equal(Winner.WHITE);
     });
 
     it('should remove correct pieces after diagonal approach', () => {
@@ -131,6 +132,7 @@ describe('Board Tests', () => {
 
         const boardPositionsAfterDiagonalApproach: string = emptyRow5 + emptyRow5 + '00100' + emptyRow5 + emptyRow5;
         expect(board.getBoardPositionsAsString()).to.equal(boardPositionsAfterDiagonalApproach);
+        expect(board.getWinner()).to.be.equal(Winner.WHITE);
     });
 
     it('should remove correct pieces after horizontal withdrawal', () => {
@@ -144,6 +146,7 @@ describe('Board Tests', () => {
 
         const boardPositionsAfterHorizontalWithdrawal: string = emptyRow5 + emptyRow5 + '00010' + emptyRow5 + emptyRow5;
         expect(board.getBoardPositionsAsString()).to.equal(boardPositionsAfterHorizontalWithdrawal);
+        expect(board.getWinner()).to.be.equal(Winner.WHITE);
     });
 
     it('should remove correct pieces after horizontal approach', () => {
@@ -157,6 +160,7 @@ describe('Board Tests', () => {
 
         const boardPositionsAfterHorizontalApproach: string = emptyRow5 + emptyRow5 + '00100' + emptyRow5 + emptyRow5;
         expect(board.getBoardPositionsAsString()).to.equal(boardPositionsAfterHorizontalApproach);
+        expect(board.getWinner()).to.be.equal(Winner.WHITE);
     });
 
     it('should remove correct pieces after vertical withdrawal', () => {
@@ -170,6 +174,7 @@ describe('Board Tests', () => {
 
         const boardPositionsAfterVerticalWithdrawal: string = emptyRow5 + emptyRow5 + emptyRow5 + '00100' + emptyRow5;
         expect(board.getBoardPositionsAsString()).to.equal(boardPositionsAfterVerticalWithdrawal);
+        expect(board.getWinner()).to.be.equal(Winner.WHITE);
     });
 
     it('should remove correct pieces after vertical approach', () => {
@@ -183,6 +188,7 @@ describe('Board Tests', () => {
         // DO WITHDRAWAL
         const boardPositionsAfterVerticalApproach: string = emptyRow5 + emptyRow5 + '00100' + emptyRow5 + emptyRow5;
         expect(board.getBoardPositionsAsString()).to.equal(boardPositionsAfterVerticalApproach);
+        expect(board.getWinner()).to.be.equal(Winner.WHITE);
     });
     
     
@@ -197,6 +203,7 @@ describe('Board Tests', () => {
 
         const boardPositionsAfterVerticalWithdrawal: string = emptyRow5 + emptyRow5 + emptyRow5 + '02100' + emptyRow5;
         expect(board.getBoardPositionsAsString()).to.equal(boardPositionsAfterVerticalWithdrawal);
+        expect(board.getWinner()).to.be.equal(Winner.NONE);
     });
     
     it('should not allow the player to move again if that move would return them to their previous position', () => {
@@ -210,6 +217,7 @@ describe('Board Tests', () => {
 
         const boardPositionsAfterDiagonalApproach: string = '2000002000' + emptyRow5 + '00010' + emptyRow5;
         expect(board.getBoardPositionsAsString()).to.equal(boardPositionsAfterDiagonalApproach);
+        expect(board.getWinner()).to.be.equal(Winner.NONE);
     });
     
     it('should not allow the player to move in the same direction twice', () => {
@@ -224,5 +232,6 @@ describe('Board Tests', () => {
 
         const boardPositionsAfterDiagonalWithdrawal: string = emptyRow5 + emptyRow5 + '00100' + emptyRow5 + '00002';
         expect(board.getBoardPositionsAsString()).to.equal(boardPositionsAfterDiagonalWithdrawal);
+        expect(board.getWinner()).to.be.equal(Winner.NONE);
     });    
 });
