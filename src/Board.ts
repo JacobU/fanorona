@@ -7,7 +7,7 @@ export default class Board {
     private columns: number;
     private board: Cell[];
 
-    private originalCellIndexForCurrentTurn: null | number; 
+    private cellIndexesPieceHasBeenInCurrentTurn: number[]; 
 
     constructor(rows: number = 5, columns: number = 9, startingPieces?: string) {
         if (startingPieces) {
@@ -22,7 +22,7 @@ export default class Board {
             this.columns = columns;
             this.board = this.initializeBoard();
         }
-        this.originalCellIndexForCurrentTurn = null;
+        this.cellIndexesPieceHasBeenInCurrentTurn = [];
     }
 
     // Initialize the board with empty cells
@@ -94,12 +94,20 @@ export default class Board {
      * @param pieceType whose turn it is, either PieceType.BLACK or PieceType.WHITE.
      * @returns a list of the pieces that the current player can move.
      */
-    public getPiecesThatPlayerCanMove(pieceType: PieceType): Cell[] {
-        const attackingPieces: Cell[] = this.board.filter(cell => cell.isPieceType(pieceType) && this.canPieceAttack(cell.getIndex()));
-        if (! attackingPieces || attackingPieces.length === 0) {
-            return attackingPieces;
+    public getPiecesThatPlayerCanMove(pieceType: PieceType): number[] {
+        if (pieceType === PieceType.EMPTY) {
+            throw new Error('Empty pieces cannot move');
+        }
+        const attackingPieces: number[] = this.board
+            .filter(cell => cell.isPieceType(pieceType) && this.canPieceAttack(cell.getIndex()))
+            .map(cell => cell.getIndex());
+        // If there are no attacking pieces we can return any possible moves
+        if (!attackingPieces || attackingPieces.length === 0) {
+            return this.board
+                .filter(cell => cell.isPieceType(pieceType) && this.doesPieceHaveEmptyNeighbours(cell.getIndex()))
+                .map(cell => cell.getIndex());
         } else {
-            return this.board.filter(cell => cell.isPieceType(pieceType) && this.doesPieceHaveEmptyNeighbours(cell.getIndex()));
+            return attackingPieces;
         }
     }
 
@@ -109,35 +117,44 @@ export default class Board {
      * from an opponents piece, remove the pieces if needed, make the move, and then determine if 
      * another move can be made.
      * @param {number} index the index of the piece to move. 
-     * @param {PieceType} piece the type of piece to move.
      * @param {Direction} direction the direction of the piece to move.
      * @returns {boolean} whether the player can move again.
      */
-    public performMove(index: number, pieceType: PieceType, direction: Direction): boolean {
+    public performMove(index: number, direction: Direction): boolean {
         // TODO
         if (!(direction in Direction)) {
-            throw new Error('Invalid direction');
+            throw new Error('Invalid direction when trying to mover a piece.');
         }
-        // If this is the first move in the players turn, set the original cell index for the turn.
-        if (this.originalCellIndexForCurrentTurn === null) {
-            this.originalCellIndexForCurrentTurn = index;
+        const pieceType: PieceType = this.board[index].getPieceType();
+        if (pieceType === PieceType.EMPTY) {
+            throw new Error('Cant move an EMPTY piece.')
         }
+
+        // Always add the index that is has been to
+        this.cellIndexesPieceHasBeenInCurrentTurn.push(index);
 
         const willWithdraw = this.willMoveWithdraw(index, pieceType, direction);
         const willApproach = this.willMoveApproach(index, pieceType, direction);
 
         let attackType: AttackType = AttackType.NONE;
-        // Deal with whether player wants to approach or withdraw
-        if (willWithdraw && willApproach) {
-            // TODO get input
+        
+        // TODO DEAL WITH APPROACH OR WITHDRAW SELECTION
+        if (willWithdraw) {
+            attackType = AttackType.WITHDRAW;
+        }
+        if (willApproach) {
             attackType = AttackType.APPROACH;
         }
 
         // Set the new index after moving
         index = this.movePiece(pieceType, index, direction);
-        this.removeAttackedPieces(index, pieceType, direction, attackType);
-
-        return this.canPlayerMoveAgain(index, pieceType, direction);
+        if (attackType !== AttackType.NONE) {
+            this.removeAttackedPieces(index, pieceType, direction, attackType);
+            return this.canPlayerMoveAgain(index, pieceType, direction);
+        }
+        // If the player cant move again, reset the index tracker
+        this.cellIndexesPieceHasBeenInCurrentTurn = [];
+        return false;
     }
 
     /**
@@ -219,7 +236,7 @@ export default class Board {
         }
         const possibleMoves: Move[] = this.getEmptyNeighbouringCellsAsMoves(index);
         const attackingPieceType = this.board[index].getPieceType();
-        const canApproach: boolean = possibleMoves.some(move => this.willMoveApproach(move.index, attackingPieceType, move.direction));
+        const canApproach: boolean = possibleMoves.some(move => this.willMoveApproach(index, attackingPieceType, move.direction));
         const canWithdraw: boolean = possibleMoves.some(move => this.willMoveWithdraw(index, attackingPieceType, move.direction));
         return (canApproach || canWithdraw);
     }
@@ -236,11 +253,12 @@ export default class Board {
         // We check that there is at least a single neighbour of the current index of the piece that meet all of the following criteria:
         // 1) EMPTY, 2) not the original index of the piece in this turn, 3) in a different direction the last directon's move,
         // and 4) are attacking moves.
-        return this.getEmptyNeighbouringCellsAsMoves(currentIndex) // possible moves already eliminate all EMPTY cells
+        return this.getEmptyNeighbouringCellsAsMoves(currentIndex)
             .some(move => 
-                move.index !== this.originalCellIndexForCurrentTurn &&
+                !this.cellIndexesPieceHasBeenInCurrentTurn.includes(move.index) &&
                 move.direction !== previousAttackdirection &&
-                (this.willMoveApproach(move.index, pieceType, move.direction) || this.willMoveWithdraw(currentIndex, pieceType, move.direction)));
+                move.direction !== getOppositeDirection(previousAttackdirection) &&
+                (this.willMoveApproach(currentIndex, pieceType, move.direction) || this.willMoveWithdraw(currentIndex, pieceType, move.direction)));
     }
 
     /**
@@ -287,6 +305,11 @@ export default class Board {
         return newIndex;
     }
 
+    /**
+     * 
+     * @param index the index of the cell to check for moves.
+     * @returns a list of Move[] that a piece in the cell could move to.
+     */
     private getEmptyNeighbouringCellsAsMoves(index: number): Move[] {
         return this.getCellNeighbours(index)
             .filter((neighbour) => neighbour.pieceType === PieceType.EMPTY)

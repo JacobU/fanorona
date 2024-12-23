@@ -34,6 +34,9 @@ export function getOppositeDirection(direction: Direction): Direction {
 }
 
 export function getOppositePieceType(pieceType: PieceType): PieceType {
+    if (pieceType === PieceType.EMPTY) {
+        return PieceType.EMPTY;
+    }
     return pieceType === PieceType.BLACK ? PieceType.WHITE : PieceType.BLACK;
 }
 

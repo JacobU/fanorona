@@ -1,10 +1,9 @@
 import { expect } from 'chai';
 import Board from '../src/Board.ts';
-import { Direction, Neighbour, Move } from '../src/types.ts';
+import { Direction, Move, PieceType } from '../src/types.ts';
 
 describe('Board Tests', () => {
 
-    const emptyRow9: string = '000000000';
     const emptyRow5: string = '00000';
     const emptyRow3: string = '000';
 
@@ -35,114 +34,195 @@ describe('Board Tests', () => {
         expect(board.getPossibleMovesForCell(5)).to.deep.equal(directionsForBlack);
     });
 
-    // it('should provide all the possible moves a piece can make on a strong intersection', () => {
-    //     const expectedEmptyBoardMoves: Move[] = [
-    //         { index: 0, direction: Direction.UPLEFT },
-    //         { index: 1, direction: Direction.UP },
-    //         { index: 2, direction: Direction.UPRIGHT },
-    //         { index: 3, direction: Direction.LEFT },
-    //         { index: 5, direction: Direction.RIGHT },
-    //         { index: 6, direction: Direction.DOWNLEFT },
-    //         { index: 7, direction: Direction.DOWN },
-    //         { index: 8, direction: Direction.DOWNRIGHT },
-    //     ]
+    it('should provide all the possible moves for 3x3 board on a strong intersection', () => {
+        const expectedEmptyBoardMoves: Move[] = [
+            { index: 0, direction: Direction.UPLEFT },
+            { index: 1, direction: Direction.UP },
+            { index: 2, direction: Direction.UPRIGHT },
+            { index: 3, direction: Direction.LEFT },
+            { index: 5, direction: Direction.RIGHT },
+            { index: 6, direction: Direction.DOWNLEFT },
+            { index: 7, direction: Direction.DOWN },
+            { index: 8, direction: Direction.DOWNRIGHT },
+        ]
         
-    //     const board = new Board(3, 3, emptyRow3 + '010' + emptyRow3);
+        const board = new Board(3, 3, emptyRow3 + '010' + emptyRow3);
 
-    //     expect(board.getPossibleMovesForCell(4)).to.deep.equal(expectedEmptyBoardMoves);
+        expect(board.getPossibleMovesForCell(4)).to.deep.equal(expectedEmptyBoardMoves);
 
-    //     // Situation 2: Completely surrounded by pieces of its own type. Shouldnt be able to move anywhere.
+        // Situation 2: Completely surrounded by pieces of its own type. Shouldnt be able to move anywhere.
         
-    //     const whiteFilledBoard = new Board(3, 3, '111111111');
-    //     expect(whiteFilledBoard.getPossibleMovesForCell(4)).to.be.empty;
+        const whiteFilledBoard = new Board(3, 3, '111111111');
+        expect(whiteFilledBoard.getPossibleMovesForCell(4)).to.be.empty;
 
-    //     // Situation 3: Completely surrounded by pieces of its opponents type. Should be able to move anywhere.
-    //     const blackFilledBoard = new Board(3, 3, '222212222');
-    //     expect(blackFilledBoard.getPossibleMovesForCell(4)).to.be.empty;
+        // Situation 3: Completely surrounded by pieces of its opponents type. Should be able to move anywhere.
+        const blackFilledBoard = new Board(3, 3, '222212222');
+        expect(blackFilledBoard.getPossibleMovesForCell(4)).to.be.empty;
 
-    //     // Situation 4: Surrounded on the sides except for two piaka moves (up or down). Should have only those two options.
-    //     // NOTE: When debugging remember the indexes of the Move[] and Neighbour[] arrays wont match.
-    //     const piakaMovesBoard = new Board(3, 3, '202212202')
-    //     const expectedUpDownPaikaMoves: Move[] = [
-    //         { index: 1, direction: Direction.UP },
-    //         { index: 7, direction: Direction.DOWN },
-    //     ]
+        // Situation 4: Surrounded on the sides except for two piaka moves (up or down). Should have only those two options.
+        // NOTE: When debugging remember the indexes of the Move[] and Neighbour[] arrays wont match.
+        const piakaMovesBoard = new Board(3, 3, '202212202')
+        const expectedUpDownPaikaMoves: Move[] = [
+            { index: 1, direction: Direction.UP },
+            { index: 7, direction: Direction.DOWN },
+        ]
 
-    //     expect(piakaMovesBoard.getPossibleMovesForCell(4)).to.deep.equal(expectedUpDownPaikaMoves)
-    // });
+        expect(piakaMovesBoard.getPossibleMovesForCell(4)).to.deep.equal(expectedUpDownPaikaMoves);
 
-    // it('should remove correct pieces after diagonal withdrawal', () => {
-    //     // Withdraw diagonal
-    //     const boardPositionsBeforeDiagonalWithdrawal: string = '200000200000100' + emptyRow5 + emptyRow5;
-    //     const board = new Board(5, 5, boardPositionsBeforeDiagonalWithdrawal);
+        // Situation 5: Should have 2 paika moves (up or down) but also an attacking move. Only the attacking move should be returned.
+        const singleAttackBoard = new Board(3, 3, '200212202');
+        const expectedAttackMove: Move[] = [ { index: 2, direction: Direction.UPRIGHT } ];
+        
+        expect(singleAttackBoard.getPossibleMovesForCell(4)).to.deep.equal(expectedAttackMove);
 
-    //     // Do withdrawal
-    //     const boardPositionsAfterDiagonalWithdrawal: string = emptyRow5 + emptyRow5 + emptyRow5 + '00010' + emptyRow5;
-    //     expect(board.getBoardPositionsAsString()).to.equal(boardPositionsAfterDiagonalWithdrawal);
-    // });
+        // Situation 6: Should have 2 paika moves (up or down) but also 2 attacking moves. Only the attacking moves should be returned.
+        const doubleAttackBoard = new Board(3, 3, '200212200');
+        const expectedAttackMoves: Move[] = [ 
+            { index: 2, direction: Direction.UPRIGHT },
+            { index: 8, direction: Direction.DOWNRIGHT },
+        ];
+        
+        expect(doubleAttackBoard.getPossibleMovesForCell(4)).to.deep.equal(expectedAttackMoves);
+    });
 
-    // it('should remove correct pieces after diagonal approach', () => {
-    //     // Approach diagonal
-    //     const boardPositionsBeforeDiagonalApproach: string = '2000002000' + emptyRow5 + '00010' + emptyRow5;
-    //     const board = new Board(5, 5, boardPositionsBeforeDiagonalApproach);
+    it('should return the correct cells that can move', () => {
+        // Situation 1: No cells on that piece type on the board. Should return empty list.
+        const noBlackCellsBoard = new Board(3, 3, '000111111');
+        expect(noBlackCellsBoard.getPiecesThatPlayerCanMove(PieceType.BLACK)).to.be.empty;
 
-    //     // Do approach
-    //     const boardPositionsAfterDiagonalApproach: string = emptyRow5 + emptyRow5 + '00010' + emptyRow5 + emptyRow5;
-    //     expect(board.getBoardPositionsAsString()).to.equal(boardPositionsAfterDiagonalApproach);
+        // Situation 2: 1 cell of that type on the board. Should return that cell.
+        const oneBlackCellBoard = new Board(3, 3, '000121111');
+        expect(oneBlackCellBoard.getPiecesThatPlayerCanMove(PieceType.BLACK)).to.deep.equal([4]);
 
-    // it('should remove correct pieces after horizontal withdrawal', () => {
-    //     // Withdraw horizontal
-    //     const boardPositionsBeforeHorizontalWithdrawal: string = emptyRow5 + emptyRow5 + '22100' + emptyRow5 + emptyRow5;
-    //     const board = new Board(5, 5, boardPositionsBeforeHorizontalWithdrawal);
+        // Situation 3: 1 cell of that type with piaka move, the other with attacking move. Should return attacking cell.
+        const singleAttackSinglePaikaCellBoard = new Board(3, 3, '200121111');
+        expect(singleAttackSinglePaikaCellBoard.getPiecesThatPlayerCanMove(PieceType.BLACK)).to.deep.equal([4]);
 
-    //     // DO WITHDRAWAL
-    //     const boardPositionsAfterHorizontalWithdrawal: string = emptyRow5 + emptyRow5 + '00010' + emptyRow5 + emptyRow5;
-    //     expect(board.getBoardPositionsAsString()).to.equal(boardPositionsAfterHorizontalWithdrawal);
-    // });
+        // Situation 4: Same as 3, but different with white pieces.
+        const singleAttackSinglePaikaCellBoardWhite = new Board(3, 3, '100212222');
+        expect(singleAttackSinglePaikaCellBoardWhite.getPiecesThatPlayerCanMove(PieceType.WHITE)).to.deep.equal([4]);
 
-    // it('should remove correct pieces after horizontal approach', () => {
-    //     // Approach horizontal
-    //     const boardPositionsBeforeHorizontalApproach: string = emptyRow5 + emptyRow5 + '22010' + emptyRow5 + emptyRow5;
-    //     const board = new Board(5, 5, boardPositionsBeforeHorizontalApproach);
+        // Situation 5: 2 cells that can attack. Should return those two.
+        const doubleAttackCellBoard = new Board(3, 3, '201121111');
+        expect(doubleAttackCellBoard.getPiecesThatPlayerCanMove(PieceType.BLACK)).to.deep.equal([0, 4]);
+    });
 
-    //     // DO APPROACH
-    //     const boardPositionsAfterHorizontalApproach: string = emptyRow5 + emptyRow5 + '00100' + emptyRow5 + emptyRow5;
-    //     expect(board.getBoardPositionsAsString()).to.equal(boardPositionsAfterHorizontalApproach);
-    // });
+    it('should remove correct pieces after diagonal withdrawal', () => {
+        // Withdraw diagonal
+        const boardPositionsBeforeDiagonalWithdrawal: string = '200000200000100' + emptyRow5 + emptyRow5;
+        const board = new Board(5, 5, boardPositionsBeforeDiagonalWithdrawal);
 
-    // it('should remove correct pieces after vertical withdrawal', () => {
-    //     // Withdraw vertical
-    //     const boardPositionsBeforeVerticalWithdrawal: string = '00200'+ '00200' + '00100' + emptyRow5 + emptyRow5;
-    //     const board = new Board(5, 5, boardPositionsBeforeVerticalWithdrawal);
+        // Do withdrawal
+        const canMoveAgain = board.performMove(12, Direction.DOWNRIGHT);
+        expect(canMoveAgain).to.equal(false);
 
-    //     // DO WITHDRAWAL
-    //     const boardPositionsAfterVerticalWithdrawal: string = emptyRow5 + emptyRow5 + emptyRow5 + '00100' + emptyRow5;
-    //     expect(board.getBoardPositionsAsString()).to.equal(boardPositionsAfterVerticalWithdrawal);
-    // });
+        const boardPositionsAfterDiagonalWithdrawal: string = emptyRow5 + emptyRow5 + emptyRow5 + '00010' + emptyRow5;
+        expect(board.getBoardPositionsAsString()).to.equal(boardPositionsAfterDiagonalWithdrawal);
+    });
 
-    // it('should remove correct pieces after vertical withdrawal', () => {
-    //     // Approach vertical
-    //     const boardPositionsBeforeVerticalApproach: string = '00200'+ '00200' + emptyRow5 + '00100' + emptyRow5;
-    //     const board = new Board(5, 5, boardPositionsBeforeVerticalApproach);
+    it('should remove correct pieces after diagonal approach', () => {
+        // Approach diagonal
+        const boardPositionsBeforeDiagonalApproach: string = '2000002000' + emptyRow5 + '00010' + emptyRow5;
+        const board = new Board(5, 5, boardPositionsBeforeDiagonalApproach);
 
-    //     // DO WITHDRAWAL
-    //     const boardPositionsAfterVerticalApproach: string = emptyRow5 + emptyRow5 + '00100' + emptyRow5 + emptyRow5;
-    //     expect(board.getBoardPositionsAsString()).to.equal(boardPositionsAfterVerticalApproach);
-    // });
+        // Do approach
+        const canMoveAgain = board.performMove(18, Direction.UPLEFT);
+        expect(canMoveAgain).to.equal(false);
+
+        const boardPositionsAfterDiagonalApproach: string = emptyRow5 + emptyRow5 + '00100' + emptyRow5 + emptyRow5;
+        expect(board.getBoardPositionsAsString()).to.equal(boardPositionsAfterDiagonalApproach);
+    });
+
+    it('should remove correct pieces after horizontal withdrawal', () => {
+        // Withdraw horizontal
+        const boardPositionsBeforeHorizontalWithdrawal: string = emptyRow5 + emptyRow5 + '22100' + emptyRow5 + emptyRow5;
+        const board = new Board(5, 5, boardPositionsBeforeHorizontalWithdrawal);
+
+        // DO WITHDRAWAL
+        const canMoveAgain = board.performMove(12, Direction.RIGHT);
+        expect(canMoveAgain).to.equal(false);
+
+        const boardPositionsAfterHorizontalWithdrawal: string = emptyRow5 + emptyRow5 + '00010' + emptyRow5 + emptyRow5;
+        expect(board.getBoardPositionsAsString()).to.equal(boardPositionsAfterHorizontalWithdrawal);
+    });
+
+    it('should remove correct pieces after horizontal approach', () => {
+        // Approach horizontal
+        const boardPositionsBeforeHorizontalApproach: string = emptyRow5 + emptyRow5 + '22010' + emptyRow5 + emptyRow5;
+        const board = new Board(5, 5, boardPositionsBeforeHorizontalApproach);
+
+        // DO APPROACH
+        const canMoveAgain = board.performMove(13, Direction.LEFT);
+        expect(canMoveAgain).to.equal(false);
+
+        const boardPositionsAfterHorizontalApproach: string = emptyRow5 + emptyRow5 + '00100' + emptyRow5 + emptyRow5;
+        expect(board.getBoardPositionsAsString()).to.equal(boardPositionsAfterHorizontalApproach);
+    });
+
+    it('should remove correct pieces after vertical withdrawal', () => {
+        // Withdraw vertical
+        const boardPositionsBeforeVerticalWithdrawal: string = '00200'+ '00200' + '00100' + emptyRow5 + emptyRow5;
+        const board = new Board(5, 5, boardPositionsBeforeVerticalWithdrawal);
+
+        // DO WITHDRAWAL
+        const canMoveAgain = board.performMove(12, Direction.DOWN);
+        expect(canMoveAgain).to.equal(false);
+
+        const boardPositionsAfterVerticalWithdrawal: string = emptyRow5 + emptyRow5 + emptyRow5 + '00100' + emptyRow5;
+        expect(board.getBoardPositionsAsString()).to.equal(boardPositionsAfterVerticalWithdrawal);
+    });
+
+    it('should remove correct pieces after vertical approach', () => {
+        // Approach vertical
+        const boardPositionsBeforeVerticalApproach: string = '00200'+ '00200' + emptyRow5 + '00100' + emptyRow5;
+        const board = new Board(5, 5, boardPositionsBeforeVerticalApproach);
+
+        const canMoveAgain = board.performMove(17, Direction.UP);
+        expect(canMoveAgain).to.equal(false);
+
+        // DO WITHDRAWAL
+        const boardPositionsAfterVerticalApproach: string = emptyRow5 + emptyRow5 + '00100' + emptyRow5 + emptyRow5;
+        expect(board.getBoardPositionsAsString()).to.equal(boardPositionsAfterVerticalApproach);
+    });
     
     
-    // Withdraw vertical
+    it('should tell the player they can move again if another attack is available', () => {
+        // Withdraw vertical
+        const boardPositionsBeforeVerticalWithdrawal: string = '00200'+ '00200' + '00100' + '02000' + emptyRow5;
+        const board = new Board(5, 5, boardPositionsBeforeVerticalWithdrawal);
+
+        // DO WITHDRAWAL
+        const canMoveAgain = board.performMove(12, Direction.DOWN);
+        expect(canMoveAgain).to.equal(true);
+
+        const boardPositionsAfterVerticalWithdrawal: string = emptyRow5 + emptyRow5 + emptyRow5 + '02100' + emptyRow5;
+        expect(board.getBoardPositionsAsString()).to.equal(boardPositionsAfterVerticalWithdrawal);
+    });
     
+    it('should not allow the player to move again if that move would return them to their previous position', () => {
+        // Approach diagonal
+        const boardPositionsBeforeDiagonalApproach: string = '2000002000' + '00100' + emptyRow5 + '00002';
+        const board = new Board(5, 5, boardPositionsBeforeDiagonalApproach);
+
+        // Do approach
+        const canMoveAgain = board.performMove(12, Direction.DOWNRIGHT);
+        expect(canMoveAgain).to.equal(false);
+
+        const boardPositionsAfterDiagonalApproach: string = '2000002000' + emptyRow5 + '00010' + emptyRow5;
+        expect(board.getBoardPositionsAsString()).to.equal(boardPositionsAfterDiagonalApproach);
+    });
     
-    
-    // Approach vertical
-    
-    
-    
-    // Withdraw wrong direction
-    
-    // Approach wrong direction
-    
-    // Do moves contain attack
-    
+    it('should not allow the player to move in the same direction twice', () => {
+        // Withdraw diagonal
+        const boardPositionsBeforeDiagonalWithdrawal: string = '2000001000' + emptyRow5 + emptyRow5 + '00002';
+        const board = new Board(5, 5, boardPositionsBeforeDiagonalWithdrawal);
+
+        // Do withdrawal
+        const canMoveAgain = board.performMove(6, Direction.DOWNRIGHT);
+        // Even tho an attack is possible, it shouldnt let you do it because that attack would be in the same direction as the first attack.
+        expect(canMoveAgain).to.equal(false);
+
+        const boardPositionsAfterDiagonalWithdrawal: string = emptyRow5 + emptyRow5 + '00100' + emptyRow5 + '00002';
+        expect(board.getBoardPositionsAsString()).to.equal(boardPositionsAfterDiagonalWithdrawal);
+    });    
 });
