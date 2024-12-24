@@ -1,4 +1,4 @@
-import { PieceType, CellType, Connection, Direction } from "./types.ts";
+import { PieceType, CellType, Connection, Direction } from "./types";
 
 
 export default class Cell {

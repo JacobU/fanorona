@@ -1,7 +1,6 @@
 import { expect } from 'chai';
-import Cell from '../src/Cell.ts';
-import Board from '../src/Board.ts';
-import { CellType, Connection, Direction, Move, Neighbour, PieceType } from '../src/types.ts';
+import Cell from '../src/Cell';
+import { CellType, Connection, Direction, PieceType } from '../src/types';
 
 describe('Cell tests', () => {
 

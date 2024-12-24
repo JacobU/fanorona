@@ -4,8 +4,7 @@
       "module": "esnext",                      // Module system
       "moduleResolution": "node",
       "strict": true,                       // Enable strict type-checking
-      "allowImportingTsExtensions": true,   // Enable importing .ts extensions explicitly
-      "noEmit": true,
+      "noEmit": false,
       "esModuleInterop": true,              // Allow default imports
       "forceConsistentCasingInFileNames": true,
       "outDir": "./dist",                   // Output directory for compiled files

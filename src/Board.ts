@@ -1,5 +1,5 @@
-import Cell  from './Cell.ts';
-import { Winner, PieceType, getDeltaIndex, getOppositePieceType, getOppositeDirection, Direction, Move, AttackType, CellType, Connection, Neighbour } from './types.js';
+import Cell  from './Cell';
+import { Winner, PieceType, getDeltaIndex, getOppositePieceType, getOppositeDirection, Direction, Move, AttackType, CellType, Connection, Neighbour } from './types';
 import chalk from 'chalk';
 
 export default class Board {

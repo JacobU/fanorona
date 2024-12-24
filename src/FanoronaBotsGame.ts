@@ -1,6 +1,6 @@
-import Board from './Board.ts';
-import BotRandomPlayer from './BotRandomPlayer.ts';
-import { PieceType, Winner } from './types.ts';
+import Board from './Board';
+import BotRandomPlayer from './BotRandomPlayer';
+import { PieceType, Winner } from './types';
 
 let whiteWins = 0;
 let blackWins = 0;

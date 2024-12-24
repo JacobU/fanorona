@@ -1,10 +1,10 @@
 {
   "name": "fanorona",
   "version": "1.0.0",
-  "main": "src/Board.ts",
+  "main": "src/drawBoard.js",
   "type": "module",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && cpx \"src/**/*.html\" dist/src/ && cpx \"src/assets/**/*\" dist/assets/",
     "test": "mocha --require ts-node/register 'tests/**/*.ts'",
     "start": "node --loader ts-node/esm src/FanoronaBotsGame.ts"
   },
@@ -21,6 +21,7 @@
     "@types/chalk": "^0.4.31",
     "@types/mocha": "^10.0.10",
     "chai": "^5.1.2",
+    "cpx": "^1.5.0",
     "mocha": "^11.0.1",
     "ts-node": "^10.9.2"
   }
