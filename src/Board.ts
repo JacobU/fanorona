@@ -1,5 +1,5 @@
-import Cell  from './Cell';
-import { Winner, PieceType, getDeltaIndex, getOppositePieceType, getOppositeDirection, Direction, Move, AttackType, CellType, Connection, Neighbour } from './types';
+import Cell  from './Cell.js';
+import { Winner, PieceType, getDeltaIndex, getOppositePieceType, getOppositeDirection, Direction, Move, AttackType, CellType, Connection, Neighbour } from './types.js';
 import chalk from 'chalk';
 
 export default class Board {
@@ -73,7 +73,7 @@ export default class Board {
                     displayString += chalk.white('W ');
                     break;
                 case PieceType.EMPTY:
-                    displayString += chalk.black('0 ');
+                    displayString += chalk.white('0 ');
                     break;
             }
             if ((i + 1) % this.columns == 0) {

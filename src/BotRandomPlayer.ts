@@ -1,5 +1,5 @@
-import Board from './Board';
-import { PieceType } from './types';
+import Board from './Board.js';
+import { PieceType } from './types.js';
 
 export default class BotRandomPlayer {
     private pieceType: PieceType;

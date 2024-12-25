@@ -13,8 +13,10 @@ const cellHeight = canvas.height / rows;
 // Load the circle image
 const lightPiece = new Image();
 const darkPiece = new Image();
-lightPiece.src = "./assets/svg/lightPieceDetailed.svg"; // Replace with the path to your circle image
-darkPiece.src = "./assets/svg/darkPieceDetailed.svg"; // Replace with the path to your circle image
+const wood = new Image();
+lightPiece.src = "./assets/svg/lightPieceDetailed.svg"; 
+darkPiece.src = "./assets/svg/darkPieceDetailed.svg";
+wood.src = "./assets/svg/wood.svg";
 
 const board = new Board();
 
@@ -22,17 +24,21 @@ let imagesLoaded = 0;
 
 const checkImagesLoaded = () => {
     imagesLoaded++;
-    if (imagesLoaded === 2) {
+    if (imagesLoaded === 3) {
         drawBoard(board);
     }
 };
 
 lightPiece.onload = checkImagesLoaded;
 darkPiece.onload = checkImagesLoaded;
-
+wood.onload = checkImagesLoaded;
 
 function drawBoard(board: Board) {
+    // Background board
+    ctx.drawImage(wood, 0, 0, 900, 500);
+
     // Draw the connecting lines
+    let lineIndex = 0;
     for (let row = 0; row < rows; row++) {
         for (let col = 0; col < cols; col++) {
             const x = col * cellWidth + cellWidth / 2;
@@ -52,15 +58,20 @@ function drawBoard(board: Board) {
                 drawLine(x, y, x2, y2);
             }
 
-            // Draw diagonal lines (if applicable)
-            if (col < cols - 1 && row < rows - 1) {
-                drawLine(x, y, x + cellWidth, y + cellHeight); // Down-right diagonal
+            if (lineIndex % 2 == 0) {
+                // Draw diagonal lines (if applicable)
+                if (col < cols - 1 && row < rows - 1) {
+                    drawLine(x, y, x + cellWidth, y + cellHeight); // Down-right diagonal
+                }
+                if (col > 0 && row < rows - 1) {
+                    drawLine(x, y, x - cellWidth, y + cellHeight); // Down-left diagonal
+                }
             }
-            if (col > 0 && row < rows - 1) {
-                drawLine(x, y, x - cellWidth, y + cellHeight); // Down-left diagonal
-            }
+            lineIndex++;
         }
     }
+
+    
 
     let boardIndex = 0;
     const boardString = board.getBoardPositionsAsString();

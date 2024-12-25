@@ -1,6 +1,6 @@
 import { expect } from 'chai';
-import Board from '../src/Board';
-import { Direction, Move, PieceType, Winner } from '../src/types';
+import Board from '../src/Board.js';
+import { Direction, Move, PieceType, Winner } from '../src/types.js';
 
 describe('Board Tests', () => {
 

@@ -1,15 +1,26 @@
 {
     "compilerOptions": {
-      "target": "es2022",                      // Target ECMAScript version
-      "module": "esnext",                      // Module system
-      "moduleResolution": "node",
-      "strict": true,                       // Enable strict type-checking
+      "lib": ["es2023", "dom"],
+      "module": "node16",
+      "target": "es2022",
+  
+      "strict": true,
+      "esModuleInterop": true,
+      "skipLibCheck": true,
+      "moduleResolution": "node16",
+
+
+
+      // "target": "es2022",                      // Target ECMAScript version
+      // "module": "esnext",                      // Module system
+      // "moduleResolution": "node",
+      // "strict": true,                       // Enable strict type-checking
       "noEmit": false,
-      "esModuleInterop": true,              // Allow default imports
+      // "esModuleInterop": true,              // Allow default imports
       "forceConsistentCasingInFileNames": true,
       "outDir": "./dist",                   // Output directory for compiled files
       "rootDir": "./",                      // Root directory for source files
-      "skipLibCheck": true
+      // "skipLibCheck": true
     },
     "include": ["tests/**/*.ts", "src/**/*"],
     "exclude": ["node_modules", "dist"]

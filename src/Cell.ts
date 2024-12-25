@@ -1,4 +1,4 @@
-import { PieceType, CellType, Connection, Direction } from "./types";
+import { PieceType, CellType, Connection, Direction } from "./types.js";
 
 
 export default class Cell {

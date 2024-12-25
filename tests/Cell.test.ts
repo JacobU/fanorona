@@ -1,6 +1,6 @@
 import { expect } from 'chai';
-import Cell from '../src/Cell';
-import { CellType, Connection, Direction, PieceType } from '../src/types';
+import Cell from '../src/Cell.js';
+import { CellType, Connection, Direction, PieceType } from '../src/types.js';
 
 describe('Cell tests', () => {
 

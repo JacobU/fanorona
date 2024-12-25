@@ -1,6 +1,6 @@
-import Board from './Board';
-import BotRandomPlayer from './BotRandomPlayer';
-import { PieceType, Winner } from './types';
+import Board from './Board.js';
+import BotRandomPlayer from './BotRandomPlayer.js';
+import { PieceType, Winner } from './types.js';
 
 let whiteWins = 0;
 let blackWins = 0;
