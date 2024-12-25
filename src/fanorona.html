@@ -14,14 +14,87 @@
             height: 100vh; /* Make the body take up the full viewport height */
         }
 
+        /* Ensure the canvas and grid container are properly aligned */
+        #canvas-container {
+            position: relative;
+            width: 900px;
+            height: 500px;
+        }
+
         /* Optional: Add border for better visibility of the canvas */
         #fanoronaBoard {
             border: 1px solid black;
+            z-index: 1;
         }
+
+        /* Grid container */
+        .grid-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            border: none;
+            display: grid;
+            grid-template-columns: repeat(9, 1fr); /* 9 columns */
+            grid-template-rows: repeat(5, 1fr); /* 5 rows */
+            z-index: 2; /* Grid is above the canvas */
+        }
+    
+        /* Buttons in the grid */
+        .grid-container button {
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+            background: transparent;
+            border: none;
+            outline: none;
+            transition: background 0.2s ease;
+            position: relative; /* Required for positioning ::after */
+            overflow: hidden; /* Ensures the circle stays within the button bounds */
+        }
+
+        /* Add circular hover effect */
+        .grid-container button::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0; /* Circle starts with 0 radius */
+            height: 0;
+            background: rgba(255, 255, 255, 0.4); /* Semi-transparent color */
+            border-radius: 50%; /* Makes the shape a circle */
+            transform: translate(-50%, -50%);
+            transition: width 0.2s ease, height 0.2s ease; /* Smooth growth */
+        }
+        
+        /* Expand the circle only for the hovered button */
+        .grid-container button:hover::after {
+            width: 50px; /* Radius of the circle */
+            height: 50px;
+            opacity: 1;
+        }
+
+        .grid-container button.canMove {
+            background-color: blue;
+        }
+
     </style>
 </head>
 <body>
-    <canvas id="fanoronaBoard" width="900" height="500"></canvas>
+    <div id="canvas-container">
+        <canvas id="fanoronaBoard" width="900" height="500"></canvas>
+        <div class="grid-container">
+            <!-- Generate 9x5 grid buttons -->
+            <script>
+            for (let i = 0; i < 45; i++) {
+                document.write(`<button></button>`);
+            }
+            </script>
+        </div>
+    </div>
+    
     <script type="module" src="./bundle.js"></script>
 </body>
 </html>

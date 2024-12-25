@@ -11,6 +11,11 @@ export enum Winner {
     BLACK = 2,
 }
 
+export enum Turn {
+    WHITE = 0,
+    BLACK = 1,
+}
+
 export enum CellType {
     STRONG = 0,
     WEAK = 1,

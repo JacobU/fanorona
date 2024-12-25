@@ -1,5 +1,5 @@
 import Cell  from './Cell.js';
-import { Winner, PieceType, getDeltaIndex, getOppositePieceType, getOppositeDirection, Direction, Move, AttackType, CellType, Connection, Neighbour } from './types.js';
+import { Winner, PieceType, getDeltaIndex, getOppositePieceType, getOppositeDirection, Direction, Move, AttackType, CellType, Connection, Neighbour, Turn } from './types.js';
 import chalk from 'chalk';
 
 export default class Board {
@@ -9,6 +9,7 @@ export default class Board {
 
     private cellIndexesPieceHasBeenInCurrentTurn: number[]; 
     private currentlyMovingPiece: number | null;
+    private currentTurn: Turn;
 
     constructor(rows: number = 5, columns: number = 9, startingPieces?: string) {
         if (startingPieces) {
@@ -25,6 +26,7 @@ export default class Board {
         }
         this.cellIndexesPieceHasBeenInCurrentTurn = [];
         this.currentlyMovingPiece = null;
+        this.currentTurn = Turn.WHITE;
     }
 
     // Initialize the board with empty cells
@@ -104,6 +106,10 @@ export default class Board {
             .join('');
     }
 
+    public getPieceTypeAtIndex(index: number): PieceType {
+        return this.board[index].getPieceType();
+    }
+
     /**
      * If there are any pieces that can attack, one of these pieces must attack, so only these will be returned. 
      * Otherwise, any pieces which have empty neighbours can be moved, so they will be returned.
@@ -173,9 +179,14 @@ export default class Board {
             this.removeAttackedPieces(index, pieceType, direction, attackType);
             return this.canPlayerMoveAgain(index, pieceType, direction);
         }
-        // If the player cant move again, reset the index tracker
+        // If the player cant move again, reset the index tracker and the turn
         this.cellIndexesPieceHasBeenInCurrentTurn = [];
+        this.currentTurn = this.currentTurn ? Turn.WHITE : Turn.BLACK;
         return false;
+    }
+
+    public getTurn() {
+        return this.currentTurn;
     }
 
     /**

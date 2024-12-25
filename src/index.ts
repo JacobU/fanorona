@@ -1,4 +1,5 @@
 import Board from './Board.js';
+import { PieceType, Turn } from './types.js';
 
 // Set up the canvas and context
 const canvas = document.getElementById("fanoronaBoard") as HTMLCanvasElement;
@@ -26,6 +27,7 @@ const checkImagesLoaded = () => {
     imagesLoaded++;
     if (imagesLoaded === 3) {
         drawBoard(board);
+        updateBoardHighlighting(board);
     }
 };
 
@@ -105,4 +107,36 @@ function drawLine(x1: number, y1: number, x2: number, y2: number): void {
     ctx.strokeStyle = "#000"; // Line color
     ctx.lineWidth = 2;       // Line width
     ctx.stroke();
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const buttons = document.querySelectorAll('.grid-container button');
+    buttons.forEach((button, index) => {
+        button.addEventListener('click', () => {
+            const pieceIndex: number = index;
+            onCellClicked(pieceIndex);
+        });
+    });
+});
+
+function onCellClicked(index: number) {
+    if (board.getTurn() === Turn.WHITE) {
+        const piecesToMove: number[] = board.getPiecesThatPlayerCanMove(PieceType.WHITE);
+        const buttons = document.querySelectorAll('.grid-container button');
+
+        // Add a class to selected buttons
+        for (let i = 0; i < piecesToMove.length; i++) {
+            const button = buttons[piecesToMove[i]];
+            if (button) {
+                button.classList.add('canMove');
+            }
+        }
+    } else {
+        // Do nothing
+    }
+    drawBoard(board);
+}
+
+function updateBoardHighlighting(board: Board) {
+    
 }
