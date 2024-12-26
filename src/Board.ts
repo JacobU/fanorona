@@ -139,6 +139,9 @@ export default class Board {
         }
     }
 
+    public getBoardsNumberOfColumns(): number {
+        return this.columns;
+    }
     /**
      * Perform a single move (which may be just one of several in a turn). We should update the index the piece 
      * has moved, calculate whether the move will APPROACH or WITHDRAW from an opponents piece, 
