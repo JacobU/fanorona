@@ -1,4 +1,6 @@
 import Board from './Board.js';
+import BotRandomPlayer from './BotRandomPlayer.js';
+import CellClickHandler from './CellClickHandler.js';
 import { PieceType, Turn } from './types.js';
 
 // Set up the canvas and context
@@ -20,6 +22,8 @@ darkPiece.src = "./assets/svg/darkPieceDetailed.svg";
 wood.src = "./assets/svg/wood.svg";
 
 const board = new Board();
+const cellClickHandler = new CellClickHandler(board);
+const botPlayer = new BotRandomPlayer(PieceType.BLACK, board);
 
 let imagesLoaded = 0;
 
@@ -36,6 +40,8 @@ darkPiece.onload = checkImagesLoaded;
 wood.onload = checkImagesLoaded;
 
 function drawBoard(board: Board) {
+    console.log('drew the board again');
+    console.log(board.getBoardPositionsAsString());
     // Background board
     ctx.drawImage(wood, 0, 0, 900, 500);
 
@@ -120,6 +126,12 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function onCellClicked(index: number) {
+
+    console.log(index);
+
+    console.log('entered on click handler')
+    cellClickHandler.handleCellClick(index);
+
     if (board.getTurn() === Turn.WHITE) {
         const piecesToMove: number[] = board.getPiecesThatPlayerCanMove(PieceType.WHITE);
         const buttons = document.querySelectorAll('.grid-container button');
@@ -132,9 +144,20 @@ function onCellClicked(index: number) {
             }
         }
     } else {
-        // Do nothing
+        const buttonsWithCanMove = document.querySelectorAll('.grid-container button.canMove');
+        buttonsWithCanMove.forEach(button => {
+            button.classList.remove('canMove');
+        });
     }
+    
     drawBoard(board);
+
+    console.log(board.getTurn());
+    if (board.getTurn() === Turn.BLACK) {
+        console.log('bot made a move');
+        botPlayer.makeMove();
+        drawBoard(board);
+    }
 }
 
 function updateBoardHighlighting(board: Board) {

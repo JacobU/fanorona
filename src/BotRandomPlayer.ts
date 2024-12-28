@@ -13,7 +13,7 @@ export default class BotRandomPlayer {
     }
 
     public makeMove(): void {
-        // this.playerIsMovingLog();
+        this.playerIsMovingLog();
         // for (let i = 0; i < 3000000000; i++) {
         //     i++;
         // }

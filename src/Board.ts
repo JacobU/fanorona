@@ -180,7 +180,10 @@ export default class Board {
         index = this.movePiece(pieceType, index, direction);
         if (attackType !== AttackType.NONE) {
             this.removeAttackedPieces(index, pieceType, direction, attackType);
-            return this.canPlayerMoveAgain(index, pieceType, direction);
+            const canMoveAgain = this.canPlayerMoveAgain(index, pieceType, direction);
+            if (canMoveAgain) {
+                return true;
+            }
         }
         // If the player cant move again, reset the index tracker and the turn
         this.cellIndexesPieceHasBeenInCurrentTurn = [];

@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import Board from '../src/Board.js';
 import CellClickHandler from '../src/CellClickHandler.js';
-import { Direction, PieceType } from '../src/types.js';
+import { Direction } from '../src/types.js';
 
 const emptyRow5 = '00000';
 
@@ -211,68 +211,67 @@ describe('CellClickHandler tests', () => {
         expect(handler.getHandlerState()).to.deep.equal(handlerStateBefore); 
     });
 
-    // it('should not allow you to click on anything else during a chain of turns apart from move options', () => {
-    //     const board = new Board(5, 5, '10200' + emptyRow5 + '02000' + emptyRow5 + emptyRow5);
-    //     const handler =  new CellClickHandler(board);
+    it('should not allow you to click on anything else during a chain of turns apart from move options', () => {
+        const board = new Board(5, 5, '10200' + '00020' + '02000' + emptyRow5 + emptyRow5);
+        const handler =  new CellClickHandler(board);
 
-    //     // Move the piece so that we are in the middle of a turn
-    //     handler.handleCellClick(0); // Click on the white piece
-    //     console.log(board.getBoardPositionsAsString());
-    //     console.log(handler.getHandlerState());
-
-    //     handler.handleCellClick(1); // Click on the cell to move it to
-
-    //     console.log(board.getBoardPositionsAsString());
-    //     console.log(handler.getHandlerState());
-
-    //     const boardStateBefore: string = board.getBoardPositionsAsString();
-    //     const handlerStateBefore = handler.getHandlerState();
-    //     const expectedHandlerStateDuringMoveChain = { selectedCell: 1, possibleMoves: [ { index: 1, direction: 4 } ], attackingChain: true };
-
-    //     console.log(boardStateBefore);
-    //     console.log(handlerStateBefore);
-
-    //     expect(handler.getHandlerState()).to.deep.equal(expectedHandlerStateDuringMoveChain);
-
+        const boardStateBefore: string = board.getBoardPositionsAsString();
+        const boardStateAfterFirstMove: string = '01000' + '00020' + '02000' + emptyRow5 + emptyRow5;
+        const boardStateAfterSecondMove: string = emptyRow5 + '01020' + emptyRow5 + emptyRow5 + emptyRow5;
+        const boardStateAfterThirdMove: string = emptyRow5 + '00100' + emptyRow5 + emptyRow5 + emptyRow5;
+        const handlerStateBefore = handler.getHandlerState();
+        const expectedHandlerStateAfterSelection =  { selectedCell: 0, possibleMoves: [ { index: 1, direction: 4 } ], attackingChain: false }; 
+        const expectedHandlerStateAfterFirstMove = { selectedCell: 1, possibleMoves: [ { index: 6, direction: 6 } ], attackingChain: true };
+        const expectedHandlerStateAfterSecondMove = { selectedCell: 6, possibleMoves: [ { index: 7, direction: 4 } ], attackingChain: true };
+        const expectedHandlerStateAfterThirdMove = { selectedCell: null, possibleMoves: [], attackingChain: false };
         
+        expect(board.getBoardPositionsAsString()).to.equal(boardStateBefore);
+        expect(handler.getHandlerState()).to.deep.equal(handlerStateBefore);
 
-    //     // handler.handleCellClick(24);
-    //     // expect(board.getBoardPositionsAsString()).to.equal(boardStateBefore);
-    //     // expect(handler.getHandlerState()).to.deep.equal(handlerStateBefore);
-    //     handler.handleCellClick(1);
-    //     expect(board.getBoardPositionsAsString()).to.equal(boardStateBefore);
-    //     expect(handler.getHandlerState()).to.deep.equal(handlerStateBefore);
-    //     // handler.handleCellClick(2);
-    //     // expect(board.getBoardPositionsAsString()).to.equal(boardStateBefore);
-    //     // expect(handler.getHandlerState()).to.deep.equal(handlerStateBefore);
-    //     // handler.handleCellClick(0);
-    //     // expect(board.getBoardPositionsAsString()).to.equal(boardStateBefore);
-    //     // expect(handler.getHandlerState()).to.deep.equal(handlerStateBefore);
-    // });
+        // Select piece
+        handler.handleCellClick(0); // Click on the white piece
 
+        expect(board.getBoardPositionsAsString()).to.equal(boardStateBefore);
+        expect(handler.getHandlerState()).to.deep.equal(expectedHandlerStateAfterSelection);
 
-// 0) If you are in the middle of a turn
-// 0a) Click on anything else except for your options - DO NOTHING
-// 0b) Click on your options - perform move
-// 0c) Click on FINISH TURN - Deselect pieces - perform move
+        handler.handleCellClick(1); // Click on the cell to move it to
+        expect(board.getBoardPositionsAsString()).to.equal(boardStateAfterFirstMove);
+        expect(handler.getHandlerState()).to.deep.equal(expectedHandlerStateAfterFirstMove);
 
-// 3) One of your pieces is selected
-// 3f) Select an empty cell that can be moved into - move the piece
+        // Clicking on anything else except for the possible move should no nothing!
+        handler.handleCellClick(0);
+        expect(board.getBoardPositionsAsString()).to.equal(boardStateAfterFirstMove);
+        expect(handler.getHandlerState()).to.deep.equal(expectedHandlerStateAfterFirstMove);
+        handler.handleCellClick(1);
+        expect(board.getBoardPositionsAsString()).to.equal(boardStateAfterFirstMove);
+        expect(handler.getHandlerState()).to.deep.equal(expectedHandlerStateAfterFirstMove);
+        handler.handleCellClick(10);
+        expect(board.getBoardPositionsAsString()).to.equal(boardStateAfterFirstMove);
+        expect(handler.getHandlerState()).to.deep.equal(expectedHandlerStateAfterFirstMove);
+        // END RANDOM CLICKS
 
+        // Now perform the second move
+        handler.handleCellClick(6);
+        expect(board.getBoardPositionsAsString()).to.equal(boardStateAfterSecondMove);
+        expect(handler.getHandlerState()).to.deep.equal(expectedHandlerStateAfterSecondMove);
 
+        // Clicking on anything else except for the possible move should no nothing!
+        handler.handleCellClick(0);
+        expect(board.getBoardPositionsAsString()).to.equal(boardStateAfterSecondMove);
+        expect(handler.getHandlerState()).to.deep.equal(expectedHandlerStateAfterSecondMove);
+        handler.handleCellClick(1);
+        expect(board.getBoardPositionsAsString()).to.equal(boardStateAfterSecondMove);
+        expect(handler.getHandlerState()).to.deep.equal(expectedHandlerStateAfterSecondMove);
+        handler.handleCellClick(10);
+        expect(board.getBoardPositionsAsString()).to.equal(boardStateAfterSecondMove);
+        expect(handler.getHandlerState()).to.deep.equal(expectedHandlerStateAfterSecondMove);
+        // END RANDOM CLICKS
 
+        // Now perform the third move
+        handler.handleCellClick(7);
+        expect(board.getBoardPositionsAsString()).to.equal(boardStateAfterThirdMove);
+        expect(handler.getHandlerState()).to.deep.equal(expectedHandlerStateAfterThirdMove);
 
-
-//DONE
-// 1) Click anywhere - its not your move - DO NOTHING - DONE
-// 2d) Click on one of your pieces that can be moved - select that piece and show its moves - DONE
-// 2c) Click on an empty cell - DO NOTHING - DONE
-// 2a) Click on not your pieces - DO NOTHING - DONE
-// 2b) Click on one of your pieces that cant be moved - DO NOTHING
-
-// 3a) Select an empty cell (not one of your moves) - DO NOTHING
-// 3b) Select a black piece - DO NOTHING
-// 3c) Select one of your own pieces that cant be moved - unselect the piece
-// 3d) Select your piece again - unselect the piece
-// 3e) Select another piece that can be moved - select that piece
+        // TODO: Click on FINISH TURN
+    });
 });
