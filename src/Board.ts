@@ -371,10 +371,6 @@ export default class Board {
         return cellNeighbours;
     }
 
-    private getPiecesNeighbours(index: number): Neighbour[] {
-        return this.getNeighbours(index, false);
-    }
-
     private isPositionOnBoard(index: number): boolean {
         return index >= 0 && index < this.rows * this.columns;
     }
