@@ -142,6 +142,11 @@ export default class Board {
     public getBoardsNumberOfColumns(): number {
         return this.columns;
     }
+
+    public getBoardsNumberOfRows(): number {
+        return this.rows;
+    }
+
     /**
      * Perform a single move (which may be just one of several in a turn). We should update the index the piece 
      * has moved, calculate whether the move will APPROACH or WITHDRAW from an opponents piece, 
@@ -177,6 +182,7 @@ export default class Board {
         }
 
         // Set the new index after moving
+        console.log('Moved %d in direction %', index, direction);
         index = this.movePiece(pieceType, index, direction);
         if (attackType !== AttackType.NONE) {
             this.removeAttackedPieces(index, pieceType, direction, attackType);

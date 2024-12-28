@@ -12,7 +12,7 @@ export default class BotRandomPlayer {
         this.pieceTypeString = pieceType === PieceType.WHITE ? 'White' : 'Black';
     }
 
-    public makeMove(): void {
+    public makeMove(): boolean {
         this.playerIsMovingLog();
         // for (let i = 0; i < 3000000000; i++) {
         //     i++;
@@ -21,11 +21,8 @@ export default class BotRandomPlayer {
         const moveIndex: number = possiblePiecesToMove.at(Math.floor(Math.random() * possiblePiecesToMove.length))!;
         const possibleMoves = this.board.getPossibleMovesForCell(moveIndex);
         const moveChoice = possibleMoves.at(Math.floor(Math.random() * possibleMoves.length))!;
-        const canMoveAgain: boolean = this.board.performMove(moveIndex, moveChoice.direction);
+        return this.board.performMove(moveIndex, moveChoice.direction);
         // this.board.displayBoard();
-        if (canMoveAgain) {
-            this.makeMove();
-        }
     }
 
     private playerIsMovingLog() {
