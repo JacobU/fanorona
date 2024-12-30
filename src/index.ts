@@ -49,29 +49,63 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
+
+function highlightPossibleMoves(possibleMoves: number[]) {
+    const buttons = document.querySelectorAll('.grid-container button');
+
+    // Display all possible moves
+    for (let i = 0; i < possibleMoves.length; i++) {
+        const button = buttons[possibleMoves[i]];
+        if (button) {
+            button.classList.add('possibleMove');
+        }
+    }
+}
+
+function highlightMoveablePieces(moveablePieces: number[]) {
+    const buttons = document.querySelectorAll('.grid-container button');
+
+    // Display all moveable pieces
+    for (let i = 0; i < moveablePieces.length; i++) {
+        const button = buttons[moveablePieces[i]];
+        if (button) {
+            button.classList.add('moveablePiece');
+        }
+    }
+}
+
+function removeAllHighlighting() {
+    const buttonsWithMoveablePiece = document.querySelectorAll('.grid-container button.moveablePiece');
+    buttonsWithMoveablePiece.forEach(button => {
+        button.classList.remove('moveablePiece');
+    });
+    const possibleMoves = document.querySelectorAll('.grid-container button.possibleMove');
+    possibleMoves.forEach(button => {
+        button.classList.remove('possibleMove');
+    });
+}
+
+
 function onCellClicked(index: number) {
 
     console.log(index);
 
     console.log('entered on click handler')
     cellClickHandler.handleCellClick(index);
+    removeAllHighlighting();
 
     if (board.getTurn() === Turn.WHITE) {
-        const piecesToMove: number[] = board.getPiecesThatPlayerCanMove(PieceType.WHITE);
-        const buttons = document.querySelectorAll('.grid-container button');
-
-        // Add a class to selected buttons
-        for (let i = 0; i < piecesToMove.length; i++) {
-            const button = buttons[piecesToMove[i]];
-            if (button) {
-                button.classList.add('canMove');
-            }
+        const currentHandlerState = cellClickHandler.getHandlerState();
+        // If we've selected a piece, tell the player where that piece can move
+        if (currentHandlerState.selectedCell !== null) {
+            const possibleMoves: number[] = board.getPossibleMovesForCell(currentHandlerState.selectedCell).map(move => move.index);
+            highlightPossibleMoves(possibleMoves);
+            
+        } else {
+            // Otherwise let them know which pieces that can select
+            const moveablePieces: number[] = board.getPiecesThatPlayerCanMove(PieceType.WHITE);
+            highlightMoveablePieces(moveablePieces);
         }
-    } else {
-        const buttonsWithCanMove = document.querySelectorAll('.grid-container button.canMove');
-        buttonsWithCanMove.forEach(button => {
-            button.classList.remove('canMove');
-        });
     }
     
     drawBoard(board, ctx, lightPiece, darkPiece, wood, null);
@@ -79,7 +113,9 @@ function onCellClicked(index: number) {
     console.log(board.getTurn());
     if (board.getTurn() === Turn.BLACK) {
         console.log('bot made a move');
-        while(botPlayer.makeMove()) {}
+        while(botPlayer.makeMove()) {
+            // animatePieceMove(board, ctx, lightPiece, darkPiece, wood, index, )
+        }
         drawBoard(board, ctx, lightPiece, darkPiece, wood, null);
     }
 }

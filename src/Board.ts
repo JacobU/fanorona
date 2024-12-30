@@ -250,7 +250,10 @@ export default class Board {
      */
     private willMoveWithdraw(currentIndex: number, attackPieceType: PieceType, moveDirection: Direction): boolean {
         const possibleAttackedPieceIndex: number = currentIndex + getDeltaIndex(getOppositeDirection(moveDirection), this.columns);
-        if (this.isPositionOnBoard(possibleAttackedPieceIndex) && this.board[possibleAttackedPieceIndex].isPieceType(getOppositePieceType(attackPieceType))) {
+        const isAttackedPieceConnected = this.board[currentIndex].getCellConnections().map(connection => connection.index).includes(possibleAttackedPieceIndex);
+        if (this.isPositionOnBoard(possibleAttackedPieceIndex) 
+            && isAttackedPieceConnected
+            && this.board[possibleAttackedPieceIndex].isPieceType(getOppositePieceType(attackPieceType))) {
             return true;
         }
         return false;

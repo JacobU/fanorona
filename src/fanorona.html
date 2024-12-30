@@ -79,7 +79,7 @@
         }
 
 
-        .grid-container button.canMove::after {
+        .grid-container button.possibleMove::after {
             content: '';
             position: absolute;
             top: 50%;
@@ -91,6 +91,33 @@
             transform: translate(-50%, -50%);
             opacity: 1; /* Ensure it's visible */
             transition: width 0.2s ease, height 0.2s ease; /* Smooth growth */
+        }
+
+        /* Pulsating Halo */
+        .grid-container button .moveablePiece::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 229, 127, 0.5); /* Halo color */
+            border-radius: 50%;
+            transform: translate(-50%, -50%) scale(1);
+            z-index: -1;
+            animation: pulse 1s infinite;
+        }
+        
+        /* Animation */
+        @keyframes pulse {
+            0% {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 0.7;
+            }
+            100% {
+            transform: translate(-50%, -50%) scale(1.5);
+            opacity: 0;
+            }
         }
 
     </style>
