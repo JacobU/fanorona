@@ -10,6 +10,7 @@ export default class Board {
     private cellIndexesPieceHasBeenInCurrentTurn: number[]; 
     private currentlyMovingPiece: number | null;
     private currentTurn: Turn;
+    private attackOrWithdraw: AttackType;
 
     constructor(rows: number = 5, columns: number = 9, startingPieces?: string) {
         if (startingPieces) {
@@ -27,6 +28,7 @@ export default class Board {
         this.cellIndexesPieceHasBeenInCurrentTurn = [];
         this.currentlyMovingPiece = null;
         this.currentTurn = Turn.WHITE;
+        this.attackOrWithdraw = AttackType.NONE;
     }
 
     // Initialize the board with empty cells
@@ -148,6 +150,29 @@ export default class Board {
     }
 
     /**
+     * Checks whether a move (with index and direction) will cause the players piece to both approach and 
+     * withdraw from an opponent piece.
+     * @param {number} index the index of the piece to move. 
+     * @param {Direction} direction the direction of the piece to move.
+     * @returns {boolean} whether the move will cause the piece to both approach and withdraw from opponent pieces.
+     */
+    public willMoveAttackAndWithdraw(index: number, direction: Direction): boolean {
+        const pieceType: PieceType = this.board[index].getPieceType();
+
+        const willWithdraw = this.willMoveWithdraw(index, pieceType, direction);
+        const willApproach = this.willMoveApproach(index, pieceType, direction);
+        return (willApproach && willWithdraw);
+    }
+
+    public setAttackOrWithdraw(attackType: AttackType): void {
+        if (attackType === AttackType.NONE) {
+            throw new Error('You can only set the attack type to APPROACH or WITHDRAW');
+        }
+        this.attackOrWithdraw = attackType;
+    }
+
+    /**
+     * Note: willMoveAttackAndWithdraw should be called as a precondition to calling this
      * Perform a single move (which may be just one of several in a turn). We should update the index the piece 
      * has moved, calculate whether the move will APPROACH or WITHDRAW from an opponents piece, 
      * remove the pieces if needed, make the move, and then determine if another move can be made.
@@ -174,10 +199,11 @@ export default class Board {
         let attackType: AttackType = AttackType.NONE;
         
         // TODO DEAL WITH APPROACH OR WITHDRAW SELECTION
-        if (willWithdraw) {
+        if (willApproach && willWithdraw) {
+            attackType = this.attackOrWithdraw;
+        } else if (willWithdraw) {
             attackType = AttackType.WITHDRAW;
-        }
-        if (willApproach) {
+        } else if (willApproach) {
             attackType = AttackType.APPROACH;
         }
 
