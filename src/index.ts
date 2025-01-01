@@ -49,6 +49,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
+// Initial highlighting
+highlightMoveablePieces(board.getPiecesThatPlayerCanMove(PieceType.WHITE));
 
 function highlightPossibleMoves(possibleMoves: number[]) {
     const buttons = document.querySelectorAll('.grid-container button');
@@ -86,13 +88,29 @@ function removeAllHighlighting() {
 }
 
 
-function onCellClicked(index: number) {
+async function onCellClicked(index: number) {
 
-    console.log(index);
+    const handlerState = cellClickHandler.getHandlerState();
+    // If a move was made, we know it was made by white, so animate the white piece
+    const moveWasPerformed = cellClickHandler.handleCellClick(index);
+    if (moveWasPerformed) {
+        const direction = handlerState.possibleMoves.find(move => move.index === index)!.direction;
+        await animatePieceMove(board, ctx, lightPiece, darkPiece, wood, handlerState.selectedCell!, direction, lightPiece);
+    }
 
-    console.log('entered on click handler')
-    cellClickHandler.handleCellClick(index);
     removeAllHighlighting();
+
+    if (board.getTurn() === Turn.BLACK) {
+        console.log('bot made a move');
+        let notFinishedTurn: boolean = true;
+        while(notFinishedTurn) {
+            const moveResults = botPlayer.makeMove();
+            notFinishedTurn = moveResults.canMoveAgain;
+            await animatePieceMove(board, ctx, lightPiece, darkPiece, wood, moveResults.move.index, moveResults.move.direction, darkPiece);
+        }
+        console.log('redrawing board with black move');
+        drawBoard(board, ctx, lightPiece, darkPiece, wood, null);
+    }
 
     if (board.getTurn() === Turn.WHITE) {
         const currentHandlerState = cellClickHandler.getHandlerState();
@@ -106,16 +124,5 @@ function onCellClicked(index: number) {
             const moveablePieces: number[] = board.getPiecesThatPlayerCanMove(PieceType.WHITE);
             highlightMoveablePieces(moveablePieces);
         }
-    }
-    
-    drawBoard(board, ctx, lightPiece, darkPiece, wood, null);
-
-    console.log(board.getTurn());
-    if (board.getTurn() === Turn.BLACK) {
-        console.log('bot made a move');
-        while(botPlayer.makeMove()) {
-            // animatePieceMove(board, ctx, lightPiece, darkPiece, wood, index, )
-        }
-        drawBoard(board, ctx, lightPiece, darkPiece, wood, null);
     }
 }

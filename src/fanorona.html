@@ -23,7 +23,6 @@
 
         /* Optional: Add border for better visibility of the canvas */
         #fanoronaBoard {
-            border: 1px solid black;
             z-index: 1;
         }
 
@@ -86,37 +85,39 @@
             left: 50%;
             width: 50px; /* Match the hover effect size */
             height: 50px;
-            background: rgba(255, 255, 255, 0.4); /* Same color as the hover effect */
+            background: rgba(79, 195, 247, 0.2);
             border-radius: 50%; /* Makes the shape a circle */
             transform: translate(-50%, -50%);
             opacity: 1; /* Ensure it's visible */
             transition: width 0.2s ease, height 0.2s ease; /* Smooth growth */
         }
 
-        /* Pulsating Halo */
-        .grid-container button .moveablePiece::before {
+        .grid-container button.moveablePiece::before {
             content: '';
             position: absolute;
             top: 50%;
             left: 50%;
-            width: 100%;
-            height: 100%;
-            background: rgba(255, 229, 127, 0.5); /* Halo color */
-            border-radius: 50%;
-            transform: translate(-50%, -50%) scale(1);
-            z-index: -1;
-            animation: pulse 1s infinite;
+            width: 50%; /* Slightly larger than the piece */
+            height: 50%; /* Matches the width */
+            border: 4px solid rgba(79, 195, 247, 0.5); /* Ring color */
+            border-radius: 50%; /* Circular shape */
+            transform: translate(-50%, -50%) scale(1); /* Centered and starts at default scale */
+            z-index: -1; /* Behind the piece */
+            animation: pulse 2s infinite; /* Pulsating effect */
         }
         
-        /* Animation */
         @keyframes pulse {
             0% {
-            transform: translate(-50%, -50%) scale(1);
-            opacity: 0.7;
+                transform: translate(-50%, -50%) scale(1); /* Start at normal size */
+                opacity: 0.6; /* Visible */
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1.2); /* Slightly larger halo */
+                opacity: 0.4; /* Slightly transparent */
             }
             100% {
-            transform: translate(-50%, -50%) scale(1.5);
-            opacity: 0;
+                transform: translate(-50%, -50%) scale(1); /* Return to original size */
+                opacity: 0; /* Fade out */
             }
         }
 

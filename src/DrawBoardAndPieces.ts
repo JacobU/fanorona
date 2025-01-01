@@ -4,12 +4,10 @@ import { Direction, getDeltaIndex } from '../src/types.js';
 const cellSize: number = 100;
 const pieceWidth: number = 60;
 
-export function drawBoard(board: Board, ctx: CanvasRenderingContext2D, lightPiece: HTMLImageElement, darkPiece: HTMLImageElement, wood: HTMLImageElement, indexOfPieceToExclude: null | number) {
-    console.log('drew the board again');
-    console.log(board.getBoardPositionsAsString());
-
+export function drawBoard(board: Board, ctx: CanvasRenderingContext2D, lightPiece: HTMLImageElement, darkPiece: HTMLImageElement, wood: HTMLImageElement, indexesToExclude: null | number[]) {
     const rows = board.getBoardsNumberOfRows();
     const cols = board.getBoardsNumberOfColumns();
+    ctx.clearRect(0, 0, cols * cellSize, rows * cellSize);
     // Background board
     ctx.drawImage(wood, 0, 0, cols * cellSize, rows * cellSize);
 
@@ -49,8 +47,10 @@ export function drawBoard(board: Board, ctx: CanvasRenderingContext2D, lightPiec
 
     let boardString = board.getBoardPositionsAsString();
     // Exclude the current piece from being drawn temporarily
-    if (indexOfPieceToExclude) {
-        boardString = boardString.slice(0, indexOfPieceToExclude) + '0' + boardString.slice(indexOfPieceToExclude + 1);
+    if (indexesToExclude) {
+        for(let i = 0; i < indexesToExclude.length; i++) {
+            boardString = boardString.slice(0, indexesToExclude[i]) + '0' + boardString.slice(indexesToExclude[i] + 1);
+        }
     }
     drawPieces(ctx, lightPiece, darkPiece, boardString, rows, cols, cellSize);
 }
@@ -100,49 +100,55 @@ export function animatePieceMove(
     direction: Direction, 
     pieceImage: HTMLImageElement, 
     callback?: () => void
-): void {
-    const cols = board.getBoardsNumberOfColumns();
-    const rows = board.getBoardsNumberOfRows();
+): Promise<void> {
+    return new Promise((resolve) => {
+        const cols = board.getBoardsNumberOfColumns();
+        const rows = board.getBoardsNumberOfRows();
 
-    const startRow = Math.floor(indexToAnimate / cols);
-    const startCol = indexToAnimate % rows;
+        const startCol = (indexToAnimate) % cols;
+        const startRow = Math.floor(indexToAnimate / cols);
 
-    const endIndex = indexToAnimate + getDeltaIndex(direction, cols);
-    const endCol = Math.floor(endIndex / cols);
-    const endRow = endIndex % rows;
+        const endIndex = indexToAnimate + getDeltaIndex(direction, cols);
+        
+        const endCol = (endIndex) % cols;
+        const endRow = Math.floor(endIndex / cols);
+        
+        const startX = startCol * cellSize + cellSize / 2 - pieceWidth / 2;
+        const startY = startRow * cellSize + cellSize / 2 - pieceWidth / 2;
+        const endX = endCol * cellSize + cellSize / 2 - pieceWidth / 2;
+        const endY = endRow * cellSize + cellSize / 2 - pieceWidth / 2;
 
-    const startX = startCol * cellSize + cellSize / 2 - pieceWidth / 2;
-    const startY = startRow * cellSize + cellSize / 2 - pieceWidth / 2;
-    const endX = endCol * cellSize + cellSize / 2 - pieceWidth / 2;
-    const endY = endRow * cellSize + cellSize / 2 - pieceWidth / 2;
-    
-    const duration = 1000; // Animation duration in milliseconds
-    let startTime: number;
+        const duration = 1000; // Animation duration in milliseconds
+        let startTime: number;
 
-    function animateFrame(timestamp: number) {
-        if (!startTime) startTime = timestamp;
+        const indexesToExclude: number[] = [indexToAnimate, endIndex];
 
-        const elapsed = timestamp - startTime;
-        const progress = Math.min(elapsed / duration, 1); // Ensure progress stays within [0, 1]
+        function animateFrame(timestamp: number) {
+            if (!startTime) startTime = timestamp;
 
-        // Interpolate position
-        const currentX = startX + (endX - startX) * progress;
-        const currentY = startY + (endY - startY) * progress;
+            const elapsed = timestamp - startTime;
+            const progress = Math.min(elapsed / duration, 1); // Ensure progress stays within [0, 1]
 
-        // Clear the canvas and redraw the board without the animated piece
-        ctx.clearRect(0, 0, cols * cellSize, rows * cellSize);
-        drawBoard(board, ctx, lightPiece, darkPiece, wood, indexToAnimate);
+            // Interpolate position
+            const currentX = startX + (endX - startX) * progress;
+            const currentY = startY + (endY - startY) * progress;
 
-        // Draw the animated piece at its current position
-        ctx.drawImage(pieceImage, currentX, currentY, pieceWidth, pieceWidth);
+            // Clear the canvas and redraw the board without the animated piece
+            ctx.clearRect(0, 0, cols * cellSize, rows * cellSize);
+            drawBoard(board, ctx, lightPiece, darkPiece, wood, indexesToExclude);
 
-        if (progress < 1) {
-            requestAnimationFrame(animateFrame);
-        } else {
-            // Animation complete
-            if (callback) callback();
+            // Draw the animated piece at its current position
+            ctx.drawImage(pieceImage, currentX, currentY, pieceWidth, pieceWidth);
+
+            if (progress < 1) {
+                requestAnimationFrame(animateFrame);
+            } else {
+                // Animation complete
+                if (callback) callback();
+                resolve();
+            }
         }
-    }
 
-    requestAnimationFrame(animateFrame);
+        requestAnimationFrame(animateFrame);
+    });
 }

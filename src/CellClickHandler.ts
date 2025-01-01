@@ -13,8 +13,8 @@ export default class CellClickHandler {
         this.playersPieceType = PieceType.WHITE; // Default to white until we make it available to play as black
     }
 
-    handleCellClick(index: number) {
-        console.log('handled cell click');
+    handleCellClick(index: number): boolean {
+        let performedMove: boolean = false;
         // This contains all the early returns. We early return (i.e. the click does nothing) when either:
         // 1. It is not the players turn
         // 2. There is no selected piece and the player tries to select anything other than a piece that can be moved 
@@ -26,7 +26,7 @@ export default class CellClickHandler {
                 (!this.possibleMoveIndexes.map(move => move.index).includes(index) && this.board.getPieceTypeAtIndex(index) === PieceType.EMPTY) 
                     || this.board.getPieceTypeAtIndex(index) === PieceType.BLACK) ||
             ((this.inTheMiddleOfAttackingChain && this.currentlySelectedCell) && !this.possibleMoveIndexes.map(move => move.index).includes(index))) {
-            return;
+            return false;
         }
 
         // Handle the cases when you are in the middle of a turn
@@ -34,6 +34,7 @@ export default class CellClickHandler {
             const actualMove = this.possibleMoveIndexes.find(move => move.index === index)!;
             const canMoveAgain = this.board.performMove(this.currentlySelectedCell, actualMove.direction);
             this.updateOnPieceMove(index, canMoveAgain);
+            performedMove = true;
 
         // Handle all cases where no piece is currently selected            
         } else if (this.currentlySelectedCell === null) {
@@ -45,9 +46,9 @@ export default class CellClickHandler {
             // Selected one of the cells the piece can move to
             if (this.possibleMoveIndexes.map(move => move.index).includes(index)) {
                 const actualMove = this.possibleMoveIndexes.find(move => move.index === index)!;
-                console.log('performed the move');
                 const canMoveAgain = this.board.performMove(this.currentlySelectedCell, actualMove.direction);
                 this.updateOnPieceMove(index, canMoveAgain);
+                performedMove = true;
 
             // Selected an unmovable piece of their own OR the selected piece again
             } else if (!this.board.getPiecesThatPlayerCanMove(this.playersPieceType).includes(index) ||
@@ -59,6 +60,7 @@ export default class CellClickHandler {
                 this.selectCell(index);
             }
         }
+        return performedMove;
     }
 
     private deselectCell(): void {

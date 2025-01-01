@@ -1,22 +1,35 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100">
+  <defs>
+    <!-- Gradient for Outer Circle -->
+    <radialGradient id="darkOuterGradient" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#5d4037" />
+      <stop offset="100%" stop-color="#4e342e" />
+    </radialGradient>
+    <!-- Gradient for Inner Circle -->
+    <radialGradient id="darkInnerGradient" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#795548" />
+      <stop offset="100%" stop-color="#5d4037" />
+    </radialGradient>
+  </defs>
+
   <!-- Outer Circle -->
-  <circle cx="50" cy="50" r="45" fill="#4e342e" stroke="#3e2723" stroke-width="4"/>
+  <circle cx="50" cy="50" r="45" fill="url(#darkOuterGradient)" stroke="#3e2723" stroke-width="4" />
 
   <!-- Decorative Curves -->
-  <path d="M50 5 Q70 20 50 35 Q30 20 50 5" fill="none" stroke="#6d4c41" stroke-width="2"/>
-  <path d="M50 95 Q70 80 50 65 Q30 80 50 95" fill="none" stroke="#6d4c41" stroke-width="2"/>
-  <path d="M5 50 Q20 30 35 50 Q20 70 5 50" fill="none" stroke="#6d4c41" stroke-width="2"/>
-  <path d="M95 50 Q80 30 65 50 Q80 70 95 50" fill="none" stroke="#6d4c41" stroke-width="2"/>
+  <path d="M50 5 Q70 20 50 35 Q30 20 50 5" fill="none" stroke="#6d4c41" stroke-width="2" />
+  <path d="M50 95 Q70 80 50 65 Q30 80 50 95" fill="none" stroke="#6d4c41" stroke-width="2" />
+  <path d="M5 50 Q20 30 35 50 Q20 70 5 50" fill="none" stroke="#6d4c41" stroke-width="2" />
+  <path d="M95 50 Q80 30 65 50 Q80 70 95 50" fill="none" stroke="#6d4c41" stroke-width="2" />
 
   <!-- Inner Circle -->
-  <circle cx="50" cy="50" r="30" fill="#5d4037" stroke="#3e2723" stroke-width="3"/>
+  <circle cx="50" cy="50" r="30" fill="url(#darkInnerGradient)" stroke="#3e2723" stroke-width="3" />
 
   <!-- Center Highlight -->
-  <circle cx="50" cy="50" r="12" fill="#3e2723" stroke="#2c1b16" stroke-width="2"/>
+  <circle cx="50" cy="50" r="12" fill="#3e2723" stroke="#2c1b16" stroke-width="2" />
 
   <!-- Subtle Radial Details -->
-  <line x1="50" y1="20" x2="50" y2="80" stroke="#795548" stroke-width="1.5"/>
-  <line x1="20" y1="50" x2="80" y2="50" stroke="#795548" stroke-width="1.5"/>
-  <line x1="30" y1="30" x2="70" y2="70" stroke="#795548" stroke-width="1.5"/>
-  <line x1="70" y1="30" x2="30" y2="70" stroke="#795548" stroke-width="1.5"/>
+  <line x1="50" y1="20" x2="50" y2="80" stroke="#795548" stroke-width="1.5" />
+  <line x1="20" y1="50" x2="80" y2="50" stroke="#795548" stroke-width="1.5" />
+  <line x1="30" y1="30" x2="70" y2="70" stroke="#795548" stroke-width="1.5" />
+  <line x1="70" y1="30" x2="30" y2="70" stroke="#795548" stroke-width="1.5" />
 </svg>
