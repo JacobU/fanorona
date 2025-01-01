@@ -198,7 +198,6 @@ export default class Board {
 
         let attackType: AttackType = AttackType.NONE;
         
-        // TODO DEAL WITH APPROACH OR WITHDRAW SELECTION
         if (willApproach && willWithdraw) {
             attackType = this.attackOrWithdraw;
         } else if (willWithdraw) {
@@ -206,6 +205,9 @@ export default class Board {
         } else if (willApproach) {
             attackType = AttackType.APPROACH;
         }
+
+        // Reset the attack type
+        this.attackOrWithdraw = AttackType.NONE;
 
         // Set the new index after moving
         console.log('Moved %d in direction %', index, direction);
@@ -242,6 +244,8 @@ export default class Board {
             return [];
         }
     
+        // TODO. WE NEED TO FILTER OUT THE MOVES WHERE IT HAS ALREADY BEEN
+
         // If any of the moves are attacking, just return those. Otherwise just return the complete list of moves.
         const attackingMoves = moves.filter(move =>
             this.willMoveApproach(index, pieceType, move.direction) ||

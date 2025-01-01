@@ -76,6 +76,19 @@ function highlightMoveablePieces(moveablePieces: number[]) {
     }
 }
 
+function highlightApproachOrWithdrawPieces(highlightApproachOrWithdrawPieces: number[]) {
+    const buttons = document.querySelectorAll('.grid-container button');
+
+    console.log('highlighting approach and withdraw pieces');
+    // Display the two pieces that players can choose to attack
+    for (let i = 0; i < highlightApproachOrWithdrawPieces.length; i++) {
+        const button = buttons[highlightApproachOrWithdrawPieces[i]];
+        if (button) {
+            button.classList.add('approachOrWithdraw');
+        }
+    }
+}
+
 function removeAllHighlighting() {
     const buttonsWithMoveablePiece = document.querySelectorAll('.grid-container button.moveablePiece');
     buttonsWithMoveablePiece.forEach(button => {
@@ -85,16 +98,26 @@ function removeAllHighlighting() {
     possibleMoves.forEach(button => {
         button.classList.remove('possibleMove');
     });
+    const approachOrWithdrawPieces = document.querySelectorAll('.grid-container button.approachOrWithdraw');
+    approachOrWithdrawPieces.forEach(button => {
+        button.classList.remove('approachOrWithdraw');
+    });
 }
 
 
 async function onCellClicked(index: number) {
 
     const handlerState = cellClickHandler.getHandlerState();
+    console.log(handlerState);
     // If a move was made, we know it was made by white, so animate the white piece
     const moveWasPerformed = cellClickHandler.handleCellClick(index);
     if (moveWasPerformed) {
-        const direction = handlerState.possibleMoves.find(move => move.index === index)!.direction;
+        // If a move was performed, but it was done by selecting the approach or withdraw piece, we need to check what the selectedPiece 
+        // was before the current click. This will give us the actual direction.
+        const direction: Direction = handlerState.approachOrWithdrawPieces 
+            ? handlerState.possibleMoves.find(move => move.index === handlerState.approachOrWithdrawMoveIndex)!.direction
+            : handlerState.possibleMoves.find(move => move.index === index)!.direction;
+        
         await animatePieceMove(board, ctx, lightPiece, darkPiece, wood, handlerState.selectedCell!, direction, lightPiece);
     }
 
@@ -114,8 +137,13 @@ async function onCellClicked(index: number) {
 
     if (board.getTurn() === Turn.WHITE) {
         const currentHandlerState = cellClickHandler.getHandlerState();
+        // If we are selecting withdraw or approach, highlight the two pieces
+        if (currentHandlerState.approachOrWithdrawPieces) {
+            console.log('got to approach/withdraw selection');
+            highlightApproachOrWithdrawPieces(currentHandlerState.approachOrWithdrawPieces);
+
         // If we've selected a piece, tell the player where that piece can move
-        if (currentHandlerState.selectedCell !== null) {
+        } else if (currentHandlerState.selectedCell !== null) {
             const possibleMoves: number[] = board.getPossibleMovesForCell(currentHandlerState.selectedCell).map(move => move.index);
             highlightPossibleMoves(possibleMoves);
             

@@ -62,6 +62,10 @@ export interface Neighbour {
     direction: Direction,
 }
 
+/**
+ * index: the index of the cell which the piece would end up at.
+ * direction: the direction the move would make the piece travel.
+ */
 export interface Move {
     index: number,
     direction: Direction,
