@@ -103,20 +103,20 @@
             border-radius: 50%; /* Circular shape */
             transform: translate(-50%, -50%) scale(1); /* Centered and starts at default scale */
             z-index: -1; /* Behind the piece */
-            animation: pulse 2s infinite; /* Pulsating effect */
+            animation: pulse 1s infinite; /* Pulsating effect */
         }
         
         @keyframes pulse {
             0% {
                 transform: translate(-50%, -50%) scale(1); /* Start at normal size */
-                opacity: 0.6; /* Visible */
+                opacity: 0.8; /* Visible */
             }
             50% {
-                transform: translate(-50%, -50%) scale(1.2); /* Slightly larger halo */
+                transform: translate(-50%, -50%) scale(1.1); /* Slightly larger halo */
                 opacity: 0.4; /* Slightly transparent */
             }
             100% {
-                transform: translate(-50%, -50%) scale(1); /* Return to original size */
+                transform: translate(-50%, -50%) scale(1.2); /* Return to original size */
                 opacity: 0; /* Fade out */
             }
         }

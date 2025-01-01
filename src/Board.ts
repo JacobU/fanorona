@@ -235,8 +235,12 @@ export default class Board {
      * @returns {boolean} whether the move will approach an opponents piece.
      */
     private willMoveApproach(currentIndex: number, attackPieceType: PieceType, attackDirection: Direction): boolean {
-        const possibleAttackedPieceIndex: number = currentIndex + 2 * getDeltaIndex(attackDirection, this.columns);
-        if (this.isPositionOnBoard(possibleAttackedPieceIndex) && this.board[possibleAttackedPieceIndex].isPieceType(getOppositePieceType(attackPieceType))) {
+        const attackDelta = getDeltaIndex(attackDirection, this.columns);
+        const possibleAttackedPieceIndex: number = currentIndex + 2 * attackDelta;
+        const isAttackedPieceConnected = this.board[currentIndex + attackDelta].getCellConnections().map(connection => connection.index).includes(possibleAttackedPieceIndex);
+        if (this.isPositionOnBoard(possibleAttackedPieceIndex) 
+            && isAttackedPieceConnected
+            && this.board[possibleAttackedPieceIndex].isPieceType(getOppositePieceType(attackPieceType))) {
             return true;
         }
         return false;
