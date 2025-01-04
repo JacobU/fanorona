@@ -1,3 +1,5 @@
+import Cell from './Cell.js';
+
 // PieceType enum
 export enum PieceType {
     EMPTY = 0,
@@ -57,9 +59,8 @@ export interface Connection {
 }
 
 export interface Neighbour {
-    index: number,
-    pieceType: PieceType,
     direction: Direction,
+    cell: Cell,
 }
 
 /**

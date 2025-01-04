@@ -30,11 +30,13 @@ describe('CellClickHandler tests', () => {
         const handler =  new CellClickHandler(board);
 
         const boardStateBefore: string = board.getBoardPositionsAsString();
-        const handlerStateBefore = { selectedCell: null, possibleMoves: [], attackingChain: false };
+        const handlerStateBefore = { selectedCell: null, possibleMoves: [], attackingChain: false, approachOrWithdrawPieces: null, approachOrWithdrawMoveIndex: null };
         const handlerStateAfterSelection =  { 
             selectedCell: 0, 
             possibleMoves: [ { index: 1, direction: 4 }, { index: 5, direction: 6 }, { index: 6, direction: 7 } ], 
-            attackingChain: false 
+            attackingChain: false,
+            approachOrWithdrawPieces: null,
+            approachOrWithdrawMoveIndex: null,
         }; 
         
         expect(handler.getHandlerState()).to.deep.equal(handlerStateBefore);
@@ -50,7 +52,7 @@ describe('CellClickHandler tests', () => {
         const handler =  new CellClickHandler(board);
 
         const boardStateBefore: string = board.getBoardPositionsAsString();
-        const handlerStateBefore = { selectedCell: null, possibleMoves: [], attackingChain: false };
+        const handlerStateBefore = { selectedCell: null, possibleMoves: [], attackingChain: false, approachOrWithdrawPieces: null, approachOrWithdrawMoveIndex: null };
         
         expect(board.getBoardPositionsAsString()).to.equal(boardStateBefore);
         expect(handler.getHandlerState()).to.deep.equal(handlerStateBefore);
@@ -71,7 +73,7 @@ describe('CellClickHandler tests', () => {
         const handler =  new CellClickHandler(board);
 
         const boardStateBefore: string = board.getBoardPositionsAsString();
-        const handlerStateBefore = { selectedCell: null, possibleMoves: [], attackingChain: false };
+        const handlerStateBefore = { selectedCell: null, possibleMoves: [], attackingChain: false, approachOrWithdrawPieces: null, approachOrWithdrawMoveIndex: null };
         
         expect(board.getBoardPositionsAsString()).to.equal(boardStateBefore);
         expect(handler.getHandlerState()).to.deep.equal(handlerStateBefore);
@@ -87,11 +89,13 @@ describe('CellClickHandler tests', () => {
         const handler =  new CellClickHandler(board);
 
         const boardStateBefore: string = board.getBoardPositionsAsString();
-        const handlerStateBefore = { selectedCell: null, possibleMoves: [], attackingChain: false };
+        const handlerStateBefore = { selectedCell: null, possibleMoves: [], attackingChain: false, approachOrWithdrawPieces: null, approachOrWithdrawMoveIndex: null };
         const handlerStateAfterSelection =  { 
             selectedCell: 0, 
             possibleMoves: [ { index: 1, direction: 4 }, { index: 5, direction: 6 }, { index: 6, direction: 7 } ], 
-            attackingChain: false 
+            attackingChain: false,
+            approachOrWithdrawPieces: null,
+            approachOrWithdrawMoveIndex: null, 
         }; 
         
         expect(handler.getHandlerState()).to.deep.equal(handlerStateBefore);
@@ -119,11 +123,13 @@ describe('CellClickHandler tests', () => {
         const handler =  new CellClickHandler(board);
 
         const boardStateBefore: string = board.getBoardPositionsAsString();
-        const handlerStateBefore = { selectedCell: null, possibleMoves: [], attackingChain: false };
+        const handlerStateBefore = { selectedCell: null, possibleMoves: [], attackingChain: false, approachOrWithdrawPieces: null, approachOrWithdrawMoveIndex: null };
         const handlerStateAfterSelection =  { 
             selectedCell: 1, 
             possibleMoves: [ { index: 2, direction: 4 } ], 
-            attackingChain: false 
+            attackingChain: false,
+            approachOrWithdrawPieces: null,
+            approachOrWithdrawMoveIndex: null, 
         }; 
 
         expect(board.getBoardPositionsAsString()).to.equal(boardStateBefore);
@@ -157,16 +163,20 @@ describe('CellClickHandler tests', () => {
         const handler =  new CellClickHandler(board);
 
         const boardStateBefore: string = board.getBoardPositionsAsString();
-        const handlerStateBefore = { selectedCell: null, possibleMoves: [], attackingChain: false };
+        const handlerStateBefore = { selectedCell: null, possibleMoves: [], attackingChain: false, approachOrWithdrawPieces: null, approachOrWithdrawMoveIndex: null };
         const handlerStateAfterClickingOn1 =  { 
             selectedCell: 1, 
             possibleMoves: [ { index: 2, direction: 4 } ], 
-            attackingChain: false 
+            attackingChain: false,
+            approachOrWithdrawPieces: null,
+            approachOrWithdrawMoveIndex: null, 
         };
         const handlerStateAfterClickingOn5 =  { 
             selectedCell: 5, 
             possibleMoves: [ { index: 10, direction: 6 } ], 
-            attackingChain: false 
+            attackingChain: false,
+            approachOrWithdrawPieces: null,
+            approachOrWithdrawMoveIndex: null, 
         }; 
 
 
@@ -189,11 +199,13 @@ describe('CellClickHandler tests', () => {
         const handler =  new CellClickHandler(board);
 
         const boardStateBefore: string = board.getBoardPositionsAsString();
-        const handlerStateBefore = { selectedCell: null, possibleMoves: [], attackingChain: false };
+        const handlerStateBefore = { selectedCell: null, possibleMoves: [], attackingChain: false, approachOrWithdrawPieces: null, approachOrWithdrawMoveIndex: null };
         const handlerStateAfterSelection =  { 
             selectedCell: 0, 
             possibleMoves: [ { index: 1, direction: 4 }, { index: 5, direction: 6 }, { index: 6, direction: 7 } ], 
-            attackingChain: false 
+            attackingChain: false,
+            approachOrWithdrawPieces: null,
+            approachOrWithdrawMoveIndex: null, 
         }; 
         const boardStateAfterMove: string = '01000' + emptyRow5 + emptyRow5 + emptyRow5 + emptyRow5;
 
@@ -220,10 +232,10 @@ describe('CellClickHandler tests', () => {
         const boardStateAfterSecondMove: string = emptyRow5 + '01020' + emptyRow5 + emptyRow5 + emptyRow5;
         const boardStateAfterThirdMove: string = emptyRow5 + '00100' + emptyRow5 + emptyRow5 + emptyRow5;
         const handlerStateBefore = handler.getHandlerState();
-        const expectedHandlerStateAfterSelection =  { selectedCell: 0, possibleMoves: [ { index: 1, direction: 4 } ], attackingChain: false }; 
-        const expectedHandlerStateAfterFirstMove = { selectedCell: 1, possibleMoves: [ { index: 6, direction: 6 } ], attackingChain: true };
-        const expectedHandlerStateAfterSecondMove = { selectedCell: 6, possibleMoves: [ { index: 7, direction: 4 } ], attackingChain: true };
-        const expectedHandlerStateAfterThirdMove = { selectedCell: null, possibleMoves: [], attackingChain: false };
+        const expectedHandlerStateAfterSelection =  { selectedCell: 0, possibleMoves: [ { index: 1, direction: 4 } ], attackingChain: false, approachOrWithdrawPieces: null, approachOrWithdrawMoveIndex: null }; 
+        const expectedHandlerStateAfterFirstMove = { selectedCell: 1, possibleMoves: [ { index: 6, direction: 6 } ], attackingChain: true, approachOrWithdrawPieces: null, approachOrWithdrawMoveIndex: null };
+        const expectedHandlerStateAfterSecondMove = { selectedCell: 6, possibleMoves: [ { index: 7, direction: 4 } ], attackingChain: true, approachOrWithdrawPieces: null, approachOrWithdrawMoveIndex: null };
+        const expectedHandlerStateAfterThirdMove = { selectedCell: null, possibleMoves: [], attackingChain: false, approachOrWithdrawPieces: null, approachOrWithdrawMoveIndex: null };
         
         expect(board.getBoardPositionsAsString()).to.equal(boardStateBefore);
         expect(handler.getHandlerState()).to.deep.equal(handlerStateBefore);

@@ -1,11 +1,13 @@
 import Cell  from './Cell.js';
-import { Winner, PieceType, getDeltaIndex, getOppositePieceType, getOppositeDirection, Direction, Move, AttackType, CellType, Connection, Neighbour, Turn } from './types.js';
-import chalk from 'chalk';
+import { Winner, PieceType, getDeltaIndex, getOppositePieceType, getOppositeDirection, Direction, Move, AttackType, CellType, Turn } from './types.js';
 
 export default class Board {
     private rows: number;
     private columns: number;
     private board: Cell[];
+    private numWhitePieces: number;
+    private numBlackPieces: number;
+    private startingPiecePositions: PieceType[];
 
     private cellIndexesPieceHasBeenInCurrentTurn: number[]; 
     private currentlyMovingPiece: number | null;
@@ -13,12 +15,16 @@ export default class Board {
     private attackOrWithdraw: AttackType;
 
     constructor(rows: number = 5, columns: number = 9, startingPieces?: string) {
+        this.numWhitePieces = 0;
+        this.numBlackPieces = 0;
+        this.startingPiecePositions = [];
         if (startingPieces) {
             if (rows * columns !== startingPieces.length) {
                 throw new Error('The number starting positions does not match the board size.');
             }
             this.rows = rows;
             this.columns = columns;
+            
             this.board = this.initializeBoard(startingPieces);
         } else {
             this.rows = rows;
@@ -38,53 +44,47 @@ export default class Board {
             const pieceType: PieceType = parseInt(startingPiecePositions[i], 10) as PieceType;
             const cellType = i % 2 == 0 ? CellType.STRONG : CellType.WEAK;
             board.push(new Cell(i, cellType, pieceType, this.rows, this.columns));
+            this.startingPiecePositions.push(pieceType);
+            if (pieceType === PieceType.WHITE) this.numWhitePieces++;
+            else if (pieceType === PieceType.BLACK) this.numBlackPieces++;
+        }
+
+        // Precompute all the neighbours
+        for (const cell of board) {
+            const connections = cell.getCellConnections();
+            connections.forEach(connection => {
+                const neighbourCell = board[connection.index];
+                cell.setNeighbour(connection.direction, neighbourCell);
+            });
         }
         return board;
     }
 
-    public getWinner(): Winner {
-        let numWhitePieces = 0;
-        let numBlackPieces = 0;
-    
-        for (const cell of this.board) {
-            const pieceType = cell.getPieceType();
-            if (pieceType === PieceType.WHITE) {
-                numWhitePieces++;
-            } else if (pieceType === PieceType.BLACK) {
-                numBlackPieces++;
-            }
-            
-            // Exit early if there is more than 1 piece for each player
-            if (numWhitePieces > 0 && numBlackPieces > 0) {
-                return Winner.NONE;
-            }
+    private resetPiecePositions() {
+        for (let i = 0; i < this.rows * this.columns; i++) {
+            this.board[i].setPieceType(this.startingPiecePositions[i]);
         }
-    
-        return numWhitePieces === 0 ? Winner.BLACK : Winner.WHITE;
+    }
+
+    public reset() {
+        this.resetPiecePositions();
+        this.cellIndexesPieceHasBeenInCurrentTurn = []; 
+        this.currentlyMovingPiece = null;
+        this.currentTurn = Turn.WHITE;
+        this.attackOrWithdraw = AttackType.NONE;
     }
 
     /**
-     * The board is displayed on the console with colours and in rows and columns.
+     * @returns {Winner} the winner of the game or Winner.None if there is no winner yet.
      */
-    public displayBoard(): void {
-        let displayString: string = '';
-        for (let i = 0; i < this.columns * this.rows; i++) {
-            switch (this.board[i].getPieceType()) {
-                case PieceType.BLACK:
-                    displayString += chalk.red('B ');
-                    break;
-                case PieceType.WHITE:
-                    displayString += chalk.white('W ');
-                    break;
-                case PieceType.EMPTY:
-                    displayString += chalk.white('0 ');
-                    break;
-            }
-            if ((i + 1) % this.columns == 0) {
-                console.log(displayString);
-                displayString = '';
-            }
+    public getWinner(): Winner {
+        if (this.numBlackPieces === 0) {
+            return Winner.WHITE;
         }
+        if (this.numWhitePieces === 0) {
+            return Winner.BLACK;
+        }
+        return Winner.NONE;
     }
 
     /**
@@ -108,6 +108,10 @@ export default class Board {
             .join('');
     }
 
+    public getBoardPiecePositions(): number[] {
+        return this.board.map(cell => cell.getPieceType());
+    }
+
     public getPieceTypeAtIndex(index: number): PieceType {
         return this.board[index].getPieceType();
     }
@@ -125,20 +129,20 @@ export default class Board {
         // Early return for if we are already moving a piece, since only this piece can be moved.
         if (this.currentlyMovingPiece !== null) {
             return [this.currentlyMovingPiece];
-        } 
-
-        // Otherwise, search for our available options
-        const attackingPieces: number[] = this.board
-            .filter(cell => cell.isPieceType(pieceType) && this.canPieceAttack(cell.getIndex()))
-            .map(cell => cell.getIndex());
-        // If there are no attacking pieces we can return any possible moves
-        if (!attackingPieces || attackingPieces.length === 0) {
-            return this.board
-                .filter(cell => cell.isPieceType(pieceType) && this.doesPieceHaveEmptyNeighbours(cell.getIndex()))
-                .map(cell => cell.getIndex());
-        } else {
-            return attackingPieces;
         }
+
+        const attackingPieces: number[] = [];
+        const moveablePieces: number[] = [];
+
+        for (const cell of this.board) {
+            if (cell.isPieceType(pieceType)) {
+                const index = cell.getIndex();
+                if (this.canPieceAttack(index)) attackingPieces.push(index);
+                if (this.doesPieceHaveEmptyNeighbours(index)) moveablePieces.push(index);
+            }
+        }
+
+        return attackingPieces.length > 0 ? attackingPieces : moveablePieces;
     }
 
     public getBoardsNumberOfColumns(): number {
@@ -158,10 +162,7 @@ export default class Board {
      */
     public willMoveAttackAndWithdraw(index: number, direction: Direction): boolean {
         const pieceType: PieceType = this.board[index].getPieceType();
-
-        const willWithdraw = this.willMoveWithdraw(index, pieceType, direction);
-        const willApproach = this.willMoveApproach(index, pieceType, direction);
-        return (willApproach && willWithdraw);
+        return this.willMoveWithdraw(index, pieceType, direction) && this.willMoveApproach(index, pieceType, direction);
     }
 
     public setAttackOrWithdraw(attackType: AttackType): void {
@@ -183,7 +184,7 @@ export default class Board {
      */
     public performMove(index: number, direction: Direction): boolean {
         if (!(direction in Direction)) {
-            throw new Error('Invalid direction when trying to mover a piece.');
+            throw new Error('Invalid direction when trying to move a piece.');
         }
         const pieceType: PieceType = this.board[index].getPieceType();
         if (pieceType === PieceType.EMPTY) {
@@ -199,7 +200,12 @@ export default class Board {
         let attackType: AttackType = AttackType.NONE;
         
         if (willApproach && willWithdraw) {
-            attackType = this.attackOrWithdraw;
+            // If this is a bot playing, it will not have set the attackType, so just assume approach
+            if (this.attackOrWithdraw === AttackType.NONE) {
+                attackType = AttackType.APPROACH;
+            } else {
+                attackType = this.attackOrWithdraw;
+            }
         } else if (willWithdraw) {
             attackType = AttackType.WITHDRAW;
         } else if (willApproach) {
@@ -210,7 +216,6 @@ export default class Board {
         this.attackOrWithdraw = AttackType.NONE;
 
         // Set the new index after moving
-        console.log('Moved %d in direction %', index, direction);
         index = this.movePiece(pieceType, index, direction);
         if (attackType !== AttackType.NONE) {
             this.removeAttackedPieces(index, pieceType, direction, attackType);
@@ -243,19 +248,23 @@ export default class Board {
         if (moves.length === 0) {
             return [];
         }
-    
-        // TODO. WE NEED TO FILTER OUT THE MOVES WHERE IT HAS ALREADY BEEN
-
-        // If any of the moves are attacking, just return those. Otherwise just return the complete list of moves.
-        const attackingMoves = moves.filter(move =>
-            this.willMoveApproach(index, pieceType, move.direction) ||
-            this.willMoveWithdraw(index, pieceType, move.direction)
-        );
-        return attackingMoves.length > 0 ? attackingMoves : moves;
-    }
-
-    private getCellNeighbours(index: number): Neighbour[] {
-        return this.getNeighbours(index, true);
+        
+        // If player is in the middle of a turn with previous moves, filter out all the indexes they have been to as they can't move there again.
+        if (this.cellIndexesPieceHasBeenInCurrentTurn.length !== 0) {
+            return moves.filter(move =>
+                !this.cellIndexesPieceHasBeenInCurrentTurn.includes(move.index) && 
+                (this.willMoveApproach(index, pieceType, move.direction) || this.willMoveWithdraw(index, pieceType, move.direction))
+            );
+        
+        // Otherwise its their first move in the turn, so they can use a paika move if no attacking moves are available
+        } else {
+            // If any of the moves are attacking, just return those. Otherwise just return the complete list of moves.
+            const attackingMoves = moves.filter(move =>
+                this.willMoveApproach(index, pieceType, move.direction) ||
+                this.willMoveWithdraw(index, pieceType, move.direction)
+            );
+            return attackingMoves!.length > 0 ? attackingMoves! : moves;
+        }
     }
 
     /**
@@ -267,7 +276,7 @@ export default class Board {
     private willMoveApproach(currentIndex: number, attackPieceType: PieceType, attackDirection: Direction): boolean {
         const attackDelta = getDeltaIndex(attackDirection, this.columns);
         const possibleAttackedPieceIndex: number = currentIndex + 2 * attackDelta;
-        const isAttackedPieceConnected = this.board[currentIndex + attackDelta].getCellConnections().map(connection => connection.index).includes(possibleAttackedPieceIndex);
+        const isAttackedPieceConnected = this.board[currentIndex + attackDelta].getCellConnections().some(connection => connection.index === possibleAttackedPieceIndex);
         if (this.isPositionOnBoard(possibleAttackedPieceIndex) 
             && isAttackedPieceConnected
             && this.board[possibleAttackedPieceIndex].isPieceType(getOppositePieceType(attackPieceType))) {
@@ -284,7 +293,7 @@ export default class Board {
      */
     private willMoveWithdraw(currentIndex: number, attackPieceType: PieceType, moveDirection: Direction): boolean {
         const possibleAttackedPieceIndex: number = currentIndex + getDeltaIndex(getOppositeDirection(moveDirection), this.columns);
-        const isAttackedPieceConnected = this.board[currentIndex].getCellConnections().map(connection => connection.index).includes(possibleAttackedPieceIndex);
+        const isAttackedPieceConnected = this.board[currentIndex].getCellConnections().some(connection => connection.index === possibleAttackedPieceIndex);
         if (this.isPositionOnBoard(possibleAttackedPieceIndex) 
             && isAttackedPieceConnected
             && this.board[possibleAttackedPieceIndex].isPieceType(getOppositePieceType(attackPieceType))) {
@@ -298,12 +307,11 @@ export default class Board {
      * @param {number} index the index of the piece/cell
      */
     private doesPieceHaveEmptyNeighbours(index: number): boolean {
-        // TODO might be good to store the results so you dont have to calculate them again
         // Early return if we have accidentally asked to move a cell that is empty
         if (this.board[index].getPieceType() === PieceType.EMPTY) {
             return false;
         }
-        return this.getCellNeighbours(index).some(cell => cell.pieceType === PieceType.EMPTY);
+        return this.board[index].getNeighbours().some(neighbour => neighbour.cell.getPieceType() === PieceType.EMPTY);
     }
 
     /**
@@ -317,9 +325,7 @@ export default class Board {
         }
         const possibleMoves: Move[] = this.getEmptyNeighbouringCellsAsMoves(index);
         const attackingPieceType = this.board[index].getPieceType();
-        const canApproach: boolean = possibleMoves.some(move => this.willMoveApproach(index, attackingPieceType, move.direction));
-        const canWithdraw: boolean = possibleMoves.some(move => this.willMoveWithdraw(index, attackingPieceType, move.direction));
-        return (canApproach || canWithdraw);
+        return (possibleMoves.some(move => this.willMoveApproach(index, attackingPieceType, move.direction)) || possibleMoves.some(move => this.willMoveWithdraw(index, attackingPieceType, move.direction)));
     }
 
     /**
@@ -360,9 +366,15 @@ export default class Board {
             currentIndex += deltaIndexFromDirection;
         }
         currentIndex += deltaIndexFromDirection;
-        while (this.isPositionOnBoard(currentIndex) && this.board[currentIndex].getPieceType() === getOppositePieceType(pieceType)) {
+        const oppositePieceType = getOppositePieceType(pieceType);
+        let isChainStillConnected: boolean = true;
+        while (this.isPositionOnBoard(currentIndex) && this.board[currentIndex].getPieceType() === oppositePieceType && isChainStillConnected) {
             this.board[currentIndex].removePiece();
+            // Track the removal of this piece so we can easily know how many pieces of each type on the board.
+            pieceType === PieceType.WHITE ? this.numBlackPieces-- : this.numWhitePieces--;
+            const previousIndex = currentIndex;
             currentIndex += deltaIndexFromDirection;
+            isChainStillConnected = this.board[previousIndex].getCellConnections().some(connection => connection.index === currentIndex);
         }
     }
 
@@ -387,34 +399,13 @@ export default class Board {
     }
 
     /**
-     * 
      * @param index the index of the cell to check for moves.
      * @returns a list of Move[] that a piece in the cell could move to.
      */
     private getEmptyNeighbouringCellsAsMoves(index: number): Move[] {
-        return this.getCellNeighbours(index)
-            .filter((neighbour) => neighbour.pieceType === PieceType.EMPTY)
-            .map(neighbour => ({index: neighbour.index, direction: neighbour.direction}));
-    }
-
-    private getNeighbours(index: number, includeEmptyCells: boolean): Neighbour[] {
-        const cellNeighbours: Neighbour[] = [];
-
-        const connections: Connection[] = this.board[index].getCellConnections();
-        for (const connection of connections) {
-            const neighborCell = this.board[connection.index];
-            const isEmpty = neighborCell.getPieceType() === PieceType.EMPTY;
-
-            if (includeEmptyCells || (!includeEmptyCells && !isEmpty)) {
-                cellNeighbours.push({
-                    index: connection.index,
-                    pieceType: neighborCell.getPieceType(),
-                    direction: connection.direction,
-                });
-            }
-        }
-
-        return cellNeighbours;
+        return this.board[index].getNeighbours()
+            .filter((neighbour) => neighbour.cell.getPieceType() === PieceType.EMPTY)
+            .map(neighbour => ({index: neighbour.cell.getIndex(), direction: neighbour.direction}));
     }
 
     private isPositionOnBoard(index: number): boolean {
@@ -424,5 +415,4 @@ export default class Board {
     private setCell(index: number, pieceType: PieceType): void {
         this.board[index].setPieceType(pieceType);
     }
-
 }

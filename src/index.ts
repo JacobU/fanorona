@@ -1,25 +1,19 @@
 import Board from './Board.js';
 import BotRandomPlayer from './BotRandomPlayer.js';
 import CellClickHandler from './CellClickHandler.js';
-import { PieceType, Turn, Direction } from './types.js';
+import { PieceType, Turn, Direction, Winner } from './types.js';
 import { drawBoard, animatePieceMove } from './DrawBoardAndPieces.js';
 
 // Set up the canvas and context
 const canvas = document.getElementById("fanoronaBoard") as HTMLCanvasElement;
 const ctx = canvas.getContext("2d")!;
 
-// Dimensions of the board
-const rows = 5;
-const cols = 9;
-const cellWidth = canvas.width / cols;
-const cellHeight = canvas.height / rows;
-
 // Load the circle image
 const lightPiece = new Image();
 const darkPiece = new Image();
 const wood = new Image();
-lightPiece.src = "./assets/svg/lightPieceDetailed.svg"; 
-darkPiece.src = "./assets/svg/darkPieceDetailed.svg";
+lightPiece.src = "./assets/svg/lightPiece.svg"; 
+darkPiece.src = "./assets/svg/darkPiece.svg";
 wood.src = "./assets/svg/wood.svg";
 
 const board = new Board();
@@ -48,6 +42,8 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 });
+
+document.getElementById('play-again-button')!.addEventListener('click', playAgain);
 
 // Initial highlighting
 highlightMoveablePieces(board.getPiecesThatPlayerCanMove(PieceType.WHITE));
@@ -79,7 +75,6 @@ function highlightMoveablePieces(moveablePieces: number[]) {
 function highlightApproachOrWithdrawPieces(highlightApproachOrWithdrawPieces: number[]) {
     const buttons = document.querySelectorAll('.grid-container button');
 
-    console.log('highlighting approach and withdraw pieces');
     // Display the two pieces that players can choose to attack
     for (let i = 0; i < highlightApproachOrWithdrawPieces.length; i++) {
         const button = buttons[highlightApproachOrWithdrawPieces[i]];
@@ -104,11 +99,32 @@ function removeAllHighlighting() {
     });
 }
 
+function endGame() {
+    let message: string;
+    if (board.getWinner() === Winner.WHITE) {
+        message = 'You won!';
+    } else {
+        message = 'You lost!'
+    }
+    const messageContainer = document.getElementById('message-container');
+    messageContainer!.style.display = 'flex';
+
+    const winLossMessageDiv = document.getElementById('game-message');
+    winLossMessageDiv!.textContent = message;
+}
+
+function playAgain() {
+    const messageContainer = document.getElementById('message-container');
+    messageContainer!.style.display = 'none';
+    board.reset();
+    removeAllHighlighting();
+    highlightMoveablePieces(board.getPiecesThatPlayerCanMove(PieceType.WHITE));
+    drawBoard(board, ctx, lightPiece, darkPiece, wood, null);
+}
 
 async function onCellClicked(index: number) {
 
     const handlerState = cellClickHandler.getHandlerState();
-    console.log(handlerState);
     // If a move was made, we know it was made by white, so animate the white piece
     const moveWasPerformed = cellClickHandler.handleCellClick(index);
     if (moveWasPerformed) {
@@ -123,23 +139,30 @@ async function onCellClicked(index: number) {
 
     removeAllHighlighting();
 
+    if (board.getWinner() !== Winner.NONE) {
+        endGame();
+        return;
+    }
+
     if (board.getTurn() === Turn.BLACK) {
-        console.log('bot made a move');
         let notFinishedTurn: boolean = true;
         while(notFinishedTurn) {
             const moveResults = botPlayer.makeMove();
             notFinishedTurn = moveResults.canMoveAgain;
             await animatePieceMove(board, ctx, lightPiece, darkPiece, wood, moveResults.move.index, moveResults.move.direction, darkPiece);
         }
-        console.log('redrawing board with black move');
         drawBoard(board, ctx, lightPiece, darkPiece, wood, null);
+    }
+
+    if (board.getWinner() !== Winner.NONE) {
+        endGame();
+        return;
     }
 
     if (board.getTurn() === Turn.WHITE) {
         const currentHandlerState = cellClickHandler.getHandlerState();
         // If we are selecting withdraw or approach, highlight the two pieces
         if (currentHandlerState.approachOrWithdrawPieces) {
-            console.log('got to approach/withdraw selection');
             highlightApproachOrWithdrawPieces(currentHandlerState.approachOrWithdrawPieces);
 
         // If we've selected a piece, tell the player where that piece can move
@@ -153,4 +176,6 @@ async function onCellClicked(index: number) {
             highlightMoveablePieces(moveablePieces);
         }
     }
+
+
 }

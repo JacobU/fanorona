@@ -27,13 +27,6 @@ export default class CellClickHandler {
         // 4. The player is in the middle of an attacking chain and clicks on anything besides a possible 
         //    move (given that you are not in the middle of selecting an approach/withdraw)
         // 5. The player is in the middle of choosing whether to attack or withdraw and clicks on anything besides those two indexes
-        console.log('index is: %d', index);
-        console.log('which cell is selected: %d', this.currentlySelectedCell);
-        console.log('are we selecting A/W: %s', this.isSelectingAttackOrWithdraw);
-        if (this.isSelectingAttackOrWithdraw) {
-            console.log('approach: %d, withdraw: %d', this.approachOrWithdrawPieces![0], this.approachOrWithdrawPieces![1]);
-        }
-        
         if (this.board.getTurn() !== Turn.WHITE 
             || (this.currentlySelectedCell === null && !this.board.getPiecesThatPlayerCanMove(this.playersPieceType).includes(index))
             || (this.currentlySelectedCell !== null && !this.isSelectingAttackOrWithdraw &&
@@ -43,14 +36,11 @@ export default class CellClickHandler {
             || (this.isSelectingAttackOrWithdraw && !this.approachOrWithdrawPieces?.includes(index))
         ) 
         {
-            console.log('early return');
             return false;
         }
 
-        console.log(this.isSelectingAttackOrWithdraw);
         // Handle the case where we are selecting which piece to attack during a move (approach vs withdraw)
         if (this.isSelectingAttackOrWithdraw) {
-            console.log('reached the a/w section');
             if (this.approachOrWithdrawPieces![0] === index) {
                 this.board.setAttackOrWithdraw(AttackType.APPROACH);
             } else {
@@ -66,16 +56,7 @@ export default class CellClickHandler {
 
         // Handle the cases when you are in the middle of a turn
         } else if (this.inTheMiddleOfAttackingChain && this.currentlySelectedCell) {
-            const actualMove = this.possibleMoveIndexes.find(move => move.index === index)!;
-            const isMoveAttackAndWithdraw = this.board.willMoveAttackAndWithdraw(this.currentlySelectedCell, actualMove.direction);
-            if (isMoveAttackAndWithdraw) {
-                this.moveDirectionBeforeApproachWithdrawSelection = actualMove.direction;
-                this.updateOnApproachAndWithdraw(actualMove, index);
-            } else {
-                const canMoveAgain = this.board.performMove(this.currentlySelectedCell, actualMove.direction);
-                this.updateOnPieceMove(index, canMoveAgain);
-                performedMove = true;
-            }
+            performedMove = this.handleAttemptedMove(index);
         // Handle all cases where no piece is currently selected            
         } else if (this.currentlySelectedCell === null) {
             // Because of the early returns above, this piece should always be a valid piece to select
@@ -85,16 +66,7 @@ export default class CellClickHandler {
         } else {    
             // Selected one of the cells the piece can move to
             if (this.possibleMoveIndexes.map(move => move.index).includes(index)) {
-                const actualMove = this.possibleMoveIndexes.find(move => move.index === index)!;
-                const isMoveAttackAndWithdraw = this.board.willMoveAttackAndWithdraw(this.currentlySelectedCell, actualMove.direction);
-                if (isMoveAttackAndWithdraw) {
-                    this.moveDirectionBeforeApproachWithdrawSelection = actualMove.direction;
-                    this.updateOnApproachAndWithdraw(actualMove, index);
-                } else {
-                    const canMoveAgain = this.board.performMove(this.currentlySelectedCell, actualMove.direction);
-                    this.updateOnPieceMove(index, canMoveAgain);
-                    performedMove = true;
-                }
+                performedMove = this.handleAttemptedMove(index);
 
             // Selected an unmovable piece of their own OR the selected piece again
             } else if (!this.board.getPiecesThatPlayerCanMove(this.playersPieceType).includes(index) ||
@@ -129,8 +101,21 @@ export default class CellClickHandler {
         }
     }
 
+    private handleAttemptedMove(index: number): boolean {
+        const actualMove = this.possibleMoveIndexes.find(move => move.index === index)!;
+        const isMoveAttackAndWithdraw = this.board.willMoveAttackAndWithdraw(this.currentlySelectedCell!, actualMove.direction);
+        if (isMoveAttackAndWithdraw) {
+            this.moveDirectionBeforeApproachWithdrawSelection = actualMove.direction;
+            this.updateOnApproachAndWithdraw(actualMove, index);
+            return false;
+        } else {
+            const canMoveAgain = this.board.performMove(this.currentlySelectedCell!, actualMove.direction);
+            this.updateOnPieceMove(index, canMoveAgain);
+            return true;
+        }
+    }
+
     private updateOnApproachAndWithdraw(actualMove: Move, selectedIndex: number): void {
-        console.log('set A/W to true');
         this.isSelectingAttackOrWithdraw = true;
         const deltaIndex = getDeltaIndex(actualMove.direction, this.board.getBoardsNumberOfColumns());
         const approachIndex: number = this.currentlySelectedCell! + (2 * deltaIndex);

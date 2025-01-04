@@ -1,5 +1,5 @@
 import Board from '../src/Board.js';
-import { Direction, getDeltaIndex } from '../src/types.js'; 
+import { Direction, getDeltaIndex, PieceType } from '../src/types.js'; 
 
 const cellSize: number = 100;
 const pieceWidth: number = 60;
@@ -45,17 +45,17 @@ export function drawBoard(board: Board, ctx: CanvasRenderingContext2D, lightPiec
         }
     }
 
-    let boardString = board.getBoardPositionsAsString();
+    let boardPositions = board.getBoardPiecePositions();
     // Exclude the current piece from being drawn temporarily
     if (indexesToExclude) {
         for(let i = 0; i < indexesToExclude.length; i++) {
-            boardString = boardString.slice(0, indexesToExclude[i]) + '0' + boardString.slice(indexesToExclude[i] + 1);
+            boardPositions[indexesToExclude[i]] = PieceType.EMPTY;
         }
     }
-    drawPieces(ctx, lightPiece, darkPiece, boardString, rows, cols, cellSize);
+    drawPieces(ctx, lightPiece, darkPiece, boardPositions, rows, cols, cellSize);
 }
 
-function drawPieces(ctx: CanvasRenderingContext2D, lightPiece: HTMLImageElement, darkPiece: HTMLImageElement, boardString: string, rows: number, cols: number, cellSize: number) {
+function drawPieces(ctx: CanvasRenderingContext2D, lightPiece: HTMLImageElement, darkPiece: HTMLImageElement, boardPositions: number[], rows: number, cols: number, cellSize: number) {
     let boardIndex = 0;
     const pieceWidth = 60;
     
@@ -65,15 +65,15 @@ function drawPieces(ctx: CanvasRenderingContext2D, lightPiece: HTMLImageElement,
             const x = col * cellSize + cellSize / 2 - pieceWidth / 2;
             const y = row * cellSize + cellSize / 2 - pieceWidth / 2;
 
-            const pieceType = boardString.at(boardIndex);
+            const pieceType = boardPositions[boardIndex];
             // Draw the circle
             switch (pieceType) {
-                case '0':
+                case PieceType.EMPTY:
                     break;
-                case '1':
+                case PieceType.WHITE:
                     ctx.drawImage(lightPiece, x, y, pieceWidth, pieceWidth);
                     break;
-                case '2':
+                case PieceType.BLACK:
                     ctx.drawImage(darkPiece, x, y, pieceWidth, pieceWidth);
             }
             boardIndex++;
