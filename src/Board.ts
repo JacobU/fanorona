@@ -1,5 +1,5 @@
 import Cell  from './Cell.js';
-import { Winner, PieceType, getDeltaIndex, getOppositePieceType, getOppositeDirection, Direction, Move, AttackType, CellType, Turn } from './types.js';
+import { Winner, PieceType, getDeltaIndex, getOppositePieceType, getOppositeDirection, Direction, Move, AttackType, CellType, Turn, CompleteMove, TreeNode } from './types.js';
 
 export default class Board {
     private rows: number;
@@ -60,18 +60,29 @@ export default class Board {
         return board;
     }
 
-    private resetPiecePositions() {
+    private resetPiecePositions(positions: number[]) {
         for (let i = 0; i < this.rows * this.columns; i++) {
-            this.board[i].setPieceType(this.startingPiecePositions[i]);
+            this.board[i].setPieceType(positions[i]);
         }
     }
 
     public reset() {
-        this.resetPiecePositions();
+        this.resetPiecePositions(this.startingPiecePositions);
         this.cellIndexesPieceHasBeenInCurrentTurn = []; 
         this.currentlyMovingPiece = null;
         this.currentTurn = Turn.WHITE;
         this.attackOrWithdraw = AttackType.NONE;
+    }
+
+    /**
+     * @returns {number[]} the board state as a list of the pieceTypes in each cell
+     */
+    private saveBoardState(): number[] {
+        const boardState: number[] = [];
+        for (let i = 0; i < this.columns * this.rows; i++) {
+            boardState.push(this.board[i].getPieceType());
+        }
+        return boardState;
     }
 
     /**
@@ -336,7 +347,7 @@ export default class Board {
      * @param previousAttackdirection the direction the last move in the turn attacked.
      * @returns true if the player can play another move.
      */
-    private canPlayerMoveAgain(currentIndex: number, pieceType: PieceType, previousAttackdirection: Direction): boolean {
+    private canPlayerMoveAgain(currentIndex: number, pieceType: PieceType, previousAttackdirection: Direction | null): boolean {
         // We check that there is at least a single neighbour of the current index of the piece that meet all of the following criteria:
         // 1) EMPTY, 2) not the original index of the piece in this turn, 3) in a different direction the last directon's move,
         // and 4) are attacking moves.
@@ -344,7 +355,7 @@ export default class Board {
             .some(move => 
                 !this.cellIndexesPieceHasBeenInCurrentTurn.includes(move.index) &&
                 move.direction !== previousAttackdirection &&
-                move.direction !== getOppositeDirection(previousAttackdirection) &&
+                (!previousAttackdirection || move.direction !== getOppositeDirection(previousAttackdirection)) &&
                 (this.willMoveApproach(currentIndex, pieceType, move.direction) || this.willMoveWithdraw(currentIndex, pieceType, move.direction)));
     }
 
@@ -414,5 +425,63 @@ export default class Board {
 
     private setCell(index: number, pieceType: PieceType): void {
         this.board[index].setPieceType(pieceType);
+    }
+
+    private getAllPossibleCompleteMoves(pieceType: PieceType): CompleteMove[] {
+        const piecesThatCanMove = this.getPiecesThatPlayerCanMove(pieceType);
+        const originalBoardState = this.saveBoardState();
+        let allMoves: CompleteMove[] = [];
+        for (let i = 0; i < piecesThatCanMove.length; i++) {
+            const movesForPiece = this.getAllPossibleMovesForSinglePiece(piecesThatCanMove[i], originalBoardState);
+            for (let j = 0; j < movesForPiece.length; j++) {
+                allMoves.push(movesForPiece[j]);
+            }
+        }
+
+        return []
+    }
+
+    private getAllPossibleMovesForSinglePiece(index: number, originalBoardState: number[]): CompleteMove[] {
+        
+        return [];
+    }
+
+    /**
+     * 
+     * @param index the index of the piece we are moving.
+     * @param pieceType the type of piece we are building a move tree for.
+     * @param previousMoveDirection the direction of the previous move (null for the first node).
+     * @returns 
+     */
+
+
+    //// GOING TO HAVE TO FIGURE OUT HOW TO RESET THE STATE OF THE BOARD EACH TIME
+    private buildMoveTreeForSinglePiece(
+        index: number,
+        pieceType: PieceType,
+        previousMoveDirection: Direction | null,
+    ): TreeNode<number> {
+        const node: TreeNode<number> = {
+            value: index,
+            children: [],
+            isComplete: this.canPlayerMoveAgain(index, pieceType, previousMoveDirection),
+            attackType: AttackType.NONE,
+        };
+
+        // Get possible moves from the current index
+        const possibleMoves = this.getPossibleMovesForCell(index);
+    
+        // If the chain is complete, stop recursion
+        if (node.isComplete) {
+            return node;
+        }
+    
+        // For each possible move, create a child node
+        for (const nextMove of possibleMoves) {
+            const childNode = this.buildMoveTreeForSinglePiece(nextMove.index, pieceType, nextMove.direction);
+            node.children.push(childNode);
+        }
+    
+        return node;
     }
 }

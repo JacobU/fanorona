@@ -41,6 +41,48 @@ export enum Direction {
     DOWNRIGHT = 7,
 }
 
+export interface TreeNode<T> {
+    value: T;
+    children: TreeNode<T>[];
+    isComplete: boolean; // Tracks if the node represents a complete move
+    attackType: AttackType;
+}
+
+export function addChild<T>(parent: TreeNode<T>, child: TreeNode<T>): void {
+    parent.children.push(child);
+}
+
+export function getAllPaths<T>(node: TreeNode<T>): T[][] {
+    const paths: T[][] = [];
+
+    function traverse(currentNode: TreeNode<T>, currentPath: T[]): void {
+        // Add the current node's value to the path
+        currentPath.push(currentNode.value);
+
+        // If the node has no children, it’s a leaf node—record the path
+        if (currentNode.children.length === 0) {
+            paths.push([...currentPath]); // Push a copy of the current path
+        } else {
+            // Traverse all children
+            for (const child of currentNode.children) {
+                traverse(child, currentPath);
+            }
+        }
+
+        // Backtrack by removing the last node (clean up the path for siblings)
+        currentPath.pop();
+    }
+
+    traverse(node, []);
+    return paths;
+}
+
+export interface CompleteMove {
+    initialMovingPieceIndex: number,
+    moveIndexes: number[],
+    moveTypes: AttackType[],
+}
+
 export function getOppositeDirection(direction: Direction): Direction {
     // There are 8 possible directions
     return (7 - direction);
