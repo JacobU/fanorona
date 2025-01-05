@@ -77,6 +77,15 @@ export function getAllPaths<T>(node: TreeNode<T>): T[][] {
     return paths;
 }
 
+export interface BoardState {
+    positions: number[],
+    numWhitePieces: number,
+    numBlackPieces: number,
+    turn: Turn,
+    turnMoveIndexes: number[],
+    currentlyMovingPiece: number | null,
+}
+
 export interface CompleteMove {
     initialMovingPieceIndex: number,
     moveIndexes: number[],
@@ -112,6 +121,7 @@ export interface Neighbour {
 export interface Move {
     index: number,
     direction: Direction,
+    attackType: AttackType,
 }
 
 // AttackType enum
