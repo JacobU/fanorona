@@ -65,7 +65,7 @@ export default class Board {
         this.numWhitePieces = boardState.numWhitePieces;
         this.numBlackPieces = boardState.numBlackPieces;
         this.currentTurn = boardState.turn;
-        this.turnMoveIndexes = boardState.turnMoveIndexes; 
+        this.turnMoveIndexes = [...boardState.turnMoveIndexes]; 
         this.currentlyMovingPiece = boardState.currentlyMovingPiece;
         this.attackOrWithdraw = AttackType.NONE;
     }
@@ -98,13 +98,13 @@ export default class Board {
     /**
      * @returns {BoardState} the board state
      */
-    private saveBoardState(): BoardState {
+    public saveBoardState(): BoardState {
         return { 
             positions: this.saveBoardPositions(), 
             numWhitePieces: this.numWhitePieces, 
             numBlackPieces: this.numBlackPieces, 
             turn: this.currentTurn,
-            turnMoveIndexes: this.turnMoveIndexes,
+            turnMoveIndexes: [...this.turnMoveIndexes],
             currentlyMovingPiece: this.currentlyMovingPiece, 
         };
     }
@@ -227,6 +227,9 @@ export default class Board {
             throw new Error('Cant move an EMPTY piece.')
         }
 
+
+
+
         this.currentlyMovingPiece = index;
 
         // Always add the index that is has been to
@@ -274,11 +277,12 @@ export default class Board {
     }
 
     private getEmptyCellsThatHaventBeenVisited(index: number) {
-        return this.board[index].getNeighbours()
+        const result = this.board[index].getNeighbours()
             .filter((neighbour) => 
                 neighbour.cell.getPieceType() === PieceType.EMPTY
                 && !this.turnMoveIndexes.includes(neighbour.cell.getIndex()))
             .map(neighbour => ({index: neighbour.cell.getIndex(), direction: neighbour.direction}));
+        return result;
     }
 
     /**
@@ -293,6 +297,9 @@ export default class Board {
         const pieceType = this.board[index].getPieceType();
         // TODO FIGURE OUT WHY IN TREE THIS IS RETURNING MOVES THAT HAVE ALREADY BEEN MOVED TO
         let moves: {index: number, direction: Direction }[] = this.getEmptyCellsThatHaventBeenVisited(index);
+        console.log("cells we have visited",this.turnMoveIndexes);
+        console.log("cells that havent been visited or are around our piece", moves);
+        
 
         // Return early if there are no moves
         if (moves.length === 0) {
@@ -556,26 +563,40 @@ export default class Board {
             attackType: attackType,
         };
 
+        //console.log("saving main board state");
         const boardState = this.saveBoardState();
+        //console.log(this.saveBoardState());
 
         // Get possible moves from the current index
+        //console.log("searching possible moves");
         const possibleMoves = this.getPossibleMovesForCell(index);
         //console.log('Get possible moves:', this.getPossibleMovesForCell(index));
     
         // If the chain is complete, stop recursion
         if (node.isComplete) {
+            //console.log("turn is complete");
             return node;
         }
     
         // For each possible move, create a child node
         for (const nextMove of possibleMoves) {
+            //console.log("searching child node ", nextMove.index);
+            const localBoardState = this.saveBoardState();
+            //console.log("saving local board state");
+            //console.log(this.saveBoardState());
             this.setAttackOrWithdraw(nextMove.attackType);
+            //console.log("moving piece");
             this.performMove(index, nextMove.direction);
             const childNode = this.buildMoveTreeForSinglePiece(nextMove.index, pieceType, nextMove.direction, nextMove.attackType);
-            this.resetBoardState(boardState);
+            //console.log("resetting local board state");
+            this.resetBoardState(localBoardState);
+            //console.log(this.saveBoardState());
             node.children.push(childNode);
         }
-    
+        
+        //console.log("resetting main board state", boardState);
+        this.resetBoardState(boardState);
+
         return node;
     }
 }

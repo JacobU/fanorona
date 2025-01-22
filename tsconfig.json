@@ -1,18 +1,19 @@
 {
-    "compilerOptions": {
-      "lib": ["es2023", "dom"],
-      "module": "node16",
-      "target": "es2022",
-      "strict": true,
-      "esModuleInterop": true,
-      "skipLibCheck": true,
-      "moduleResolution": "node16",
-      "noEmit": false,
-      "forceConsistentCasingInFileNames": true,
-      "outDir": "./dist",                   // Output directory for compiled files
-      "rootDir": "./",                      // Root directory for source files
-      "sourceMap": true
-    },
-    "include": ["tests/**/*.ts", "src/**/*"],
-    "exclude": ["node_modules", "dist"]
-  }
+  "compilerOptions": {
+    "lib": ["es2023", "dom"],
+    "module": "node16",
+    "target": "es2022",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "moduleResolution": "node16",
+    "noEmit": false,
+    "forceConsistentCasingInFileNames": true,
+    "outDir": "./dist/src", // Output directory for compiled source files
+    "rootDir": "./src", // Root directory for source files
+    "sourceMap": true,
+    "composite": true, 
+  },
+  "include": ["src/**/*"], // Include only src files
+  "exclude": ["node_modules", "dist", "tests"] // Exclude tests and other unnecessary files
+}

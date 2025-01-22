@@ -1,0 +1,11 @@
+{
+    "extends": "./tsconfig.json", // Extend the base tsconfig.json
+    "compilerOptions": {
+      "outDir": "./dist/tests", // Output directory for compiled test files
+      "rootDir": "./tests", // Root directory for test files
+      "noEmit": false // Ensure files are emitted (compiled)
+    },
+    "include": ["tests/**/*"], // Include only test files
+    "exclude": ["node_modules", "dist", "src"], // Exclude src and other unnecessary files
+    "references": [{ "path": "./tsconfig.json" }] // Reference the src project
+  }
