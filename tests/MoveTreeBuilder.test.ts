@@ -3,6 +3,11 @@ import Board from '../src/Board.js';
 
 
 describe('MoveTreeBuilder tests', () => {
+    it('should return empty if there are no moves', () => {
+
+        
+    });
+
     it('should return the right possible moves for simple 3x3 board', () => {
         const board = new Board(3, 3, '000210002');
 

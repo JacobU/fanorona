@@ -227,9 +227,6 @@ export default class Board {
             throw new Error('Cant move an EMPTY piece.')
         }
 
-
-
-
         this.currentlyMovingPiece = index;
 
         // Always add the index that is has been to
