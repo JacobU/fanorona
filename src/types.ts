@@ -23,12 +23,6 @@ export enum CellType {
     WEAK = 1,
 }
 
-// MoveType enum
-export enum MoveType {
-    APPROACH = 0,
-    WITHDRAW = 1,
-}
-
 // Direction enum
 export enum Direction {
     UPLEFT = 0,
