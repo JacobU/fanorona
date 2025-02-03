@@ -518,7 +518,6 @@ export default class Board {
         function traverse(currentNode: TreeNode<number>, currentPath: CompleteMove, isRoot: boolean): void {
             // Clone the path to ensure immutability for each branch
             const newPath: CompleteMove = {
-                initialMovingPieceIndex: currentPath.initialMovingPieceIndex,
                 moveIndexes: isRoot ? [...currentPath.moveIndexes] : [...currentPath.moveIndexes, currentNode.value],
                 moveTypes: isRoot ? [...currentPath.moveTypes] : [...currentPath.moveTypes, currentNode.attackType],
             };
@@ -536,13 +535,14 @@ export default class Board {
         }
     
         const initialMove: CompleteMove = {
-            initialMovingPieceIndex: startIndex,
             moveIndexes: [],
             moveTypes: [],
         };
     
         traverse(node, initialMove, true); // Start traversal with the root node
-        return paths;
+        // Filter out paths with empty moveIndexes and moveTypes
+        const validPaths = paths.filter(path => path.moveIndexes.length > 0 || path.moveTypes.length > 0);
+        return validPaths;
     }
 
     /**
@@ -608,4 +608,19 @@ export default class Board {
 
         return node;
     }
+
+    /**
+     * @param boardState the state of the board to give a rating for.
+     * @param pieceType the player who we want the rating to be relative to (positive if good position, negative if bad position).
+     * @returns a number representing the rating of the overall board positions.
+     */
+    private rateBoardPositionSimple(boardState: BoardState, pieceType: PieceType): number {
+        if (pieceType === PieceType.WHITE) {
+            return boardState.numWhitePieces - boardState.numBlackPieces;
+        } else {
+            return boardState.numBlackPieces - boardState.numWhitePieces;
+        }
+    }
+
+
 }

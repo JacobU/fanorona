@@ -81,7 +81,6 @@ export interface BoardState {
 }
 
 export interface CompleteMove {
-    initialMovingPieceIndex: number,
     moveIndexes: number[],
     moveTypes: AttackType[],
 }
