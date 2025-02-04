@@ -40,6 +40,7 @@ export interface TreeNode<T> {
     children: TreeNode<T>[];
     isComplete: boolean; // Tracks if the node represents a complete move
     attackType: AttackType;
+    rating: number | null;
 }
 
 export function addChild<T>(parent: TreeNode<T>, child: TreeNode<T>): void {
@@ -83,6 +84,7 @@ export interface BoardState {
 export interface CompleteMove {
     moveIndexes: number[],
     moveTypes: AttackType[],
+    rating: number | null,
 }
 
 export function getOppositeDirection(direction: Direction): Direction {

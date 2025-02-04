@@ -411,19 +411,27 @@ export default class Board {
                 (!previousAttackdirection || move.direction !== getOppositeDirection(previousAttackdirection)) &&
                 (this.willMoveApproach(currentIndex, pieceType, move.direction) || this.willMoveWithdraw(currentIndex, pieceType, move.direction)));
     }
-
+    
     private canPlayerMove(currentIndex: number, pieceType: PieceType, previousAttackdirection: Direction | null): boolean {
+        const emptyNeighbouringMoves = this.getEmptyNeighbouringCellsAsMoves(currentIndex);
+    
+        // If there are no empty neighbouring cells, the player cannot move
+        if (emptyNeighbouringMoves.length === 0) {
+            return false;
+        }
+    
         // We check that there is at least a single neighbour of the current index of the piece that meet all of the following criteria:
         // 1) EMPTY, 2) not the original index of the piece in this turn, 3) in a different direction the last directon's move,
         // and 4) are attacking moves if there is a previous direction or paika moves if its the first move.
-        return this.getEmptyNeighbouringCellsAsMoves(currentIndex)
-            .some(move => 
-                !this.turnMoveIndexes.includes(move.index) &&
-                move.direction !== previousAttackdirection &&
-                (!previousAttackdirection || move.direction !== getOppositeDirection(previousAttackdirection)) &&
-                (!previousAttackdirection || (this.willMoveApproach(currentIndex, pieceType, move.direction) || this.willMoveWithdraw(currentIndex, pieceType, move.direction))));
+        return emptyNeighbouringMoves.some(move => {
+            const isNotAnIndexPreviouslyVisited = !this.turnMoveIndexes.includes(move.index);
+            const isDifferentDirection = move.direction !== previousAttackdirection;
+            const isNotOppositeDirection = previousAttackdirection === null || move.direction !== getOppositeDirection(previousAttackdirection);
+            const isAttackOrWithdraw = previousAttackdirection === null || (this.willMoveApproach(currentIndex, pieceType, move.direction) || this.willMoveWithdraw(currentIndex, pieceType, move.direction));
+    
+            return isNotAnIndexPreviouslyVisited && isDifferentDirection && isNotOppositeDirection && isAttackOrWithdraw;
+        });
     }
-
     /**
      * Removes at least one of the opponents pieces including all those in the same direction of the WITHDRAW or APPROACH until
      * there is 1) a cell that doesnt contain the opponents piece type or if 2) the edge of the board has been reached. 
@@ -492,27 +500,29 @@ export default class Board {
         this.board[index].setPieceType(pieceType);
     }
 
-    private getAllPossibleCompleteMoves(pieceType: PieceType): CompleteMove[] {
+    public getAllPossibleCompleteMoves(pieceType: PieceType): { startIndexes: number[], moves: CompleteMove[][] } {
         const piecesThatCanMove = this.getPiecesThatPlayerCanMove(pieceType);
-        const originalBoardState = this.saveBoardState();
-        let allMoves: CompleteMove[] = [];
+        let moves: CompleteMove[][] = [];
+        let startIndexes: number[] = [];
         for (let i = 0; i < piecesThatCanMove.length; i++) {
             const movesForPiece = this.getAllPossibleMovesForSinglePiece(piecesThatCanMove[i]);
+            startIndexes.push(piecesThatCanMove[i]);
+            moves[i] = [];
             for (let j = 0; j < movesForPiece.length; j++) {
-                allMoves.push(movesForPiece[j]);
+                moves[i].push(movesForPiece[j]);
             }
         }
 
-        return allMoves;
+        return { startIndexes: startIndexes, moves: moves };
     }
 
     public getAllPossibleMovesForSinglePiece(index: number): CompleteMove[] {
         const allMovesTree = this.buildMoveTreeForSinglePiece(index, this.board[index].getPieceType(), null, AttackType.NONE);
-        return this.getAllPaths(allMovesTree, index);
+        return this.getAllPaths(allMovesTree);
         
     }
 
-    private getAllPaths(node: TreeNode<number>, startIndex: number): CompleteMove[] {
+    private getAllPaths(node: TreeNode<number>): CompleteMove[] {
         const paths: CompleteMove[] = [];
     
         function traverse(currentNode: TreeNode<number>, currentPath: CompleteMove, isRoot: boolean): void {
@@ -520,10 +530,12 @@ export default class Board {
             const newPath: CompleteMove = {
                 moveIndexes: isRoot ? [...currentPath.moveIndexes] : [...currentPath.moveIndexes, currentNode.value],
                 moveTypes: isRoot ? [...currentPath.moveTypes] : [...currentPath.moveTypes, currentNode.attackType],
+                rating: 0,
             };
     
             // If the node has no children, it’s a leaf node—record the path
             if (currentNode.children.length === 0) {
+                newPath.rating = currentNode.rating;
                 paths.push(newPath);
                 return;
             }
@@ -537,6 +549,7 @@ export default class Board {
         const initialMove: CompleteMove = {
             moveIndexes: [],
             moveTypes: [],
+            rating: 0,
         };
     
         traverse(node, initialMove, true); // Start traversal with the root node
@@ -558,52 +571,39 @@ export default class Board {
         previousMoveDirection: Direction | null,
         attackType: AttackType,
     ): TreeNode<number> {
-        // HAVE TO FIGURE OUT HOW TO GET THE FIRST ATTACK TYPE TO NOT BE NONE, OR TO NOT STORE THE FIRST NODE AS THE FIRST INDEX WE ARE STARTING AT
-
-        //console.log('Can player move again:', this.canPlayerMoveAgain(index, pieceType, previousMoveDirection));
         const node: TreeNode<number> =  {
             value: index,
             children: [],
             isComplete: !this.canPlayerMove(index, pieceType, previousMoveDirection),
             attackType: attackType,
+            rating: null,
         };
 
-        //console.log("saving main board state");
         const boardState = this.saveBoardState();
-        //console.log(this.saveBoardState());
 
         // Get possible moves from the current index
-        //console.log("searching possible moves");
         const possibleMoves = this.getPossibleMovesForCell(index);
-        //console.log('Get possible moves:', this.getPossibleMovesForCell(index));
     
         // If the chain is complete, stop recursion
         if (node.isComplete) {
-            //console.log("turn is complete");
+            node.rating = this.rateBoardPositionSimple(boardState, pieceType);
             return node;
         }
     
         // For each possible move, create a child node
         for (const nextMove of possibleMoves) {
-            //console.log("searching child node ", nextMove.index);
             const localBoardState = this.saveBoardState();
-            //console.log("saving local board state");
-            //console.log(this.saveBoardState());
             this.setAttackOrWithdraw(nextMove.attackType);
-            //console.log("moving piece");
             this.performMove(index, nextMove.direction, true);
             const childNode = this.buildMoveTreeForSinglePiece(
                 nextMove.index, 
                 pieceType, 
                 nextMove.direction, 
                 nextMove.attackType);
-            //console.log("resetting local board state");
             this.resetBoardState(localBoardState);
-            //console.log(this.saveBoardState());
             node.children.push(childNode);
         }
         
-        //console.log("resetting main board state", boardState);
         this.resetBoardState(boardState);
 
         return node;
@@ -621,6 +621,14 @@ export default class Board {
             return boardState.numBlackPieces - boardState.numWhitePieces;
         }
     }
+
+    /**
+     * @param pieceType the player to find the best move for.
+     * @return the best move as a CompleteMove.
+     */
+    // public getBestMoveSimple(pieceType: PieceType): CompleteMove {
+
+    // }
 
 
 }
