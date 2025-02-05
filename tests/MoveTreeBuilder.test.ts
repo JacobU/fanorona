@@ -77,9 +77,28 @@ describe('MoveTreeBuilder tests', () => {
     it('should return the correct moves for two white pieces in a 3x3 board', () => {
         const board = new Board(3, 3, '210200201');
         const allMoves = board.getAllPossibleCompleteMoves(PieceType.WHITE);
-        
-        console.log(JSON.stringify(allMoves, null));
-
+        const expectedPossibleMoves = {
+            "startIndexes":[1,8],
+            "moves":[
+                [
+                    {"moveIndexes":[2,4,5],"moveTypes":[2,1,2],"rating":2}
+                ],
+                [
+                    {"moveIndexes":[4,2],"moveTypes":[1,2],"rating":1},
+                    {"moveIndexes":[4,5],"moveTypes":[1,2],"rating":1},
+                    {"moveIndexes":[7],"moveTypes":[1],"rating":0}]
+                ]
+            }
+        expect(allMoves).to.deep.equals(expectedPossibleMoves);
     });
 
+    it('should return the best move for two white pieces on a 3x3 board', () => {
+        const board = new Board(3, 3, '210200201');
+        const bestMove = board.getBestMoveSimple(PieceType.WHITE);
+        const expectedBestMove = {
+            startIndex: 1,
+            move: { moveIndexes: [ 2, 4, 5 ], moveTypes: [ 2, 1, 2 ], rating: 2 }
+        }
+        expect(bestMove).to.deep.equals(expectedBestMove);
+    });
 });

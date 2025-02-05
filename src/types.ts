@@ -87,6 +87,11 @@ export interface CompleteMove {
     rating: number | null,
 }
 
+export interface BestMove {
+    startIndex: number,
+    move: CompleteMove
+}
+
 export function getOppositeDirection(direction: Direction): Direction {
     // There are 8 possible directions
     return (7 - direction);
@@ -138,6 +143,20 @@ export function getDeltaIndex(direction: Direction, cols: number): number {
         case Direction.DOWN: return cols;
         case Direction.DOWNRIGHT: return cols + 1;
         default: throw new Error("Invalid direction");
+    }
+}
+
+export function getDirectionFromDeltaIndex(deltaIndex: number, cols: number): Direction {
+    switch (deltaIndex) {
+        case -cols - 1: return Direction.UPLEFT;
+        case -cols: return Direction.UP;
+        case -cols + 1: return Direction.UPRIGHT;
+        case -1: return Direction.LEFT;
+        case 1: return Direction.RIGHT;
+        case cols - 1: return Direction.DOWNLEFT;
+        case cols: return Direction.DOWN;
+        case cols + 1: return Direction.DOWNRIGHT;
+        default: throw new Error("Invalid delta index");
     }
 }
 

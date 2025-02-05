@@ -1,5 +1,20 @@
 import Cell  from './Cell.js';
-import { Winner, PieceType, getDeltaIndex, getOppositePieceType, getOppositeDirection, Direction, Move, AttackType, CellType, Turn, CompleteMove, TreeNode, BoardState } from './types.js';
+import { 
+    Winner, 
+    PieceType, 
+    getDeltaIndex, 
+    getOppositePieceType, 
+    getOppositeDirection, 
+    Direction, 
+    Move, 
+    AttackType, 
+    CellType, 
+    Turn, 
+    CompleteMove, 
+    TreeNode, 
+    BoardState,
+    BestMove 
+} from './types.js';
 
 export default class Board {
     private rows: number;
@@ -622,13 +637,33 @@ export default class Board {
         }
     }
 
-    /**
-     * @param pieceType the player to find the best move for.
-     * @return the best move as a CompleteMove.
-     */
-    // public getBestMoveSimple(pieceType: PieceType): CompleteMove {
-
-    // }
-
+    public getBestMoveSimple(pieceType: PieceType): BestMove | null {
+        const allMoves = this.getAllPossibleCompleteMoves(pieceType);
+        let highestRatingMove: CompleteMove | null = null;
+        let startIndex: number | null = null;
+    
+        // Iterate through the startIndexes and moves
+        for (let i = 0; i < allMoves.startIndexes.length; i++) {
+            const currentStartIndex = allMoves.startIndexes[i];
+            const currentMoves = allMoves.moves[i];
+    
+            // Iterate through the moves in the current group
+            for (const move of currentMoves) {
+                if (!highestRatingMove || move.rating! > highestRatingMove.rating!) {
+                    highestRatingMove = move;
+                    startIndex = currentStartIndex;
+                }
+            }
+        }
+    
+        if (highestRatingMove && startIndex !== null) {
+            return {
+                startIndex,
+                move: highestRatingMove,
+            };
+        }
+    
+        return null;
+    }
 
 }

@@ -37,6 +37,7 @@ export default class BotRandomPlayer {
             this.inMiddleOfMoveChain = false;
             this.indexOfPieceThatMustBeMoved = null;
         }
+        console.log(moveIndex, moveChoice.direction);
         return { canMoveAgain: canMoveAgain, move: { index: moveIndex, direction: moveChoice.direction } };
     }
 

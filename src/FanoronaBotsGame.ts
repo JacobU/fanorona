@@ -1,5 +1,6 @@
 import Board from './Board.js';
 import BotRandomPlayer from './BotRandomPlayer.js';
+import SimpleBot from './SimpleBot.js';
 import { PieceType, Winner } from './types.js';
 
 let whiteWins = 0;
@@ -8,7 +9,7 @@ let blackWins = 0;
 
 while (whiteWins < 1000) {
     const board = new Board();
-    const white = new BotRandomPlayer(PieceType.WHITE, board);
+    const white = new SimpleBot(PieceType.WHITE, board);
     const black = new BotRandomPlayer(PieceType.BLACK, board);
 
     let turn: number = 0;
@@ -16,9 +17,9 @@ while (whiteWins < 1000) {
 
     while (board.getWinner() === Winner.NONE) {
         if (turn % 2 == 0) {
-            white.makeMove();
+            while(white.makeMove().canMoveAgain) {}
         } else {
-            black.makeMove();
+            while(black.makeMove().canMoveAgain) {}
         }
         turn++;
     }
