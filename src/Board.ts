@@ -433,6 +433,7 @@ export default class Board {
      * @returns true if the piece has at least one legal move available.
      */
     private hasLegalMove(currentIndex: number, pieceType: PieceType, previousAttackdirection: Direction | null): boolean {
+        if (this.getWinner() !== Winner.NONE) return false;
         const emptyNeighbouringMoves = this.getEmptyNeighbouringCellsAsMoves(currentIndex);
     
         // If there are no empty neighbouring cells, the player cannot move

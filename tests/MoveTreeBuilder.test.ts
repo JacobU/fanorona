@@ -102,4 +102,22 @@ describe('MoveTreeBuilder tests', () => {
         };
         expect(bestMove).to.deep.equals(expectedBestMove);
     });
+
+    it('should assign correct non-null rating to a one-move win', () => {
+        // White at index 4, only black at index 3. WITHDRAW RIGHT (4→5) captures the last black piece.
+        // After capture: numWhitePieces=1, numBlackPieces=0 → rating = 1.
+        const board = new Board(3, 3, '000210000');
+        const possibleMoves = board.getAllPossibleMovesForSinglePiece(4);
+        const expected: CompleteMove[] = [
+            { moveIndexes: [5], moveTypes: [AttackType.WITHDRAW], rating: 1 },
+        ];
+        expect(possibleMoves).to.deep.equal(expected);
+    });
+
+    it('should never return a CompleteMove with null rating', () => {
+        const board = new Board(3, 3, '000210002');
+        const possibleMoves = board.getAllPossibleMovesForSinglePiece(4);
+        expect(possibleMoves.length).to.be.greaterThan(0);
+        expect(possibleMoves.every(m => m.rating !== null)).to.be.true;
+    });
 });
