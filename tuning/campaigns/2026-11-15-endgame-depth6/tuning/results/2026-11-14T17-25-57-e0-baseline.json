@@ -1,0 +1,96 @@
+{
+  "date": "2026-11-14T17:25:57.217Z",
+  "configFile": "e0-baseline.json",
+  "config": {
+    "mode": "gauntlet",
+    "openings": {
+      "count": 10,
+      "turns": 4,
+      "seed": 1501
+    },
+    "opponents": [
+      "DeepFortress"
+    ],
+    "base": {
+      "depth": 4,
+      "weights": {
+        "material": 100,
+        "vulnerability": 30,
+        "strongPoints": 5,
+        "lineExposure": 5
+      },
+      "endgameWeights": {
+        "edgeExposure": 40,
+        "centrality": 20
+      },
+      "endgameDepth": 6
+    }
+  },
+  "totalGames": 20,
+  "elapsedMs": 312986,
+  "results": [
+    {
+      "name": "Base",
+      "isVariant": true,
+      "depth": 4,
+      "weights": {
+        "material": 100,
+        "vulnerability": 30,
+        "strongPoints": 5,
+        "lineExposure": 5
+      },
+      "endgameWeights": {
+        "edgeExposure": 40,
+        "centrality": 20
+      },
+      "endgameDepth": 6,
+      "score": 0.55,
+      "margin": 0.2180362355206125,
+      "winRate": 0.3,
+      "drawRate": 0.5,
+      "lossRate": 0.2,
+      "decisiveWinRate": 0.6,
+      "wins": 6,
+      "draws": 10,
+      "losses": 4,
+      "turnLimitDraws": 0,
+      "msPerTurn": 645.5589769968053,
+      "vs": {
+        "DeepFortress": {
+          "wins": 6,
+          "draws": 10,
+          "losses": 4
+        }
+      }
+    },
+    {
+      "name": "DeepFortress",
+      "isVariant": false,
+      "depth": 4,
+      "weights": {
+        "material": 100,
+        "vulnerability": 30,
+        "strongPoints": 5,
+        "lineExposure": 5
+      },
+      "score": 0.45,
+      "margin": 0.2180362355206125,
+      "winRate": 0.2,
+      "drawRate": 0.5,
+      "lossRate": 0.3,
+      "decisiveWinRate": 0.4,
+      "wins": 4,
+      "draws": 10,
+      "losses": 6,
+      "turnLimitDraws": 0,
+      "msPerTurn": 15.765685272145031,
+      "vs": {
+        "Base": {
+          "wins": 4,
+          "draws": 10,
+          "losses": 6
+        }
+      }
+    }
+  ]
+}

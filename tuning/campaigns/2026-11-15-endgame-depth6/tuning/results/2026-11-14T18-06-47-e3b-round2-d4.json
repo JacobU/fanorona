@@ -1,0 +1,1299 @@
+{
+  "date": "2026-11-14T18:06:47.364Z",
+  "configFile": "e3b-round2-d4.json",
+  "config": {
+    "mode": "gauntlet",
+    "endgameStarts": {
+      "count": 64,
+      "seed": 3202
+    },
+    "opponents": [
+      "DeepFortress"
+    ],
+    "base": {
+      "depth": 4,
+      "weights": {
+        "material": 100,
+        "vulnerability": 30,
+        "strongPoints": 5,
+        "lineExposure": 5
+      },
+      "endgameWeights": {},
+      "endgameDepth": 4
+    },
+    "variants": [
+      {
+        "name": "r43 e7 c21 s15 v-1 l2",
+        "endgameWeights": {
+          "edgeExposure": 7,
+          "centrality": 21,
+          "strongPoints": 15,
+          "vulnerability": -1,
+          "lineExposure": 2
+        }
+      },
+      {
+        "name": "r20 e2 c1 s4 l21",
+        "endgameWeights": {
+          "edgeExposure": 2,
+          "centrality": 1,
+          "strongPoints": 4,
+          "lineExposure": 21
+        }
+      },
+      {
+        "name": "C20",
+        "endgameWeights": {
+          "centrality": 20
+        }
+      },
+      {
+        "name": "r01 e2 c1 s-2 v5 l17",
+        "endgameWeights": {
+          "edgeExposure": 2,
+          "centrality": 1,
+          "strongPoints": -2,
+          "vulnerability": 5,
+          "lineExposure": 17
+        }
+      },
+      {
+        "name": "E40",
+        "endgameWeights": {
+          "edgeExposure": 40
+        }
+      },
+      {
+        "name": "r02 e8 c37 s1 v-24",
+        "endgameWeights": {
+          "edgeExposure": 8,
+          "centrality": 37,
+          "strongPoints": 1,
+          "vulnerability": -24
+        }
+      },
+      {
+        "name": "r11 e-3 c47 v-20 l-1",
+        "endgameWeights": {
+          "edgeExposure": -3,
+          "centrality": 47,
+          "vulnerability": -20,
+          "lineExposure": -1
+        }
+      },
+      {
+        "name": "r46 e23 c50 s-1 v2 l6",
+        "endgameWeights": {
+          "edgeExposure": 23,
+          "centrality": 50,
+          "strongPoints": -1,
+          "vulnerability": 2,
+          "lineExposure": 6
+        }
+      },
+      {
+        "name": "r23 c4 s-1 v-3 l3",
+        "endgameWeights": {
+          "centrality": 4,
+          "strongPoints": -1,
+          "vulnerability": -3,
+          "lineExposure": 3
+        }
+      },
+      {
+        "name": "r54 c10 s4 v-16 l-5",
+        "endgameWeights": {
+          "centrality": 10,
+          "strongPoints": 4,
+          "vulnerability": -16,
+          "lineExposure": -5
+        }
+      },
+      {
+        "name": "r55 e-3 c17 s9 v1 l-6",
+        "endgameWeights": {
+          "edgeExposure": -3,
+          "centrality": 17,
+          "strongPoints": 9,
+          "vulnerability": 1,
+          "lineExposure": -6
+        }
+      },
+      {
+        "name": "Current l-5",
+        "endgameWeights": {
+          "edgeExposure": 40,
+          "centrality": 20,
+          "lineExposure": -5
+        }
+      },
+      {
+        "name": "r05 e16 c7 s13 v26 l8",
+        "endgameWeights": {
+          "edgeExposure": 16,
+          "centrality": 7,
+          "strongPoints": 13,
+          "vulnerability": 26,
+          "lineExposure": 8
+        }
+      },
+      {
+        "name": "r09 e12 c15 s-4 v16 l1",
+        "endgameWeights": {
+          "edgeExposure": 12,
+          "centrality": 15,
+          "strongPoints": -4,
+          "vulnerability": 16,
+          "lineExposure": 1
+        }
+      },
+      {
+        "name": "r17 c73 s3 l-12",
+        "endgameWeights": {
+          "centrality": 73,
+          "strongPoints": 3,
+          "lineExposure": -12
+        }
+      },
+      {
+        "name": "r30 e1 c-2 s7 v56 l1",
+        "endgameWeights": {
+          "edgeExposure": 1,
+          "centrality": -2,
+          "strongPoints": 7,
+          "vulnerability": 56,
+          "lineExposure": 1
+        }
+      },
+      {
+        "name": "Current",
+        "endgameWeights": {
+          "edgeExposure": 40,
+          "centrality": 20
+        }
+      },
+      {
+        "name": "Current s-5",
+        "endgameWeights": {
+          "edgeExposure": 40,
+          "centrality": 20,
+          "strongPoints": -5
+        }
+      },
+      {
+        "name": "Current v-30",
+        "endgameWeights": {
+          "edgeExposure": 40,
+          "centrality": 20,
+          "vulnerability": -30
+        }
+      },
+      {
+        "name": "Current v+30",
+        "endgameWeights": {
+          "edgeExposure": 40,
+          "centrality": 20,
+          "vulnerability": 30
+        }
+      }
+    ]
+  },
+  "totalGames": 2688,
+  "elapsedMs": 1015209,
+  "results": [
+    {
+      "name": "r17 c73 s3 l-12",
+      "isVariant": true,
+      "depth": 4,
+      "weights": {
+        "material": 100,
+        "vulnerability": 30,
+        "strongPoints": 5,
+        "lineExposure": 5
+      },
+      "endgameWeights": {
+        "centrality": 73,
+        "strongPoints": 3,
+        "lineExposure": -12
+      },
+      "endgameDepth": 4,
+      "score": 0.61328125,
+      "margin": 0.08436815361220788,
+      "winRate": 0.328125,
+      "drawRate": 0.5703125,
+      "lossRate": 0.1015625,
+      "decisiveWinRate": 0.7636363636363637,
+      "wins": 42,
+      "draws": 73,
+      "losses": 13,
+      "turnLimitDraws": 0,
+      "msPerTurn": 10.537340890969137,
+      "vs": {
+        "DeepFortress": {
+          "wins": 42,
+          "draws": 73,
+          "losses": 13
+        }
+      },
+      "ahead": {
+        "wins": 32,
+        "draws": 31,
+        "losses": 1
+      },
+      "behind": {
+        "wins": 10,
+        "draws": 42,
+        "losses": 12
+      }
+    },
+    {
+      "name": "r43 e7 c21 s15 v-1 l2",
+      "isVariant": true,
+      "depth": 4,
+      "weights": {
+        "material": 100,
+        "vulnerability": 30,
+        "strongPoints": 5,
+        "lineExposure": 5
+      },
+      "endgameWeights": {
+        "edgeExposure": 7,
+        "centrality": 21,
+        "strongPoints": 15,
+        "vulnerability": -1,
+        "lineExposure": 2
+      },
+      "endgameDepth": 4,
+      "score": 0.609375,
+      "margin": 0.08452271141602821,
+      "winRate": 0.28125,
+      "drawRate": 0.65625,
+      "lossRate": 0.0625,
+      "decisiveWinRate": 0.8181818181818182,
+      "wins": 36,
+      "draws": 84,
+      "losses": 8,
+      "turnLimitDraws": 0,
+      "msPerTurn": 15.697037663293438,
+      "vs": {
+        "DeepFortress": {
+          "wins": 36,
+          "draws": 84,
+          "losses": 8
+        }
+      },
+      "ahead": {
+        "wins": 30,
+        "draws": 33,
+        "losses": 1
+      },
+      "behind": {
+        "wins": 6,
+        "draws": 51,
+        "losses": 7
+      }
+    },
+    {
+      "name": "r02 e8 c37 s1 v-24",
+      "isVariant": true,
+      "depth": 4,
+      "weights": {
+        "material": 100,
+        "vulnerability": 30,
+        "strongPoints": 5,
+        "lineExposure": 5
+      },
+      "endgameWeights": {
+        "edgeExposure": 8,
+        "centrality": 37,
+        "strongPoints": 1,
+        "vulnerability": -24
+      },
+      "endgameDepth": 4,
+      "score": 0.609375,
+      "margin": 0.08452271141602821,
+      "winRate": 0.3125,
+      "drawRate": 0.59375,
+      "lossRate": 0.09375,
+      "decisiveWinRate": 0.7692307692307693,
+      "wins": 40,
+      "draws": 76,
+      "losses": 12,
+      "turnLimitDraws": 0,
+      "msPerTurn": 14.237961306818562,
+      "vs": {
+        "DeepFortress": {
+          "wins": 40,
+          "draws": 76,
+          "losses": 12
+        }
+      },
+      "ahead": {
+        "wins": 34,
+        "draws": 30,
+        "losses": 0
+      },
+      "behind": {
+        "wins": 6,
+        "draws": 46,
+        "losses": 12
+      }
+    },
+    {
+      "name": "r09 e12 c15 s-4 v16 l1",
+      "isVariant": true,
+      "depth": 4,
+      "weights": {
+        "material": 100,
+        "vulnerability": 30,
+        "strongPoints": 5,
+        "lineExposure": 5
+      },
+      "endgameWeights": {
+        "edgeExposure": 12,
+        "centrality": 15,
+        "strongPoints": -4,
+        "vulnerability": 16,
+        "lineExposure": 1
+      },
+      "endgameDepth": 4,
+      "score": 0.60546875,
+      "margin": 0.08467157868782058,
+      "winRate": 0.3046875,
+      "drawRate": 0.6015625,
+      "lossRate": 0.09375,
+      "decisiveWinRate": 0.7647058823529411,
+      "wins": 39,
+      "draws": 77,
+      "losses": 12,
+      "turnLimitDraws": 0,
+      "msPerTurn": 14.908015509683029,
+      "vs": {
+        "DeepFortress": {
+          "wins": 39,
+          "draws": 77,
+          "losses": 12
+        }
+      },
+      "ahead": {
+        "wins": 33,
+        "draws": 30,
+        "losses": 1
+      },
+      "behind": {
+        "wins": 6,
+        "draws": 47,
+        "losses": 11
+      }
+    },
+    {
+      "name": "r11 e-3 c47 v-20 l-1",
+      "isVariant": true,
+      "depth": 4,
+      "weights": {
+        "material": 100,
+        "vulnerability": 30,
+        "strongPoints": 5,
+        "lineExposure": 5
+      },
+      "endgameWeights": {
+        "edgeExposure": -3,
+        "centrality": 47,
+        "vulnerability": -20,
+        "lineExposure": -1
+      },
+      "endgameDepth": 4,
+      "score": 0.58984375,
+      "margin": 0.08521072185374004,
+      "winRate": 0.2734375,
+      "drawRate": 0.6328125,
+      "lossRate": 0.09375,
+      "decisiveWinRate": 0.7446808510638298,
+      "wins": 35,
+      "draws": 81,
+      "losses": 12,
+      "turnLimitDraws": 0,
+      "msPerTurn": 15.880983204267789,
+      "vs": {
+        "DeepFortress": {
+          "wins": 35,
+          "draws": 81,
+          "losses": 12
+        }
+      },
+      "ahead": {
+        "wins": 28,
+        "draws": 36,
+        "losses": 0
+      },
+      "behind": {
+        "wins": 7,
+        "draws": 45,
+        "losses": 12
+      }
+    },
+    {
+      "name": "r05 e16 c7 s13 v26 l8",
+      "isVariant": true,
+      "depth": 4,
+      "weights": {
+        "material": 100,
+        "vulnerability": 30,
+        "strongPoints": 5,
+        "lineExposure": 5
+      },
+      "endgameWeights": {
+        "edgeExposure": 16,
+        "centrality": 7,
+        "strongPoints": 13,
+        "vulnerability": 26,
+        "lineExposure": 8
+      },
+      "endgameDepth": 4,
+      "score": 0.58984375,
+      "margin": 0.08521072185374004,
+      "winRate": 0.2734375,
+      "drawRate": 0.6328125,
+      "lossRate": 0.09375,
+      "decisiveWinRate": 0.7446808510638298,
+      "wins": 35,
+      "draws": 81,
+      "losses": 12,
+      "turnLimitDraws": 0,
+      "msPerTurn": 16.001124258260628,
+      "vs": {
+        "DeepFortress": {
+          "wins": 35,
+          "draws": 81,
+          "losses": 12
+        }
+      },
+      "ahead": {
+        "wins": 30,
+        "draws": 34,
+        "losses": 0
+      },
+      "behind": {
+        "wins": 5,
+        "draws": 47,
+        "losses": 12
+      }
+    },
+    {
+      "name": "E40",
+      "isVariant": true,
+      "depth": 4,
+      "weights": {
+        "material": 100,
+        "vulnerability": 30,
+        "strongPoints": 5,
+        "lineExposure": 5
+      },
+      "endgameWeights": {
+        "edgeExposure": 40
+      },
+      "endgameDepth": 4,
+      "score": 0.578125,
+      "margin": 0.08555666681974401,
+      "winRate": 0.2890625,
+      "drawRate": 0.578125,
+      "lossRate": 0.1328125,
+      "decisiveWinRate": 0.6851851851851852,
+      "wins": 37,
+      "draws": 74,
+      "losses": 17,
+      "turnLimitDraws": 0,
+      "msPerTurn": 14.41479453269331,
+      "vs": {
+        "DeepFortress": {
+          "wins": 37,
+          "draws": 74,
+          "losses": 17
+        }
+      },
+      "ahead": {
+        "wins": 30,
+        "draws": 32,
+        "losses": 2
+      },
+      "behind": {
+        "wins": 7,
+        "draws": 42,
+        "losses": 15
+      }
+    },
+    {
+      "name": "C20",
+      "isVariant": true,
+      "depth": 4,
+      "weights": {
+        "material": 100,
+        "vulnerability": 30,
+        "strongPoints": 5,
+        "lineExposure": 5
+      },
+      "endgameWeights": {
+        "centrality": 20
+      },
+      "endgameDepth": 4,
+      "score": 0.57421875,
+      "margin": 0.08566097979341283,
+      "winRate": 0.265625,
+      "drawRate": 0.6171875,
+      "lossRate": 0.1171875,
+      "decisiveWinRate": 0.6938775510204082,
+      "wins": 34,
+      "draws": 79,
+      "losses": 15,
+      "turnLimitDraws": 0,
+      "msPerTurn": 14.592893289955379,
+      "vs": {
+        "DeepFortress": {
+          "wins": 34,
+          "draws": 79,
+          "losses": 15
+        }
+      },
+      "ahead": {
+        "wins": 30,
+        "draws": 33,
+        "losses": 1
+      },
+      "behind": {
+        "wins": 4,
+        "draws": 46,
+        "losses": 14
+      }
+    },
+    {
+      "name": "r20 e2 c1 s4 l21",
+      "isVariant": true,
+      "depth": 4,
+      "weights": {
+        "material": 100,
+        "vulnerability": 30,
+        "strongPoints": 5,
+        "lineExposure": 5
+      },
+      "endgameWeights": {
+        "edgeExposure": 2,
+        "centrality": 1,
+        "strongPoints": 4,
+        "lineExposure": 21
+      },
+      "endgameDepth": 4,
+      "score": 0.5703125,
+      "margin": 0.08575982609716974,
+      "winRate": 0.21875,
+      "drawRate": 0.703125,
+      "lossRate": 0.078125,
+      "decisiveWinRate": 0.7368421052631579,
+      "wins": 28,
+      "draws": 90,
+      "losses": 10,
+      "turnLimitDraws": 0,
+      "msPerTurn": 12.33358691870191,
+      "vs": {
+        "DeepFortress": {
+          "wins": 28,
+          "draws": 90,
+          "losses": 10
+        }
+      },
+      "ahead": {
+        "wins": 24,
+        "draws": 40,
+        "losses": 0
+      },
+      "behind": {
+        "wins": 4,
+        "draws": 50,
+        "losses": 10
+      }
+    },
+    {
+      "name": "r01 e2 c1 s-2 v5 l17",
+      "isVariant": true,
+      "depth": 4,
+      "weights": {
+        "material": 100,
+        "vulnerability": 30,
+        "strongPoints": 5,
+        "lineExposure": 5
+      },
+      "endgameWeights": {
+        "edgeExposure": 2,
+        "centrality": 1,
+        "strongPoints": -2,
+        "vulnerability": 5,
+        "lineExposure": 17
+      },
+      "endgameDepth": 4,
+      "score": 0.5703125,
+      "margin": 0.08575982609716974,
+      "winRate": 0.2421875,
+      "drawRate": 0.65625,
+      "lossRate": 0.1015625,
+      "decisiveWinRate": 0.7045454545454546,
+      "wins": 31,
+      "draws": 84,
+      "losses": 13,
+      "turnLimitDraws": 0,
+      "msPerTurn": 16.009033130306374,
+      "vs": {
+        "DeepFortress": {
+          "wins": 31,
+          "draws": 84,
+          "losses": 13
+        }
+      },
+      "ahead": {
+        "wins": 26,
+        "draws": 37,
+        "losses": 1
+      },
+      "behind": {
+        "wins": 5,
+        "draws": 47,
+        "losses": 12
+      }
+    },
+    {
+      "name": "r54 c10 s4 v-16 l-5",
+      "isVariant": true,
+      "depth": 4,
+      "weights": {
+        "material": 100,
+        "vulnerability": 30,
+        "strongPoints": 5,
+        "lineExposure": 5
+      },
+      "endgameWeights": {
+        "centrality": 10,
+        "strongPoints": 4,
+        "vulnerability": -16,
+        "lineExposure": -5
+      },
+      "endgameDepth": 4,
+      "score": 0.56640625,
+      "margin": 0.08585322461301402,
+      "winRate": 0.2265625,
+      "drawRate": 0.6796875,
+      "lossRate": 0.09375,
+      "decisiveWinRate": 0.7073170731707317,
+      "wins": 29,
+      "draws": 87,
+      "losses": 12,
+      "turnLimitDraws": 0,
+      "msPerTurn": 18.213105534748486,
+      "vs": {
+        "DeepFortress": {
+          "wins": 29,
+          "draws": 87,
+          "losses": 12
+        }
+      },
+      "ahead": {
+        "wins": 26,
+        "draws": 37,
+        "losses": 1
+      },
+      "behind": {
+        "wins": 3,
+        "draws": 50,
+        "losses": 11
+      }
+    },
+    {
+      "name": "r23 c4 s-1 v-3 l3",
+      "isVariant": true,
+      "depth": 4,
+      "weights": {
+        "material": 100,
+        "vulnerability": 30,
+        "strongPoints": 5,
+        "lineExposure": 5
+      },
+      "endgameWeights": {
+        "centrality": 4,
+        "strongPoints": -1,
+        "vulnerability": -3,
+        "lineExposure": 3
+      },
+      "endgameDepth": 4,
+      "score": 0.55859375,
+      "margin": 0.08602374822387063,
+      "winRate": 0.234375,
+      "drawRate": 0.6484375,
+      "lossRate": 0.1171875,
+      "decisiveWinRate": 0.6666666666666666,
+      "wins": 30,
+      "draws": 83,
+      "losses": 15,
+      "turnLimitDraws": 0,
+      "msPerTurn": 17.602460334146492,
+      "vs": {
+        "DeepFortress": {
+          "wins": 30,
+          "draws": 83,
+          "losses": 15
+        }
+      },
+      "ahead": {
+        "wins": 25,
+        "draws": 37,
+        "losses": 2
+      },
+      "behind": {
+        "wins": 5,
+        "draws": 46,
+        "losses": 13
+      }
+    },
+    {
+      "name": "r46 e23 c50 s-1 v2 l6",
+      "isVariant": true,
+      "depth": 4,
+      "weights": {
+        "material": 100,
+        "vulnerability": 30,
+        "strongPoints": 5,
+        "lineExposure": 5
+      },
+      "endgameWeights": {
+        "edgeExposure": 23,
+        "centrality": 50,
+        "strongPoints": -1,
+        "vulnerability": 2,
+        "lineExposure": 6
+      },
+      "endgameDepth": 4,
+      "score": 0.55078125,
+      "margin": 0.08617267957572883,
+      "winRate": 0.2578125,
+      "drawRate": 0.5859375,
+      "lossRate": 0.15625,
+      "decisiveWinRate": 0.6226415094339622,
+      "wins": 33,
+      "draws": 75,
+      "losses": 20,
+      "turnLimitDraws": 0,
+      "msPerTurn": 10.71222573635047,
+      "vs": {
+        "DeepFortress": {
+          "wins": 33,
+          "draws": 75,
+          "losses": 20
+        }
+      },
+      "ahead": {
+        "wins": 30,
+        "draws": 30,
+        "losses": 4
+      },
+      "behind": {
+        "wins": 3,
+        "draws": 45,
+        "losses": 16
+      }
+    },
+    {
+      "name": "r55 e-3 c17 s9 v1 l-6",
+      "isVariant": true,
+      "depth": 4,
+      "weights": {
+        "material": 100,
+        "vulnerability": 30,
+        "strongPoints": 5,
+        "lineExposure": 5
+      },
+      "endgameWeights": {
+        "edgeExposure": -3,
+        "centrality": 17,
+        "strongPoints": 9,
+        "vulnerability": 1,
+        "lineExposure": -6
+      },
+      "endgameDepth": 4,
+      "score": 0.55078125,
+      "margin": 0.08617267957572883,
+      "winRate": 0.1953125,
+      "drawRate": 0.7109375,
+      "lossRate": 0.09375,
+      "decisiveWinRate": 0.6756756756756757,
+      "wins": 25,
+      "draws": 91,
+      "losses": 12,
+      "turnLimitDraws": 0,
+      "msPerTurn": 17.31805140674447,
+      "vs": {
+        "DeepFortress": {
+          "wins": 25,
+          "draws": 91,
+          "losses": 12
+        }
+      },
+      "ahead": {
+        "wins": 25,
+        "draws": 38,
+        "losses": 1
+      },
+      "behind": {
+        "wins": 0,
+        "draws": 53,
+        "losses": 11
+      }
+    },
+    {
+      "name": "Current",
+      "isVariant": true,
+      "depth": 4,
+      "weights": {
+        "material": 100,
+        "vulnerability": 30,
+        "strongPoints": 5,
+        "lineExposure": 5
+      },
+      "endgameWeights": {
+        "edgeExposure": 40,
+        "centrality": 20
+      },
+      "endgameDepth": 4,
+      "score": 0.55078125,
+      "margin": 0.08617267957572883,
+      "winRate": 0.328125,
+      "drawRate": 0.4453125,
+      "lossRate": 0.2265625,
+      "decisiveWinRate": 0.5915492957746479,
+      "wins": 42,
+      "draws": 57,
+      "losses": 29,
+      "turnLimitDraws": 0,
+      "msPerTurn": 9.854629183874554,
+      "vs": {
+        "DeepFortress": {
+          "wins": 42,
+          "draws": 57,
+          "losses": 29
+        }
+      },
+      "ahead": {
+        "wins": 35,
+        "draws": 27,
+        "losses": 2
+      },
+      "behind": {
+        "wins": 7,
+        "draws": 30,
+        "losses": 27
+      }
+    },
+    {
+      "name": "Current v+30",
+      "isVariant": true,
+      "depth": 4,
+      "weights": {
+        "material": 100,
+        "vulnerability": 30,
+        "strongPoints": 5,
+        "lineExposure": 5
+      },
+      "endgameWeights": {
+        "edgeExposure": 40,
+        "centrality": 20,
+        "vulnerability": 30
+      },
+      "endgameDepth": 4,
+      "score": 0.546875,
+      "margin": 0.08623908374646433,
+      "winRate": 0.28125,
+      "drawRate": 0.53125,
+      "lossRate": 0.1875,
+      "decisiveWinRate": 0.6,
+      "wins": 36,
+      "draws": 68,
+      "losses": 24,
+      "turnLimitDraws": 0,
+      "msPerTurn": 11.101263942391496,
+      "vs": {
+        "DeepFortress": {
+          "wins": 36,
+          "draws": 68,
+          "losses": 24
+        }
+      },
+      "ahead": {
+        "wins": 29,
+        "draws": 32,
+        "losses": 3
+      },
+      "behind": {
+        "wins": 7,
+        "draws": 36,
+        "losses": 21
+      }
+    },
+    {
+      "name": "Current v-30",
+      "isVariant": true,
+      "depth": 4,
+      "weights": {
+        "material": 100,
+        "vulnerability": 30,
+        "strongPoints": 5,
+        "lineExposure": 5
+      },
+      "endgameWeights": {
+        "edgeExposure": 40,
+        "centrality": 20,
+        "vulnerability": -30
+      },
+      "endgameDepth": 4,
+      "score": 0.5390625,
+      "margin": 0.08635583106731225,
+      "winRate": 0.3046875,
+      "drawRate": 0.46875,
+      "lossRate": 0.2265625,
+      "decisiveWinRate": 0.5735294117647058,
+      "wins": 39,
+      "draws": 60,
+      "losses": 29,
+      "turnLimitDraws": 0,
+      "msPerTurn": 11.849795111647222,
+      "vs": {
+        "DeepFortress": {
+          "wins": 39,
+          "draws": 60,
+          "losses": 29
+        }
+      },
+      "ahead": {
+        "wins": 33,
+        "draws": 28,
+        "losses": 3
+      },
+      "behind": {
+        "wins": 6,
+        "draws": 32,
+        "losses": 26
+      }
+    },
+    {
+      "name": "Current l-5",
+      "isVariant": true,
+      "depth": 4,
+      "weights": {
+        "material": 100,
+        "vulnerability": 30,
+        "strongPoints": 5,
+        "lineExposure": 5
+      },
+      "endgameWeights": {
+        "edgeExposure": 40,
+        "centrality": 20,
+        "lineExposure": -5
+      },
+      "endgameDepth": 4,
+      "score": 0.53515625,
+      "margin": 0.08640619591819905,
+      "winRate": 0.28125,
+      "drawRate": 0.5078125,
+      "lossRate": 0.2109375,
+      "decisiveWinRate": 0.5714285714285714,
+      "wins": 36,
+      "draws": 65,
+      "losses": 27,
+      "turnLimitDraws": 0,
+      "msPerTurn": 11.696018101045908,
+      "vs": {
+        "DeepFortress": {
+          "wins": 36,
+          "draws": 65,
+          "losses": 27
+        }
+      },
+      "ahead": {
+        "wins": 32,
+        "draws": 30,
+        "losses": 2
+      },
+      "behind": {
+        "wins": 4,
+        "draws": 35,
+        "losses": 25
+      }
+    },
+    {
+      "name": "r30 e1 c-2 s7 v56 l1",
+      "isVariant": true,
+      "depth": 4,
+      "weights": {
+        "material": 100,
+        "vulnerability": 30,
+        "strongPoints": 5,
+        "lineExposure": 5
+      },
+      "endgameWeights": {
+        "edgeExposure": 1,
+        "centrality": -2,
+        "strongPoints": 7,
+        "vulnerability": 56,
+        "lineExposure": 1
+      },
+      "endgameDepth": 4,
+      "score": 0.53125,
+      "margin": 0.08645123433455852,
+      "winRate": 0.15625,
+      "drawRate": 0.75,
+      "lossRate": 0.09375,
+      "decisiveWinRate": 0.625,
+      "wins": 20,
+      "draws": 96,
+      "losses": 12,
+      "turnLimitDraws": 0,
+      "msPerTurn": 18.14164916968829,
+      "vs": {
+        "DeepFortress": {
+          "wins": 20,
+          "draws": 96,
+          "losses": 12
+        }
+      },
+      "ahead": {
+        "wins": 17,
+        "draws": 45,
+        "losses": 2
+      },
+      "behind": {
+        "wins": 3,
+        "draws": 51,
+        "losses": 10
+      }
+    },
+    {
+      "name": "Current s-5",
+      "isVariant": true,
+      "depth": 4,
+      "weights": {
+        "material": 100,
+        "vulnerability": 30,
+        "strongPoints": 5,
+        "lineExposure": 5
+      },
+      "endgameWeights": {
+        "edgeExposure": 40,
+        "centrality": 20,
+        "strongPoints": -5
+      },
+      "endgameDepth": 4,
+      "score": 0.51953125,
+      "margin": 0.08655446920772805,
+      "winRate": 0.265625,
+      "drawRate": 0.5078125,
+      "lossRate": 0.2265625,
+      "decisiveWinRate": 0.5396825396825397,
+      "wins": 34,
+      "draws": 65,
+      "losses": 29,
+      "turnLimitDraws": 0,
+      "msPerTurn": 9.451878819319342,
+      "vs": {
+        "DeepFortress": {
+          "wins": 34,
+          "draws": 65,
+          "losses": 29
+        }
+      },
+      "ahead": {
+        "wins": 32,
+        "draws": 30,
+        "losses": 2
+      },
+      "behind": {
+        "wins": 2,
+        "draws": 35,
+        "losses": 27
+      }
+    },
+    {
+      "name": "Base",
+      "isVariant": true,
+      "depth": 4,
+      "weights": {
+        "material": 100,
+        "vulnerability": 30,
+        "strongPoints": 5,
+        "lineExposure": 5
+      },
+      "endgameWeights": {},
+      "endgameDepth": 4,
+      "score": 0.5078125,
+      "margin": 0.08661000624854524,
+      "winRate": 0.140625,
+      "drawRate": 0.734375,
+      "lossRate": 0.125,
+      "decisiveWinRate": 0.5294117647058824,
+      "wins": 18,
+      "draws": 94,
+      "losses": 16,
+      "turnLimitDraws": 0,
+      "msPerTurn": 16.868027150180342,
+      "vs": {
+        "DeepFortress": {
+          "wins": 18,
+          "draws": 94,
+          "losses": 16
+        }
+      },
+      "ahead": {
+        "wins": 16,
+        "draws": 46,
+        "losses": 2
+      },
+      "behind": {
+        "wins": 2,
+        "draws": 48,
+        "losses": 14
+      }
+    },
+    {
+      "name": "DeepFortress",
+      "isVariant": false,
+      "depth": 4,
+      "weights": {
+        "material": 100,
+        "vulnerability": 30,
+        "strongPoints": 5,
+        "lineExposure": 5
+      },
+      "score": 0.4348958333333333,
+      "margin": 0.018741239785402087,
+      "winRate": 0.12983630952380953,
+      "drawRate": 0.6101190476190477,
+      "lossRate": 0.26004464285714285,
+      "decisiveWinRate": 0.3330152671755725,
+      "wins": 349,
+      "draws": 1640,
+      "losses": 699,
+      "turnLimitDraws": 0,
+      "msPerTurn": 12.398335151578955,
+      "vs": {
+        "Base": {
+          "wins": 16,
+          "draws": 94,
+          "losses": 18
+        },
+        "r43 e7 c21 s15 v-1 l2": {
+          "wins": 8,
+          "draws": 84,
+          "losses": 36
+        },
+        "r20 e2 c1 s4 l21": {
+          "wins": 10,
+          "draws": 90,
+          "losses": 28
+        },
+        "C20": {
+          "wins": 15,
+          "draws": 79,
+          "losses": 34
+        },
+        "r01 e2 c1 s-2 v5 l17": {
+          "wins": 13,
+          "draws": 84,
+          "losses": 31
+        },
+        "E40": {
+          "wins": 17,
+          "draws": 74,
+          "losses": 37
+        },
+        "r02 e8 c37 s1 v-24": {
+          "wins": 12,
+          "draws": 76,
+          "losses": 40
+        },
+        "r11 e-3 c47 v-20 l-1": {
+          "wins": 12,
+          "draws": 81,
+          "losses": 35
+        },
+        "r46 e23 c50 s-1 v2 l6": {
+          "wins": 20,
+          "draws": 75,
+          "losses": 33
+        },
+        "r23 c4 s-1 v-3 l3": {
+          "wins": 15,
+          "draws": 83,
+          "losses": 30
+        },
+        "r54 c10 s4 v-16 l-5": {
+          "wins": 12,
+          "draws": 87,
+          "losses": 29
+        },
+        "r55 e-3 c17 s9 v1 l-6": {
+          "wins": 12,
+          "draws": 91,
+          "losses": 25
+        },
+        "Current l-5": {
+          "wins": 27,
+          "draws": 65,
+          "losses": 36
+        },
+        "r05 e16 c7 s13 v26 l8": {
+          "wins": 12,
+          "draws": 81,
+          "losses": 35
+        },
+        "r09 e12 c15 s-4 v16 l1": {
+          "wins": 12,
+          "draws": 77,
+          "losses": 39
+        },
+        "r17 c73 s3 l-12": {
+          "wins": 13,
+          "draws": 73,
+          "losses": 42
+        },
+        "r30 e1 c-2 s7 v56 l1": {
+          "wins": 12,
+          "draws": 96,
+          "losses": 20
+        },
+        "Current": {
+          "wins": 29,
+          "draws": 57,
+          "losses": 42
+        },
+        "Current s-5": {
+          "wins": 29,
+          "draws": 65,
+          "losses": 34
+        },
+        "Current v-30": {
+          "wins": 29,
+          "draws": 60,
+          "losses": 39
+        },
+        "Current v+30": {
+          "wins": 24,
+          "draws": 68,
+          "losses": 36
+        }
+      },
+      "ahead": {
+        "wins": 318,
+        "draws": 924,
+        "losses": 102
+      },
+      "behind": {
+        "wins": 31,
+        "draws": 716,
+        "losses": 597
+      }
+    }
+  ]
+}

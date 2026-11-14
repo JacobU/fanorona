@@ -342,3 +342,72 @@ describe('Endgame BotSpec tests', () => {
         expect(() => buildVariants({ base: { weights: {}, endgameWeights: { edgy: 1 } as any } })).to.throw('Unknown evaluator "edgy"');
     });
 });
+
+describe('Per-bot endgame threshold tests', () => {
+    const endgameWeights = { edgeExposure: 40, centrality: 20 };
+
+    it('endgameFactor should use custom start and full thresholds when given', () => {
+        const expected: [number, number][] = [[12, 0], [8, 0], [7, 0.25], [6, 0.5], [5, 0.75], [4, 1], [2, 1]];
+        for (const [n, factor] of expected) {
+            expect(endgameFactor(n, 8, 4), `${n} pieces`).to.equal(factor);
+        }
+        // The defaults are unchanged
+        expect(endgameFactor(8)).to.equal(0.5);
+    });
+
+    it('presets should blend with their own thresholds', () => {
+        const preset = createPreset('Late', 2, Fortress.weights, '', { endgameWeights, endgameStart: 8, endgameFull: 4 });
+        expect(preset.endgameStart).to.equal(8);
+        expect(preset.endgameFull).to.equal(4);
+        const base = evaluatorFromWeights(Fortress.weights);
+        const endgame = evaluatorFromWeights(endgameWeights);
+        for (const [n, factor] of [[9, 0], [8, 0], [7, 0.25], [6, 0.5], [4, 1]] as [number, number][]) {
+            const board = boardWithPieces(n);
+            expect(preset.evaluator(board, PieceType.WHITE), `${n} pieces`)
+                .to.equal(base(board, PieceType.WHITE) + factor * endgame(board, PieceType.WHITE));
+        }
+    });
+
+    it('searchDepthFor should switch to endgameDepth at the preset\'s own start threshold', () => {
+        const preset = createPreset('Late', 2, Fortress.weights, '', { endgameWeights, endgameDepth: 6, endgameStart: 8, endgameFull: 4 });
+        expect(searchDepthFor(preset, boardWithPieces(10))).to.equal(2);
+        expect(searchDepthFor(preset, boardWithPieces(9))).to.equal(2);
+        expect(searchDepthFor(preset, boardWithPieces(8))).to.equal(6);
+        const early = createPreset('Early', 2, Fortress.weights, '', { endgameDepth: 6, endgameStart: 12 });
+        expect(searchDepthFor(early, boardWithPieces(12))).to.equal(6);
+        expect(searchDepthFor(early, boardWithPieces(13))).to.equal(2);
+    });
+
+    it('presets without thresholds should not get the fields', () => {
+        expect(DeepFortressEndgame.endgameStart).to.equal(undefined);
+        expect(DeepFortressEndgame.endgameFull).to.equal(undefined);
+    });
+
+    it('should reject thresholds where full is not below start', () => {
+        expect(() => createPreset('Bad', 2, Fortress.weights, '', { endgameWeights, endgameStart: 6, endgameFull: 6 })).to.throw('endgameFull');
+        expect(() => createPreset('Bad', 2, Fortress.weights, '', { endgameWeights, endgameStart: 5 })).to.throw('endgameFull');
+    });
+
+    it('should round trip the thresholds through BotSpec', () => {
+        const spec: BotSpec = {
+            kind: 'search', name: 'Test', depth: 4, weights: { material: 100 },
+            endgameWeights: { centrality: 7 }, endgameDepth: 6, endgameStart: 8, endgameFull: 4,
+        };
+        const preset = presetFromSpec(spec);
+        expect(preset.endgameStart).to.equal(8);
+        expect(preset.endgameFull).to.equal(4);
+        expect(specFromPreset(preset)).to.deep.equal(spec);
+    });
+
+    it('tuning configs should pass thresholds from the base and variants to the bots', () => {
+        const variants = buildVariants({
+            base: { depth: 4, weights: { material: 100 }, endgameWeights: { edgeExposure: 40 }, endgameDepth: 6, endgameStart: 10, endgameFull: 6 },
+            variants: [{ name: 'Late', endgameStart: 8, endgameFull: 4 }],
+        });
+        expect(variants[0]).to.deep.include({ endgameStart: 10, endgameFull: 6 });
+        expect(variants[1]).to.deep.equal({
+            kind: 'search', name: 'Late', depth: 4, weights: { material: 100 },
+            endgameWeights: { edgeExposure: 40 }, endgameDepth: 6, endgameStart: 8, endgameFull: 4,
+        });
+    });
+});

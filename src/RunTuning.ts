@@ -4,7 +4,8 @@ import { basename, join } from 'path';
 import { EVALUATOR_NAMES, Weights } from './ai/presets.js';
 import { BotSpec } from './ai/tuning/BotSpec.js';
 import { DEFAULT_MAX_TURNS, GridKey, TuningConfig } from './ai/tuning/TuningConfig.js';
-import { ParticipantResult, runTuning } from './ai/tuning/Tuner.js';
+import { PairRecord, ParticipantResult, runTuning } from './ai/tuning/Tuner.js';
+import { ENDGAME_FULL_PIECES, ENDGAME_START_PIECES } from './ai/endgame.js';
 
 // Usage: npm run tune -- [configFile] [--games N] [--workers N]
 // e.g.   npm run tune -- tuning/grid.json --games 40
@@ -34,7 +35,9 @@ const formatWeights = (spec: BotSpec) => spec.kind === 'random'
     : `depth ${spec.depth}: ` + listWeights(spec.weights)
         // Endgame settings, when the bot has any
         + (spec.endgameWeights !== undefined ? `; endgame: ${listWeights(spec.endgameWeights)}` : '')
-        + (spec.endgameDepth !== undefined ? `; endgame depth ${spec.endgameDepth}` : '');
+        + (spec.endgameDepth !== undefined ? `; endgame depth ${spec.endgameDepth}` : '')
+        + (spec.endgameStart !== undefined || spec.endgameFull !== undefined
+            ? `; endgame from ${spec.endgameStart ?? ENDGAME_START_PIECES} pieces (full at ${spec.endgameFull ?? ENDGAME_FULL_PIECES})` : '');
 
 function printTable(rows: string[][]): void {
     const widths = rows[0].map((_, col) => Math.max(...rows.map(row => row[col].length)));
@@ -43,7 +46,9 @@ function printTable(rows: string[][]): void {
 
 const gamesDescription = config.openings
     ? `${config.openings.count} openings of ${config.openings.turns} turns, each played with both colours`
-    : `${config.gamesPerPair ?? 20} games per pair`;
+    : config.endgameStarts
+        ? `${config.endgameStarts.count} endgame starts, each played with both colours`
+        : `${config.gamesPerPair ?? 20} games per pair`;
 console.log(`Tuning with ${basename(configPath)} (${config.mode ?? 'gauntlet'}, ${gamesDescription}, ${workers} worker${workers === 1 ? '' : 's'})`);
 
 let lastPrinted = 0;
@@ -64,10 +69,19 @@ const columns = isGauntlet ? opponents : result.participants;
 // Ranking, with each bot's score against every opponent so you can see who it does well or badly against.
 console.log('Score         = points per game (win 1, draw ½). ± is how much of that could be luck (95% confidence).');
 console.log('Win/Draw/Loss = share of games with each result.');
-console.log('Decisive      = share of the games with a winner that this bot won (ignores draws).\n');
+console.log('Decisive      = share of the games with a winner that this bot won (ignores draws).');
+// From endgame starts, also show how well each bot uses an advantage and defends a disadvantage.
+const showEndgame = config.endgameStarts !== undefined;
+if (showEndgame) {
+    console.log('Converts      = share of the games this bot started ahead that it won.');
+    console.log('Holds         = share of the games this bot started behind that it didn\'t lose (won or drew).');
+}
+console.log('');
+const gamesIn = (r: PairRecord) => r.wins + r.draws + r.losses;
+const shareOf = (count: number, r: PairRecord) => gamesIn(r) > 0 ? wholePercent(count / gamesIn(r)) : '-';
 const shown = isGauntlet ? variants : result.participants;
 printTable([
-    ['Bot', 'Score', '±', 'Win', 'Draw', 'Loss', 'Decisive', ...columns.map(c => `vs ${c.spec.name}`), 'ms/turn'],
+    ['Bot', 'Score', '±', 'Win', 'Draw', 'Loss', 'Decisive', ...(showEndgame ? ['Converts', 'Holds'] : []), ...columns.map(c => `vs ${c.spec.name}`), 'ms/turn'],
     ...shown.map((p: ParticipantResult) => [
         p.spec.name,
         percent(p.score),
@@ -76,6 +90,7 @@ printTable([
         wholePercent(p.drawRate),
         wholePercent(p.lossRate),
         p.decisiveWinRate === null ? '-' : wholePercent(p.decisiveWinRate),
+        ...(showEndgame ? [shareOf(p.ahead.wins, p.ahead), shareOf(p.behind.wins + p.behind.draws, p.behind)] : []),
         ...columns.map(c => {
             const r = p.vs[c.spec.name];
             if (!r) return '-';
@@ -131,6 +146,8 @@ writeFileSync(resultsPath, JSON.stringify({
         // Left out of the JSON (undefined) for bots without endgame settings
         endgameWeights: p.spec.kind === 'search' ? p.spec.endgameWeights : undefined,
         endgameDepth: p.spec.kind === 'search' ? p.spec.endgameDepth : undefined,
+        endgameStart: p.spec.kind === 'search' ? p.spec.endgameStart : undefined,
+        endgameFull: p.spec.kind === 'search' ? p.spec.endgameFull : undefined,
         score: p.score,
         margin: p.margin,
         winRate: p.winRate,
@@ -143,6 +160,8 @@ writeFileSync(resultsPath, JSON.stringify({
         turnLimitDraws: p.turnLimitDraws,
         msPerTurn: p.msPerTurn,
         vs: p.vs,
+        ahead: p.ahead,
+        behind: p.behind,
     })),
 }, null, 2));
 console.log(`\nSaved results to ${resultsPath}`);

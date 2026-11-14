@@ -23,9 +23,10 @@ export function totalPieces(board: Board): number {
 /**
  * How much the endgame evaluator counts with this many pieces on the board: 0 at ENDGAME_START_PIECES or more,
  * rising linearly to 1 at ENDGAME_FULL_PIECES or fewer.
+ * @param start, full a bot's own thresholds, if it has them (the defaults are the constants above).
  */
-export function endgameFactor(numPieces: number): number {
-    const factor = (ENDGAME_START_PIECES - numPieces) / (ENDGAME_START_PIECES - ENDGAME_FULL_PIECES);
+export function endgameFactor(numPieces: number, start: number = ENDGAME_START_PIECES, full: number = ENDGAME_FULL_PIECES): number {
+    const factor = (start - numPieces) / (start - full);
     return Math.min(1, Math.max(0, factor));
 }
 
@@ -33,9 +34,9 @@ export function endgameFactor(numPieces: number): number {
  * Adds the endgame evaluator to the base evaluator, scaled by endgameFactor, so it fades in as the board empties.
  * Stays symmetric as long as both evaluators are (the factor only depends on the board).
  */
-export function blendEndgame(base: Evaluator, endgame: Evaluator): Evaluator {
+export function blendEndgame(base: Evaluator, endgame: Evaluator, start: number = ENDGAME_START_PIECES, full: number = ENDGAME_FULL_PIECES): Evaluator {
     return (board, pieceType) => {
-        const factor = endgameFactor(totalPieces(board));
+        const factor = endgameFactor(totalPieces(board), start, full);
         const score = base(board, pieceType);
         return factor === 0 ? score : score + factor * endgame(board, pieceType);
     };
@@ -43,11 +44,11 @@ export function blendEndgame(base: Evaluator, endgame: Evaluator): Evaluator {
 
 /**
  * @returns how many turns ahead a bot should search from this position: its endgameDepth (if it has one) once
- * there are ENDGAME_START_PIECES or fewer pieces left, otherwise its normal depth. Fewer pieces means fewer moves
+ * there are ENDGAME_START_PIECES (or the bot's own endgameStart) or fewer pieces left, otherwise its normal depth. Fewer pieces means fewer moves
  * per turn, so deeper searches become affordable.
  */
-export function searchDepthFor(preset: { depth: number, endgameDepth?: number }, board: Board): number {
-    if (preset.endgameDepth !== undefined && totalPieces(board) <= ENDGAME_START_PIECES) {
+export function searchDepthFor(preset: { depth: number, endgameDepth?: number, endgameStart?: number }, board: Board): number {
+    if (preset.endgameDepth !== undefined && totalPieces(board) <= (preset.endgameStart ?? ENDGAME_START_PIECES)) {
         return preset.endgameDepth;
     }
     return preset.depth;

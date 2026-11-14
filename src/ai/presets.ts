@@ -1,6 +1,6 @@
 import { Evaluator, WeightedTerm, weighted } from './Evaluator.js';
 import { material, vulnerability, strongPoints, lineExposure, edgeExposure, centrality } from './evaluators.js';
-import { blendEndgame } from './endgame.js';
+import { ENDGAME_FULL_PIECES, ENDGAME_START_PIECES, blendEndgame } from './endgame.js';
 
 /**
  * Every evaluator that can be weighted, by name. Add new evaluators here to make them available to presets
@@ -28,6 +28,9 @@ export interface BotPreset {
     endgameWeights?: Weights,
     // Search depth to use once there are few pieces left (see searchDepthFor). Not set = always use depth.
     endgameDepth?: number,
+    // The bot's own endgame thresholds (see endgame.ts). Not set = ENDGAME_START_PIECES / ENDGAME_FULL_PIECES.
+    endgameStart?: number,
+    endgameFull?: number,
     // Rates positions using weights, plus endgameWeights blended in during the endgame.
     evaluator: Evaluator,
 }
@@ -35,6 +38,8 @@ export interface BotPreset {
 export interface EndgameOptions {
     endgameWeights?: Weights,
     endgameDepth?: number,
+    endgameStart?: number,
+    endgameFull?: number,
 }
 
 export function evaluatorFromWeights(weights: Weights): Evaluator {
@@ -46,12 +51,19 @@ export function evaluatorFromWeights(weights: Weights): Evaluator {
 
 export function createPreset(name: string, depth: number, weights: Weights, description: string = '', options: EndgameOptions = {}): BotPreset {
     const preset: BotPreset = { name, description, depth, weights, evaluator: evaluatorFromWeights(weights) };
+    const start = options.endgameStart ?? ENDGAME_START_PIECES;
+    const full = options.endgameFull ?? ENDGAME_FULL_PIECES;
+    if (full >= start) {
+        throw new Error(`${name}: endgameFull (${full}) must be below endgameStart (${start}).`);
+    }
     // Only add the endgame fields when they're set, so presets without them look exactly as they did before.
     if (options.endgameWeights !== undefined) {
         preset.endgameWeights = options.endgameWeights;
-        preset.evaluator = blendEndgame(preset.evaluator, evaluatorFromWeights(options.endgameWeights));
+        preset.evaluator = blendEndgame(preset.evaluator, evaluatorFromWeights(options.endgameWeights), start, full);
     }
     if (options.endgameDepth !== undefined) preset.endgameDepth = options.endgameDepth;
+    if (options.endgameStart !== undefined) preset.endgameStart = options.endgameStart;
+    if (options.endgameFull !== undefined) preset.endgameFull = options.endgameFull;
     return preset;
 }
 

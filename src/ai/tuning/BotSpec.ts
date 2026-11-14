@@ -6,7 +6,7 @@ import { Contestant, RandomContestant, contestantFromPreset } from '../Tournamen
  * JSON and sent to worker threads.
  */
 export type BotSpec =
-    | { kind: 'search', name: string, depth: number, weights: Weights, endgameWeights?: Weights, endgameDepth?: number }
+    | { kind: 'search', name: string, depth: number, weights: Weights, endgameWeights?: Weights, endgameDepth?: number, endgameStart?: number, endgameFull?: number }
     | { kind: 'random', name: string };
 
 export function specFromPreset(preset: BotPreset): BotSpec {
@@ -14,6 +14,8 @@ export function specFromPreset(preset: BotPreset): BotSpec {
     // Endgame settings are optional, so only add them when the preset has them.
     if (preset.endgameWeights !== undefined) spec.endgameWeights = { ...preset.endgameWeights };
     if (preset.endgameDepth !== undefined) spec.endgameDepth = preset.endgameDepth;
+    if (preset.endgameStart !== undefined) spec.endgameStart = preset.endgameStart;
+    if (preset.endgameFull !== undefined) spec.endgameFull = preset.endgameFull;
     return spec;
 }
 
@@ -35,7 +37,9 @@ export function findBuiltInSpec(name: string): BotSpec {
  * Turns a search spec back into a preset (the reverse of specFromPreset), including any endgame settings.
  */
 export function presetFromSpec(spec: Extract<BotSpec, { kind: 'search' }>): BotPreset {
-    return createPreset(spec.name, spec.depth, spec.weights, '', { endgameWeights: spec.endgameWeights, endgameDepth: spec.endgameDepth });
+    return createPreset(spec.name, spec.depth, spec.weights, '', {
+        endgameWeights: spec.endgameWeights, endgameDepth: spec.endgameDepth, endgameStart: spec.endgameStart, endgameFull: spec.endgameFull,
+    });
 }
 
 export function contestantFromSpec(spec: BotSpec): Contestant {

@@ -1,6 +1,6 @@
 import { BotSpec, findBuiltInSpec } from './BotSpec.js';
 import { GameJob, runGames } from './GamePool.js';
-import { Opening, generateOpenings } from './Openings.js';
+import { Opening, generateEndgameStarts, generateOpenings, startLead } from './Openings.js';
 import { DEFAULT_GAMES_PER_PAIR, DEFAULT_MAX_TURNS, TuningConfig, buildVariants } from './TuningConfig.js';
 
 export interface PairRecord {
@@ -32,6 +32,10 @@ export interface ParticipantResult {
     msPerTurn: number,
     // Results against each other participant, by name
     vs: Record<string, PairRecord>,
+    // Results split by whether this bot started with more pieces (ahead) or fewer (behind) than its opponent, from the
+    // opening or endgame start. Games that started level are in neither.
+    ahead: PairRecord,
+    behind: PairRecord,
 }
 
 export interface TuningResult {
@@ -69,7 +73,16 @@ export async function runTuning(config: TuningConfig, numWorkers: number, onProg
         pairs = allPairs(everyone);
     }
 
-    const openings = config.openings ? generateOpenings(config.openings.count, config.openings.turns, config.openings.seed ?? 1) : undefined;
+    if (config.openings && config.endgameStarts) {
+        throw new Error('A config can use either openings or endgameStarts, not both.');
+    }
+    let openings: Opening[] | undefined;
+    if (config.openings) {
+        openings = generateOpenings(config.openings.count, config.openings.turns, config.openings.seed ?? 1);
+    } else if (config.endgameStarts) {
+        const { count, seed, ...options } = config.endgameStarts;
+        openings = generateEndgameStarts(count, options, seed ?? 1);
+    }
     const { participants, totalGames } = await playPairings(everyone, pairs, gamesPerPair, maxTurns, numWorkers, onProgress, openings);
     for (const participant of participants) participant.isVariant = variants.includes(participant.spec);
 
@@ -122,29 +135,40 @@ export async function playPairings(
     openings?: Opening[],
 ): Promise<{ participants: ParticipantResult[], totalGames: number }> {
     // Colours alternate each game so neither bot gets the advantage of always moving first.
-    const jobs: (GameJob & { a: BotSpec, b: BotSpec, aIsWhite: boolean })[] = [];
+    // whiteLead: how many pieces white is ahead by at the start of the game (from the opening).
+    const jobs: (GameJob & { a: BotSpec, b: BotSpec, aIsWhite: boolean, whiteLead: number })[] = [];
+    const leads = new Map((openings ?? []).map(opening => [opening, startLead(opening)]));
     for (const [a, b] of pairs) {
         if (openings) {
             for (const opening of openings) {
-                jobs.push({ white: a, black: b, maxTurns, opening, a, b, aIsWhite: true });
-                jobs.push({ white: b, black: a, maxTurns, opening, a, b, aIsWhite: false });
+                const whiteLead = leads.get(opening)!;
+                jobs.push({ white: a, black: b, maxTurns, opening, a, b, aIsWhite: true, whiteLead });
+                jobs.push({ white: b, black: a, maxTurns, opening, a, b, aIsWhite: false, whiteLead });
             }
         } else {
             for (let game = 0; game < gamesPerPair; game++) {
                 const aIsWhite = game % 2 === 0;
-                jobs.push({ white: aIsWhite ? a : b, black: aIsWhite ? b : a, maxTurns, a, b, aIsWhite });
+                jobs.push({ white: aIsWhite ? a : b, black: aIsWhite ? b : a, maxTurns, a, b, aIsWhite, whiteLead: 0 });
             }
         }
     }
 
     const stats = await runGames(jobs.map(({ white, black, maxTurns, opening }) => ({ white, black, maxTurns, opening })), numWorkers, onProgress);
 
-    const totals = new Map<string, { record: PairRecord, turnLimitDraws: number, ms: number, turns: number, vs: Record<string, PairRecord> }>();
-    for (const spec of everyone) totals.set(spec.name, { record: { wins: 0, draws: 0, losses: 0 }, turnLimitDraws: 0, ms: 0, turns: 0, vs: {} });
+    const totals = new Map<string, { record: PairRecord, turnLimitDraws: number, ms: number, turns: number, vs: Record<string, PairRecord>, ahead: PairRecord, behind: PairRecord }>();
+    for (const spec of everyone) {
+        totals.set(spec.name, {
+            record: { wins: 0, draws: 0, losses: 0 }, turnLimitDraws: 0, ms: 0, turns: 0, vs: {},
+            ahead: { wins: 0, draws: 0, losses: 0 }, behind: { wins: 0, draws: 0, losses: 0 },
+        });
+    }
 
-    const addResult = (name: string, opponentName: string, result: keyof PairRecord, isTurnLimitDraw: boolean, ms: number, turns: number) => {
+    // lead: how many pieces this bot started ahead by (negative if behind).
+    const addResult = (name: string, opponentName: string, result: keyof PairRecord, isTurnLimitDraw: boolean, ms: number, turns: number, lead: number) => {
         const t = totals.get(name)!;
         t.record[result]++;
+        if (lead > 0) t.ahead[result]++;
+        else if (lead < 0) t.behind[result]++;
         if (isTurnLimitDraw) t.turnLimitDraws++;
         t.vs[opponentName] ??= { wins: 0, draws: 0, losses: 0 };
         t.vs[opponentName][result]++;
@@ -160,8 +184,9 @@ export async function playPairings(
         const whiteTurns = Math.ceil(game.turns / 2);
         const blackTurns = Math.floor(game.turns / 2);
         const isTurnLimitDraw = game.drawReason === 'TURN_LIMIT';
-        addResult(job.a.name, job.b.name, aResult, isTurnLimitDraw, job.aIsWhite ? game.whiteMs : game.blackMs, job.aIsWhite ? whiteTurns : blackTurns);
-        addResult(job.b.name, job.a.name, bResult, isTurnLimitDraw, job.aIsWhite ? game.blackMs : game.whiteMs, job.aIsWhite ? blackTurns : whiteTurns);
+        const aLead = job.aIsWhite ? job.whiteLead : -job.whiteLead;
+        addResult(job.a.name, job.b.name, aResult, isTurnLimitDraw, job.aIsWhite ? game.whiteMs : game.blackMs, job.aIsWhite ? whiteTurns : blackTurns, aLead);
+        addResult(job.b.name, job.a.name, bResult, isTurnLimitDraw, job.aIsWhite ? game.blackMs : game.whiteMs, job.aIsWhite ? blackTurns : whiteTurns, -aLead);
     });
 
     const participants: ParticipantResult[] = everyone
@@ -184,6 +209,8 @@ export async function playPairings(
                 margin: games > 0 ? 1.96 * Math.sqrt(score * (1 - score) / games) : 0,
                 msPerTurn: t.turns > 0 ? t.ms / t.turns : 0,
                 vs: t.vs,
+                ahead: t.ahead,
+                behind: t.behind,
             };
         })
         .filter(p => p.games > 0);

@@ -1,5 +1,6 @@
 import { EVALUATOR_NAMES, EvaluatorName, Weights } from '../presets.js';
 import { BotSpec } from './BotSpec.js';
+import { EndgameStartOptions } from './Openings.js';
 
 export type GridKey = EvaluatorName | 'depth';
 
@@ -14,19 +15,24 @@ export interface TuningConfig {
     // Play every pairing from the same set of random openings, once with each colour. When set, each pair plays
     // 2 × count games and gamesPerPair is ignored.
     openings?: { count: number, turns: number, seed?: number },
+    // Play every pairing from the same set of endgame positions instead (see generateEndgameStarts), once with each
+    // colour, so each bot plays every start once from the side that's ahead and once from the side that's behind.
+    // Use either openings or endgameStarts, not both.
+    endgameStarts?: { count: number, seed?: number } & Partial<EndgameStartOptions>,
     // Safety limit on game length (games normally end sooner through the no-capture draw rule).
     maxTurns?: number,
     // Built-in bots (preset names or 'Random') for the variants to play against.
     opponents?: string[],
     // The starting point that the grid and variants change. endgameWeights and endgameDepth are optional
     // (see BotPreset): extra weights blended in as the board empties, and a deeper search once few pieces are left.
-    base: { depth?: number, weights: Weights, endgameWeights?: Weights, endgameDepth?: number },
+    // endgameStart and endgameFull are the bot's own endgame thresholds (see endgame.ts).
+    base: { depth?: number, weights: Weights, endgameWeights?: Weights, endgameDepth?: number, endgameStart?: number, endgameFull?: number },
     // Every combination of these values is tried, each applied on top of base.
     grid?: Partial<Record<GridKey, number[]>>,
     // Hand-picked variants, each applied on top of base. Weights listed here replace the base weight
     // (use 0 to switch an evaluator off).
     // endgameWeights are applied on top of the base endgameWeights in the same way.
-    variants?: { name: string, depth?: number, weights?: Weights, endgameWeights?: Weights, endgameDepth?: number }[],
+    variants?: { name: string, depth?: number, weights?: Weights, endgameWeights?: Weights, endgameDepth?: number, endgameStart?: number, endgameFull?: number }[],
 }
 
 export const DEFAULT_GAMES_PER_PAIR = 20;
@@ -41,13 +47,17 @@ export function buildVariants(config: TuningConfig): BotSpec[] {
     validateWeights(config.base.endgameWeights ?? {}, 'base endgameWeights');
     const baseDepth = config.base.depth ?? 2;
     // Adds the base's endgame settings (overridden by the variant's) to a spec, leaving them out when neither has any.
-    const withEndgame = (spec: BotSpec, variant: { endgameWeights?: Weights, endgameDepth?: number } = {}): BotSpec => {
+    const withEndgame = (spec: BotSpec, variant: { endgameWeights?: Weights, endgameDepth?: number, endgameStart?: number, endgameFull?: number } = {}): BotSpec => {
         if (spec.kind !== 'search') return spec;
         if (config.base.endgameWeights !== undefined || variant.endgameWeights !== undefined) {
             spec.endgameWeights = { ...config.base.endgameWeights, ...variant.endgameWeights };
         }
         const endgameDepth = variant.endgameDepth ?? config.base.endgameDepth;
         if (endgameDepth !== undefined) spec.endgameDepth = endgameDepth;
+        const endgameStart = variant.endgameStart ?? config.base.endgameStart;
+        if (endgameStart !== undefined) spec.endgameStart = endgameStart;
+        const endgameFull = variant.endgameFull ?? config.base.endgameFull;
+        if (endgameFull !== undefined) spec.endgameFull = endgameFull;
         return spec;
     };
     const variants: BotSpec[] = [];

@@ -1,0 +1,6 @@
+{
+  "mode": "gauntlet",
+  "openings": { "count": 10, "turns": 4, "seed": 1501 },
+  "opponents": ["DeepFortress"],
+  "base": { "depth": 4, "weights": { "material": 100, "vulnerability": 30, "strongPoints": 5, "lineExposure": 5 }, "endgameWeights": { "edgeExposure": 40, "centrality": 20 }, "endgameDepth": 6 }
+}

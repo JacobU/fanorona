@@ -1,0 +1,602 @@
+{
+  "mode": "gauntlet",
+  "endgameStarts": {
+    "count": 24,
+    "seed": 3102
+  },
+  "opponents": [
+    "DeepFortress"
+  ],
+  "base": {
+    "depth": 4,
+    "weights": {
+      "material": 100,
+      "vulnerability": 30,
+      "strongPoints": 5,
+      "lineExposure": 5
+    },
+    "endgameWeights": {},
+    "endgameDepth": 4
+  },
+  "variants": [
+    {
+      "name": "Current",
+      "endgameWeights": {
+        "edgeExposure": 40,
+        "centrality": 20
+      }
+    },
+    {
+      "name": "E40",
+      "endgameWeights": {
+        "edgeExposure": 40
+      }
+    },
+    {
+      "name": "C20",
+      "endgameWeights": {
+        "centrality": 20
+      }
+    },
+    {
+      "name": "Current s-5",
+      "endgameWeights": {
+        "edgeExposure": 40,
+        "centrality": 20,
+        "strongPoints": -5
+      }
+    },
+    {
+      "name": "Current v-30",
+      "endgameWeights": {
+        "edgeExposure": 40,
+        "centrality": 20,
+        "vulnerability": -30
+      }
+    },
+    {
+      "name": "Current v+30",
+      "endgameWeights": {
+        "edgeExposure": 40,
+        "centrality": 20,
+        "vulnerability": 30
+      }
+    },
+    {
+      "name": "Current l-5",
+      "endgameWeights": {
+        "edgeExposure": 40,
+        "centrality": 20,
+        "lineExposure": -5
+      }
+    },
+    {
+      "name": "r01 e2 c1 s-2 v5 l17",
+      "endgameWeights": {
+        "edgeExposure": 2,
+        "centrality": 1,
+        "strongPoints": -2,
+        "vulnerability": 5,
+        "lineExposure": 17
+      }
+    },
+    {
+      "name": "r02 e8 c37 s1 v-24",
+      "endgameWeights": {
+        "edgeExposure": 8,
+        "centrality": 37,
+        "strongPoints": 1,
+        "vulnerability": -24
+      }
+    },
+    {
+      "name": "r03 s-5 v-14 l4",
+      "endgameWeights": {
+        "strongPoints": -5,
+        "vulnerability": -14,
+        "lineExposure": 4
+      }
+    },
+    {
+      "name": "r04 s11 v-6 l-3",
+      "endgameWeights": {
+        "strongPoints": 11,
+        "vulnerability": -6,
+        "lineExposure": -3
+      }
+    },
+    {
+      "name": "r05 e16 c7 s13 v26 l8",
+      "endgameWeights": {
+        "edgeExposure": 16,
+        "centrality": 7,
+        "strongPoints": 13,
+        "vulnerability": 26,
+        "lineExposure": 8
+      }
+    },
+    {
+      "name": "r06 e4 c-1 s-17 v1 l22",
+      "endgameWeights": {
+        "edgeExposure": 4,
+        "centrality": -1,
+        "strongPoints": -17,
+        "vulnerability": 1,
+        "lineExposure": 22
+      }
+    },
+    {
+      "name": "r07 e-5 c64 s1 v75 l-15",
+      "endgameWeights": {
+        "edgeExposure": -5,
+        "centrality": 64,
+        "strongPoints": 1,
+        "vulnerability": 75,
+        "lineExposure": -15
+      }
+    },
+    {
+      "name": "r08 e6 c-9 s-12 v14 l-1",
+      "endgameWeights": {
+        "edgeExposure": 6,
+        "centrality": -9,
+        "strongPoints": -12,
+        "vulnerability": 14,
+        "lineExposure": -1
+      }
+    },
+    {
+      "name": "r09 e12 c15 s-4 v16 l1",
+      "endgameWeights": {
+        "edgeExposure": 12,
+        "centrality": 15,
+        "strongPoints": -4,
+        "vulnerability": 16,
+        "lineExposure": 1
+      }
+    },
+    {
+      "name": "r10 e-18 c-15 s2 l-14",
+      "endgameWeights": {
+        "edgeExposure": -18,
+        "centrality": -15,
+        "strongPoints": 2,
+        "lineExposure": -14
+      }
+    },
+    {
+      "name": "r11 e-3 c47 v-20 l-1",
+      "endgameWeights": {
+        "edgeExposure": -3,
+        "centrality": 47,
+        "vulnerability": -20,
+        "lineExposure": -1
+      }
+    },
+    {
+      "name": "r12 e-4 c5 s-8 v22 l-17",
+      "endgameWeights": {
+        "edgeExposure": -4,
+        "centrality": 5,
+        "strongPoints": -8,
+        "vulnerability": 22,
+        "lineExposure": -17
+      }
+    },
+    {
+      "name": "r13 e27 c-1 s-13 v2 l25",
+      "endgameWeights": {
+        "edgeExposure": 27,
+        "centrality": -1,
+        "strongPoints": -13,
+        "vulnerability": 2,
+        "lineExposure": 25
+      }
+    },
+    {
+      "name": "r14 e72 c6 s-1 l-3",
+      "endgameWeights": {
+        "edgeExposure": 72,
+        "centrality": 6,
+        "strongPoints": -1,
+        "lineExposure": -3
+      }
+    },
+    {
+      "name": "r15 e-9 c-10 s22 v9 l-3",
+      "endgameWeights": {
+        "edgeExposure": -9,
+        "centrality": -10,
+        "strongPoints": 22,
+        "vulnerability": 9,
+        "lineExposure": -3
+      }
+    },
+    {
+      "name": "r16 e79 c26 s-3 v8",
+      "endgameWeights": {
+        "edgeExposure": 79,
+        "centrality": 26,
+        "strongPoints": -3,
+        "vulnerability": 8
+      }
+    },
+    {
+      "name": "r17 c73 s3 l-12",
+      "endgameWeights": {
+        "centrality": 73,
+        "strongPoints": 3,
+        "lineExposure": -12
+      }
+    },
+    {
+      "name": "r18 e-1 s-15 v-1 l-1",
+      "endgameWeights": {
+        "edgeExposure": -1,
+        "strongPoints": -15,
+        "vulnerability": -1,
+        "lineExposure": -1
+      }
+    },
+    {
+      "name": "r19 e64 c2 s-2 v30 l-2",
+      "endgameWeights": {
+        "edgeExposure": 64,
+        "centrality": 2,
+        "strongPoints": -2,
+        "vulnerability": 30,
+        "lineExposure": -2
+      }
+    },
+    {
+      "name": "r20 e2 c1 s4 l21",
+      "endgameWeights": {
+        "edgeExposure": 2,
+        "centrality": 1,
+        "strongPoints": 4,
+        "lineExposure": 21
+      }
+    },
+    {
+      "name": "r21 e-2 c-2 s5 v4 l16",
+      "endgameWeights": {
+        "edgeExposure": -2,
+        "centrality": -2,
+        "strongPoints": 5,
+        "vulnerability": 4,
+        "lineExposure": 16
+      }
+    },
+    {
+      "name": "r22 e-1 s19 v7",
+      "endgameWeights": {
+        "edgeExposure": -1,
+        "strongPoints": 19,
+        "vulnerability": 7
+      }
+    },
+    {
+      "name": "r23 c4 s-1 v-3 l3",
+      "endgameWeights": {
+        "centrality": 4,
+        "strongPoints": -1,
+        "vulnerability": -3,
+        "lineExposure": 3
+      }
+    },
+    {
+      "name": "r24 e-5 c-3 s5 v41 l-4",
+      "endgameWeights": {
+        "edgeExposure": -5,
+        "centrality": -3,
+        "strongPoints": 5,
+        "vulnerability": 41,
+        "lineExposure": -4
+      }
+    },
+    {
+      "name": "r25 e2 c-11 s1 v33 l1",
+      "endgameWeights": {
+        "edgeExposure": 2,
+        "centrality": -11,
+        "strongPoints": 1,
+        "vulnerability": 33,
+        "lineExposure": 1
+      }
+    },
+    {
+      "name": "r26 e-2 c-3 s3 v11",
+      "endgameWeights": {
+        "edgeExposure": -2,
+        "centrality": -3,
+        "strongPoints": 3,
+        "vulnerability": 11
+      }
+    },
+    {
+      "name": "r27 e15 c-1 s2 v-5 l-9",
+      "endgameWeights": {
+        "edgeExposure": 15,
+        "centrality": -1,
+        "strongPoints": 2,
+        "vulnerability": -5,
+        "lineExposure": -9
+      }
+    },
+    {
+      "name": "r28 e-15 c-5 s-7 v-3",
+      "endgameWeights": {
+        "edgeExposure": -15,
+        "centrality": -5,
+        "strongPoints": -7,
+        "vulnerability": -3
+      }
+    },
+    {
+      "name": "r29 e4 c31 s9 v3 l-1",
+      "endgameWeights": {
+        "edgeExposure": 4,
+        "centrality": 31,
+        "strongPoints": 9,
+        "vulnerability": 3,
+        "lineExposure": -1
+      }
+    },
+    {
+      "name": "r30 e1 c-2 s7 v56 l1",
+      "endgameWeights": {
+        "edgeExposure": 1,
+        "centrality": -2,
+        "strongPoints": 7,
+        "vulnerability": 56,
+        "lineExposure": 1
+      }
+    },
+    {
+      "name": "r31 e52 c86 s-6 v-1 l28",
+      "endgameWeights": {
+        "edgeExposure": 52,
+        "centrality": 86,
+        "strongPoints": -6,
+        "vulnerability": -1,
+        "lineExposure": 28
+      }
+    },
+    {
+      "name": "r32 e3 c-1 l-2",
+      "endgameWeights": {
+        "edgeExposure": 3,
+        "centrality": -1,
+        "lineExposure": -2
+      }
+    },
+    {
+      "name": "r33 e-2 c3 s2 v-11 l1",
+      "endgameWeights": {
+        "edgeExposure": -2,
+        "centrality": 3,
+        "strongPoints": 2,
+        "vulnerability": -11,
+        "lineExposure": 1
+      }
+    },
+    {
+      "name": "r34 e2 c-18 v6 l4",
+      "endgameWeights": {
+        "edgeExposure": 2,
+        "centrality": -18,
+        "vulnerability": 6,
+        "lineExposure": 4
+      }
+    },
+    {
+      "name": "r35 e-12 c14 s29 v45 l3",
+      "endgameWeights": {
+        "edgeExposure": -12,
+        "centrality": 14,
+        "strongPoints": 29,
+        "vulnerability": 45,
+        "lineExposure": 3
+      }
+    },
+    {
+      "name": "r36 e-1 c41 s12 v-28 l5",
+      "endgameWeights": {
+        "edgeExposure": -1,
+        "centrality": 41,
+        "strongPoints": 12,
+        "vulnerability": -28,
+        "lineExposure": 5
+      }
+    },
+    {
+      "name": "r37 e-8 c4 s-5 v3 l2",
+      "endgameWeights": {
+        "edgeExposure": -8,
+        "centrality": 4,
+        "strongPoints": -5,
+        "vulnerability": 3,
+        "lineExposure": 2
+      }
+    },
+    {
+      "name": "r38 e1 c2 v-4 l-19",
+      "endgameWeights": {
+        "edgeExposure": 1,
+        "centrality": 2,
+        "vulnerability": -4,
+        "lineExposure": -19
+      }
+    },
+    {
+      "name": "r39 e-7 c-4 v12 l-6",
+      "endgameWeights": {
+        "edgeExposure": -7,
+        "centrality": -4,
+        "vulnerability": 12,
+        "lineExposure": -6
+      }
+    },
+    {
+      "name": "r40 e49 c24 s1 v83 l-1",
+      "endgameWeights": {
+        "edgeExposure": 49,
+        "centrality": 24,
+        "strongPoints": 1,
+        "vulnerability": 83,
+        "lineExposure": -1
+      }
+    },
+    {
+      "name": "r41 e9 c-7 s25 v62 l-8",
+      "endgameWeights": {
+        "edgeExposure": 9,
+        "centrality": -7,
+        "strongPoints": 25,
+        "vulnerability": 62,
+        "lineExposure": -8
+      }
+    },
+    {
+      "name": "r42 e5 c1 s-2 v2 l-10",
+      "endgameWeights": {
+        "edgeExposure": 5,
+        "centrality": 1,
+        "strongPoints": -2,
+        "vulnerability": 2,
+        "lineExposure": -10
+      }
+    },
+    {
+      "name": "r43 e7 c21 s15 v-1 l2",
+      "endgameWeights": {
+        "edgeExposure": 7,
+        "centrality": 21,
+        "strongPoints": 15,
+        "vulnerability": -1,
+        "lineExposure": 2
+      }
+    },
+    {
+      "name": "r44 e21 c-2 s-8 v-8 l-6",
+      "endgameWeights": {
+        "edgeExposure": 21,
+        "centrality": -2,
+        "strongPoints": -8,
+        "vulnerability": -8,
+        "lineExposure": -6
+      }
+    },
+    {
+      "name": "r45 c1 s-1 v-2 l2",
+      "endgameWeights": {
+        "centrality": 1,
+        "strongPoints": -1,
+        "vulnerability": -2,
+        "lineExposure": 2
+      }
+    },
+    {
+      "name": "r46 e23 c50 s-1 v2 l6",
+      "endgameWeights": {
+        "edgeExposure": 23,
+        "centrality": 50,
+        "strongPoints": -1,
+        "vulnerability": 2,
+        "lineExposure": 6
+      }
+    },
+    {
+      "name": "r47 e35 c-15 s7 v-7 l11",
+      "endgameWeights": {
+        "edgeExposure": 35,
+        "centrality": -15,
+        "strongPoints": 7,
+        "vulnerability": -7,
+        "lineExposure": 11
+      }
+    },
+    {
+      "name": "r48 e-10 c8 s-3",
+      "endgameWeights": {
+        "edgeExposure": -10,
+        "centrality": 8,
+        "strongPoints": -3
+      }
+    },
+    {
+      "name": "r49 e29 c3 s17 v-19 l5",
+      "endgameWeights": {
+        "edgeExposure": 29,
+        "centrality": 3,
+        "strongPoints": 17,
+        "vulnerability": -19,
+        "lineExposure": 5
+      }
+    },
+    {
+      "name": "r50 e87 c-5 s-1 v1 l11",
+      "endgameWeights": {
+        "edgeExposure": 87,
+        "centrality": -5,
+        "strongPoints": -1,
+        "vulnerability": 1,
+        "lineExposure": 11
+      }
+    },
+    {
+      "name": "r51 e-15 c11 s-10 v-2 l7",
+      "endgameWeights": {
+        "edgeExposure": -15,
+        "centrality": 11,
+        "strongPoints": -10,
+        "vulnerability": -2,
+        "lineExposure": 7
+      }
+    },
+    {
+      "name": "r52 c-7 v19 l9",
+      "endgameWeights": {
+        "centrality": -7,
+        "vulnerability": 19,
+        "lineExposure": 9
+      }
+    },
+    {
+      "name": "r53 e11 s-18 v-4",
+      "endgameWeights": {
+        "edgeExposure": 11,
+        "strongPoints": -18,
+        "vulnerability": -4
+      }
+    },
+    {
+      "name": "r54 c10 s4 v-16 l-5",
+      "endgameWeights": {
+        "centrality": 10,
+        "strongPoints": 4,
+        "vulnerability": -16,
+        "lineExposure": -5
+      }
+    },
+    {
+      "name": "r55 e-3 c17 s9 v1 l-6",
+      "endgameWeights": {
+        "edgeExposure": -3,
+        "centrality": 17,
+        "strongPoints": 9,
+        "vulnerability": 1,
+        "lineExposure": -6
+      }
+    },
+    {
+      "name": "r56 e40 c88 v-9 l13",
+      "endgameWeights": {
+        "edgeExposure": 40,
+        "centrality": 88,
+        "vulnerability": -9,
+        "lineExposure": 13
+      }
+    }
+  ]
+}
