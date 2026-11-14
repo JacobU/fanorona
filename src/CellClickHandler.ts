@@ -1,10 +1,11 @@
 import Board from './Board.js';
-import { PieceType, Turn, Move, getDeltaIndex, AttackType, Direction } from './types.js';
+import { PieceType, Turn, Move, getDeltaIndex, AttackType, Direction, getOppositePieceType } from './types.js';
 
 export default class CellClickHandler {
     private board: Board;
     private currentlySelectedCell: null | number = null;
-    private playersPieceType: PieceType;
+    // The colours the people at this screen are allowed to move
+    private controlledColours: PieceType[];
     private possibleMoveIndexes: Move[] = [];
     private inTheMiddleOfAttackingChain: boolean = false;
     private isSelectingAttackOrWithdraw: boolean = false;
@@ -14,7 +15,35 @@ export default class CellClickHandler {
 
     constructor(board: Board) {
         this.board = board;
-        this.playersPieceType = PieceType.WHITE; // Default to white until we make it available to play as black
+        this.controlledColours = [PieceType.WHITE]; // Default to white until we make it available to play as black
+    }
+
+    /**
+     * Sets which colours clicks can move: [WHITE, BLACK] for two players on one screen, or just the human's colour
+     * when playing the bot (or nothing while no game is being played).
+     */
+    public setControlledColours(colours: PieceType[]): void {
+        this.controlledColours = [...colours];
+    }
+
+    /**
+     * Forgets any selected piece, capture chain or pending approach/withdraw choice (used when restarting).
+     * The board itself is not touched.
+     */
+    public reset(): void {
+        this.deselectCell();
+        this.inTheMiddleOfAttackingChain = false;
+        this.isSelectingAttackOrWithdraw = false;
+        this.approachOrWithdrawPieces = null;
+        this.moveDirectionBeforeApproachWithdrawSelection = null;
+        this.approachOrWithdrawMoveIndex = null;
+    }
+
+    /**
+     * @returns the colour whose turn it is (the player clicking is playing this colour).
+     */
+    private turnColour(): PieceType {
+        return this.board.getTurn() === Turn.WHITE ? PieceType.WHITE : PieceType.BLACK;
     }
 
     handleCellClick(index: number): boolean {
@@ -27,14 +56,15 @@ export default class CellClickHandler {
         // 4. The player is in the middle of an attacking chain and clicks on anything besides a possible 
         //    move (given that you are not in the middle of selecting an approach/withdraw)
         // 5. The player is in the middle of choosing whether to attack or withdraw and clicks on anything besides those two indexes
+        const playersPieceType = this.turnColour();
         const isPossibleMove = this.possibleMoveIndexes.map(move => move.index).includes(index);
-        const isNotMyTurn = this.board.getTurn() !== Turn.WHITE;
+        const isNotMyTurn = !this.controlledColours.includes(playersPieceType);
         const isSelectingNonMovablePiece = this.currentlySelectedCell === null
-            && !this.board.getPiecesThatPlayerCanMove(this.playersPieceType).includes(index);
+            && !this.board.getPiecesThatPlayerCanMove(playersPieceType).includes(index);
         const isInvalidMoveWhilePieceSelected = this.currentlySelectedCell !== null
             && !this.isSelectingAttackOrWithdraw
             && ((!isPossibleMove && this.board.getPieceTypeAtIndex(index) === PieceType.EMPTY)
-                || this.board.getPieceTypeAtIndex(index) === PieceType.BLACK);
+                || this.board.getPieceTypeAtIndex(index) === getOppositePieceType(playersPieceType));
         const isLockedInChainClickingNonMove = this.inTheMiddleOfAttackingChain
             && this.currentlySelectedCell !== null
             && !this.isSelectingAttackOrWithdraw
@@ -76,12 +106,12 @@ export default class CellClickHandler {
                 performedMove = this.handleAttemptedMove(index);
 
             // Selected an unmovable piece of their own OR the selected piece again
-            } else if (!this.board.getPiecesThatPlayerCanMove(this.playersPieceType).includes(index) ||
+            } else if (!this.board.getPiecesThatPlayerCanMove(playersPieceType).includes(index) ||
                         this.currentlySelectedCell === index) {
                 this.deselectCell();
 
             // Selected another piece that could be moved
-            } else if (this.board.getPiecesThatPlayerCanMove(this.playersPieceType).includes(index)) {
+            } else if (this.board.getPiecesThatPlayerCanMove(playersPieceType).includes(index)) {
                 this.selectCell(index);
             }
         }
@@ -93,7 +123,7 @@ export default class CellClickHandler {
      * capture of a turn is compulsory).
      */
     public canEndTurn(): boolean {
-        return this.board.getTurn() === Turn.WHITE && this.board.canEndTurn();
+        return this.controlledColours.includes(this.turnColour()) && this.board.canEndTurn();
     }
 
     /**

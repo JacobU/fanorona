@@ -1,0 +1,272 @@
+{
+ "label": "2-line-walk-captures",
+ "date": "2026-11-14T16:39:28.252Z",
+ "results": {
+  "openings": {
+   "positions": 20,
+   "totalSeconds": 3.115473,
+   "meanMs": 155.77365,
+   "medianMs": 138.49350000000004,
+   "p90Ms": 344.33850000000007,
+   "worstMs": 390.73159999999984,
+   "worstPosition": "opening 13",
+   "nodes": 261871,
+   "nodesPerSecond": 84054.97335396583,
+   "timings": [
+    {
+     "name": "opening 0",
+     "ms": 355.0674,
+     "nodes": 25765
+    },
+    {
+     "name": "opening 1",
+     "ms": 128.61850000000004,
+     "nodes": 13890
+    },
+    {
+     "name": "opening 2",
+     "ms": 40.3691,
+     "nodes": 2437
+    },
+    {
+     "name": "opening 3",
+     "ms": 158.2265,
+     "nodes": 14731
+    },
+    {
+     "name": "opening 4",
+     "ms": 141.71769999999992,
+     "nodes": 10899
+    },
+    {
+     "name": "opening 5",
+     "ms": 113.83130000000006,
+     "nodes": 10252
+    },
+    {
+     "name": "opening 6",
+     "ms": 344.33850000000007,
+     "nodes": 24643
+    },
+    {
+     "name": "opening 7",
+     "ms": 82.60030000000006,
+     "nodes": 5751
+    },
+    {
+     "name": "opening 8",
+     "ms": 162.23429999999985,
+     "nodes": 12814
+    },
+    {
+     "name": "opening 9",
+     "ms": 94.03770000000009,
+     "nodes": 7886
+    },
+    {
+     "name": "opening 10",
+     "ms": 85.87329999999997,
+     "nodes": 8910
+    },
+    {
+     "name": "opening 11",
+     "ms": 115.02320000000009,
+     "nodes": 11498
+    },
+    {
+     "name": "opening 12",
+     "ms": 140.40149999999994,
+     "nodes": 14377
+    },
+    {
+     "name": "opening 13",
+     "ms": 390.73159999999984,
+     "nodes": 30897
+    },
+    {
+     "name": "opening 14",
+     "ms": 44.66859999999997,
+     "nodes": 3569
+    },
+    {
+     "name": "opening 15",
+     "ms": 150.3735999999999,
+     "nodes": 14005
+    },
+    {
+     "name": "opening 16",
+     "ms": 46.9032000000002,
+     "nodes": 3821
+    },
+    {
+     "name": "opening 17",
+     "ms": 222.54160000000002,
+     "nodes": 20890
+    },
+    {
+     "name": "opening 18",
+     "ms": 159.42160000000013,
+     "nodes": 13719
+    },
+    {
+     "name": "opening 19",
+     "ms": 138.49350000000004,
+     "nodes": 11117
+    }
+   ]
+  },
+  "endgames": {
+   "positions": 28,
+   "totalSeconds": 12.091560100000002,
+   "meanMs": 431.84143214285723,
+   "medianMs": 156.49170000000004,
+   "p90Ms": 1784.9889999999996,
+   "worstMs": 2563.0935999999992,
+   "worstPosition": "bot game 13, turn 65",
+   "nodes": 2036012,
+   "nodesPerSecond": 168382.90370818233,
+   "timings": [
+    {
+     "name": "bot game 0, turn 55",
+     "ms": 138.85199999999986,
+     "nodes": 21753
+    },
+    {
+     "name": "bot game 1, turn 47",
+     "ms": 741.2428,
+     "nodes": 114662
+    },
+    {
+     "name": "bot game 3, turn 167",
+     "ms": 4.356499999999869,
+     "nodes": 2631
+    },
+    {
+     "name": "bot game 4, turn 121",
+     "ms": 0.04179999999996653,
+     "nodes": 18
+    },
+    {
+     "name": "bot game 6, turn 89",
+     "ms": 156.49170000000004,
+     "nodes": 28356
+    },
+    {
+     "name": "bot game 7, turn 80",
+     "ms": 154.35300000000007,
+     "nodes": 35146
+    },
+    {
+     "name": "bot game 8, turn 39",
+     "ms": 0.014599999999518332,
+     "nodes": 1
+    },
+    {
+     "name": "bot game 9, turn 25",
+     "ms": 462.2602999999999,
+     "nodes": 88784
+    },
+    {
+     "name": "bot game 10, turn 42",
+     "ms": 343.28920000000016,
+     "nodes": 56633
+    },
+    {
+     "name": "bot game 11, turn 52",
+     "ms": 159.9332999999997,
+     "nodes": 27018
+    },
+    {
+     "name": "bot game 12, turn 72",
+     "ms": 1890.1204000000007,
+     "nodes": 324467
+    },
+    {
+     "name": "bot game 13, turn 65",
+     "ms": 2563.0935999999992,
+     "nodes": 410956
+    },
+    {
+     "name": "bot game 14, turn 197",
+     "ms": 55.4440999999988,
+     "nodes": 10227
+    },
+    {
+     "name": "random game 0, turn 27",
+     "ms": 291.572900000001,
+     "nodes": 52453
+    },
+    {
+     "name": "random game 1, turn 29",
+     "ms": 441.1147000000001,
+     "nodes": 68307
+    },
+    {
+     "name": "random game 2, turn 23",
+     "ms": 340.3806999999997,
+     "nodes": 65221
+    },
+    {
+     "name": "random game 3, turn 24",
+     "ms": 101.96130000000085,
+     "nodes": 21448
+    },
+    {
+     "name": "random game 4, turn 15",
+     "ms": 4.130999999999403,
+     "nodes": 884
+    },
+    {
+     "name": "random game 5, turn 61",
+     "ms": 547.3521000000001,
+     "nodes": 89785
+    },
+    {
+     "name": "random game 6, turn 24",
+     "ms": 68.17290000000139,
+     "nodes": 12380
+    },
+    {
+     "name": "random game 7, turn 38",
+     "ms": 163.89619999999923,
+     "nodes": 37210
+    },
+    {
+     "name": "random game 8, turn 44",
+     "ms": 119.5697999999993,
+     "nodes": 23599
+    },
+    {
+     "name": "random game 9, turn 77",
+     "ms": 34.514100000000326,
+     "nodes": 6660
+    },
+    {
+     "name": "random game 10, turn 11",
+     "ms": 71.0554000000011,
+     "nodes": 12593
+    },
+    {
+     "name": "random game 11, turn 23",
+     "ms": 1784.9889999999996,
+     "nodes": 263049
+    },
+    {
+     "name": "random game 12, turn 65",
+     "ms": 915.3296000000009,
+     "nodes": 171903
+    },
+    {
+     "name": "random game 13, turn 15",
+     "ms": 155.9393,
+     "nodes": 26470
+    },
+    {
+     "name": "random game 14, turn 16",
+     "ms": 382.08779999999933,
+     "nodes": 63398
+    }
+   ]
+  }
+ }
+}

@@ -3,7 +3,7 @@ import Board from '../src/Board.js';
 import { PieceType } from '../src/types.js';
 import { seededRng } from '../src/ai/random.js';
 import { applyOpening, generateOpenings } from '../src/ai/tuning/Openings.js';
-import { Sample, fitLogistic, labelPositions, recordPosition, toWeights } from '../src/ai/tuning/Texel.js';
+import { Sample, fitLogistic, labelPositions, recordPosition, remapFeatures, toWeights } from '../src/ai/tuning/Texel.js';
 import { EVALUATOR_NAMES } from '../src/ai/presets.js';
 import { runTuning } from '../src/ai/tuning/Tuner.js';
 
@@ -38,6 +38,23 @@ describe('Opening tests', () => {
 });
 
 describe('Texel tests', () => {
+    it('should remap features saved in an older evaluator order to the current one', () => {
+        // Files saved before mobility was removed list 7 features, with mobility third
+        const savedNames = ['material', 'vulnerability', 'mobility', 'strongPoints', 'lineExposure', 'edgeExposure', 'centrality'];
+        const remapped = remapFeatures([1, 2, 3, 4, 5, 6, 7], savedNames);
+        expect(remapped.length).to.equal(EVALUATOR_NAMES.length);
+        const byName = Object.fromEntries(EVALUATOR_NAMES.map((name, i) => [name, remapped[i]]));
+        expect(byName).to.deep.equal({ material: 1, vulnerability: 2, strongPoints: 4, lineExposure: 5, edgeExposure: 6, centrality: 7 });
+    });
+
+    it('should count features missing from an old file as 0', () => {
+        // Files saved before the endgame evaluators were added
+        const savedNames = ['material', 'vulnerability', 'mobility', 'strongPoints', 'lineExposure'];
+        const remapped = remapFeatures([1, 2, 3, 4, 5], savedNames);
+        const byName = Object.fromEntries(EVALUATOR_NAMES.map((name, i) => [name, remapped[i]]));
+        expect(byName).to.deep.equal({ material: 1, vulnerability: 2, strongPoints: 4, lineExposure: 5, edgeExposure: 0, centrality: 0 });
+    });
+
     it('should record features from the side to move and label them with the result', () => {
         const board = new Board(3, 3, '210200201');
         const position = recordPosition(board, PieceType.WHITE);
@@ -51,19 +68,25 @@ describe('Texel tests', () => {
 
     it('should recover the weights that generated the results', () => {
         // Results drawn from a known model: sigmoid(0.4 * material + 0.2 * lineExposure)
+        // Feature positions are looked up by name, so the test doesn't depend on the order of EVALUATOR_NAMES
+        const MATERIAL = EVALUATOR_NAMES.indexOf('material');
+        const VULNERABILITY = EVALUATOR_NAMES.indexOf('vulnerability');
+        const LINE_EXPOSURE = EVALUATOR_NAMES.indexOf('lineExposure');
         const rng = seededRng(3);
         const samples: Sample[] = [];
         for (let i = 0; i < 20000; i++) {
-            const features = [Math.round(rng() * 10 - 5), Math.round(rng() * 6 - 3), 0, 0, Math.round(rng() * 8 - 4)];
-            // Pad with zeros for any evaluators after the first five
-            while (features.length < EVALUATOR_NAMES.length) features.push(0);
-            const p = 1 / (1 + Math.exp(-(0.4 * features[0] + 0.2 * features[4])));
+            // Every other evaluator is 0
+            const features = EVALUATOR_NAMES.map(() => 0);
+            features[MATERIAL] = Math.round(rng() * 10 - 5);
+            features[VULNERABILITY] = Math.round(rng() * 6 - 3);
+            features[LINE_EXPOSURE] = Math.round(rng() * 8 - 4);
+            const p = 1 / (1 + Math.exp(-(0.4 * features[MATERIAL] + 0.2 * features[LINE_EXPOSURE])));
             samples.push({ features, result: rng() < p ? 1 : 0, quiet: true, game: i });
         }
         const fit = fitLogistic(samples);
-        expect(fit.coefficients[0]).to.be.closeTo(0.4, 0.03);
-        expect(fit.coefficients[4]).to.be.closeTo(0.2, 0.03);
-        expect(fit.coefficients[1]).to.be.closeTo(0, 0.03);
+        expect(fit.coefficients[MATERIAL]).to.be.closeTo(0.4, 0.03);
+        expect(fit.coefficients[LINE_EXPOSURE]).to.be.closeTo(0.2, 0.03);
+        expect(fit.coefficients[VULNERABILITY]).to.be.closeTo(0, 0.03);
         expect(toWeights(fit.coefficients).lineExposure).to.be.closeTo(50, 8);
     });
 });

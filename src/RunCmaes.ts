@@ -20,7 +20,7 @@ interface CmaesConfig {
     // The weights being tuned, in order. Every other weight comes from `fixed`.
     names: EvaluatorName[],
     // Optional multiplier per weight, so weights on very different scales can share one step size
-    // (e.g. 0.1 for mobility means a search step of 10 changes mobility by 1)
+    // (e.g. 0.1 for vulnerability means a search step of 10 changes vulnerability by 1)
     scales?: number[],
     fixed: Weights,
     start: number[],

@@ -1,4 +1,5 @@
 import Cell  from './Cell.js';
+import { BoardTables, NO_NEIGHBOUR, getBoardTables } from './BoardTables.js';
 import { 
     Winner, 
     PieceType, 
@@ -13,6 +14,7 @@ import {
     CompleteMove, 
     TreeNode,
     BoardState,
+    FullBoardState,
     getDirectionFromDeltaIndex,
 } from './types.js';
 
@@ -25,6 +27,8 @@ export default class Board {
     private rows: number;
     private columns: number;
     private board: Cell[];
+    // Which cells are connected to which, looked up instead of searching each cell's connections
+    private tables: BoardTables;
     private numWhitePieces: number;
     private numBlackPieces: number;
     private startingPiecePositions: PieceType[];
@@ -52,6 +56,7 @@ export default class Board {
             this.columns = columns;
             this.board = this.initializeBoard();
         }
+        this.tables = getBoardTables(this.rows, this.columns, this.board);
         this.turnMoveIndexes = [];
         this.currentlyMovingPiece = null;
         this.currentTurn = Turn.WHITE;
@@ -136,6 +141,20 @@ export default class Board {
         };
     }
 
+    /**
+     * @returns every piece of the board's state, including the pending approach-or-withdraw choice, the starting
+     * layout and the board size, which saveBoardState leaves out. Only for tests that check the board is left
+     * exactly as it was found (e.g. after a search).
+     */
+    public getFullStateForTesting(): FullBoardState {
+        return {
+            ...this.saveBoardState(),
+            attackOrWithdraw: this.attackOrWithdraw,
+            startingPiecePositions: [...this.startingPiecePositions],
+            rows: this.rows,
+            columns: this.columns,
+        };
+    }
 
     /**
      * @returns {Winner} the winner of the game, Winner.DRAW if NO_CAPTURE_DRAW_TURNS turns have passed without a capture,
@@ -208,11 +227,13 @@ export default class Board {
         const attackingPieces: number[] = [];
         const moveablePieces: number[] = [];
 
-        for (const cell of this.board) {
-            if (cell.isPieceType(pieceType)) {
-                const index = cell.getIndex();
-                if (this.canPieceAttack(index)) attackingPieces.push(index);
-                if (this.doesPieceHaveEmptyNeighbours(index)) moveablePieces.push(index);
+        for (let index = 0; index < this.board.length; index++) {
+            if (this.board[index].getPieceType() !== pieceType) continue;
+            if (this.canPieceAttack(index)) {
+                attackingPieces.push(index);
+            } else if (attackingPieces.length === 0 && this.doesPieceHaveEmptyNeighbours(index)) {
+                // Pieces that can only make a paika move are only needed if no piece can attack
+                moveablePieces.push(index);
             }
         }
 
@@ -286,12 +307,14 @@ export default class Board {
         // Reset the attack type
         this.attackOrWithdraw = AttackType.NONE;
 
+        // Work out what the move captures before making it (it doesn't depend on where the piece ends up)
+        const captured = this.piecesCapturedByMove(index, pieceType, direction, attackType);
         // Set the new index after moving
         index = this.movePiece(pieceType, index, direction);
         // Track where the piece is now, since only this piece can move again in this turn.
         this.currentlyMovingPiece = index;
         if (attackType !== AttackType.NONE) {
-            this.removeAttackedPieces(index, pieceType, direction, attackType);
+            this.removeAttackedPieces(captured, pieceType);
             const canMoveAgain = this.canContinueAttackChain(index, pieceType, direction);
             if (canMoveAgain) {
                 return true;
@@ -343,11 +366,13 @@ export default class Board {
     }
 
     private getEmptyCellsThatHaventBeenVisited(index: number) {
-        const result = this.board[index].getNeighbours()
-            .filter((neighbour) => 
-                neighbour.cell.getPieceType() === PieceType.EMPTY
-                && !this.turnMoveIndexes.includes(neighbour.cell.getIndex()))
-            .map(neighbour => ({index: neighbour.cell.getIndex(), direction: neighbour.direction}));
+        const result: { index: number, direction: Direction }[] = [];
+        for (const direction of this.tables.directions[index]) {
+            const neighbour = this.tables.neighbour[index * 8 + direction];
+            if (this.board[neighbour].getPieceType() === PieceType.EMPTY && !this.turnMoveIndexes.includes(neighbour)) {
+                result.push({ index: neighbour, direction });
+            }
+        }
         return result;
     }
 
@@ -409,15 +434,12 @@ export default class Board {
      * @returns {boolean} whether the move will approach an opponents piece.
      */
     private willMoveApproach(currentIndex: number, attackPieceType: PieceType, attackDirection: Direction): boolean {
-        const attackDelta = getDeltaIndex(attackDirection, this.columns);
-        const possibleAttackedPieceIndex: number = currentIndex + 2 * attackDelta;
-        const isAttackedPieceConnected = this.board[currentIndex + attackDelta].getCellConnections().some(connection => connection.index === possibleAttackedPieceIndex);
-        if (this.isPositionOnBoard(possibleAttackedPieceIndex) 
-            && isAttackedPieceConnected
-            && this.board[possibleAttackedPieceIndex].isPieceType(getOppositePieceType(attackPieceType))) {
-            return true;
-        }
-        return false;
+        // The cell the piece moves to, then the cell beyond it along the same line
+        const moveIndex = this.tables.neighbour[currentIndex * 8 + attackDirection];
+        if (moveIndex === NO_NEIGHBOUR) return false;
+        const possibleAttackedPieceIndex = this.tables.neighbour[moveIndex * 8 + attackDirection];
+        return possibleAttackedPieceIndex !== NO_NEIGHBOUR
+            && this.board[possibleAttackedPieceIndex].isPieceType(getOppositePieceType(attackPieceType));
     }
 
     /**
@@ -427,14 +449,10 @@ export default class Board {
      * @returns {boolean} whether moving this piece will cause an opponents piece to be "withdrawn" from.
      */
     private willMoveWithdraw(currentIndex: number, attackPieceType: PieceType, moveDirection: Direction): boolean {
-        const possibleAttackedPieceIndex: number = currentIndex + getDeltaIndex(getOppositeDirection(moveDirection), this.columns);
-        const isAttackedPieceConnected = this.board[currentIndex].getCellConnections().some(connection => connection.index === possibleAttackedPieceIndex);
-        if (this.isPositionOnBoard(possibleAttackedPieceIndex) 
-            && isAttackedPieceConnected
-            && this.board[possibleAttackedPieceIndex].isPieceType(getOppositePieceType(attackPieceType))) {
-            return true;
-        }
-        return false;
+        // The cell directly behind the piece, along the line it moves away on
+        const possibleAttackedPieceIndex = this.tables.neighbour[currentIndex * 8 + getOppositeDirection(moveDirection)];
+        return possibleAttackedPieceIndex !== NO_NEIGHBOUR
+            && this.board[possibleAttackedPieceIndex].isPieceType(getOppositePieceType(attackPieceType));
     }
 
     /**
@@ -446,7 +464,10 @@ export default class Board {
         if (this.board[index].getPieceType() === PieceType.EMPTY) {
             return false;
         }
-        return this.board[index].getNeighbours().some(neighbour => neighbour.cell.getPieceType() === PieceType.EMPTY);
+        for (const neighbour of this.tables.connected[index]) {
+            if (this.board[neighbour].getPieceType() === PieceType.EMPTY) return true;
+        }
+        return false;
     }
 
     /**
@@ -458,9 +479,15 @@ export default class Board {
         if (this.board[index].getPieceType() === PieceType.EMPTY) {
             return false;
         }
-        const possibleMoves: { index: number, direction: Direction }[] = this.getEmptyNeighbouringCellsAsMoves(index);
         const attackingPieceType = this.board[index].getPieceType();
-        return (possibleMoves.some(move => this.willMoveApproach(index, attackingPieceType, move.direction)) || possibleMoves.some(move => this.willMoveWithdraw(index, attackingPieceType, move.direction)));
+        // Check each move to an empty neighbour directly, without building a list of the moves
+        for (const direction of this.tables.directions[index]) {
+            if (this.board[this.tables.neighbour[index * 8 + direction]].getPieceType() !== PieceType.EMPTY) continue;
+            if (this.willMoveApproach(index, attackingPieceType, direction) || this.willMoveWithdraw(index, attackingPieceType, direction)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -514,32 +541,55 @@ export default class Board {
         });
     }
     /**
-     * Removes at least one of the opponents pieces including all those in the same direction of the WITHDRAW or APPROACH until
-     * there is 1) a cell that doesnt contain the opponents piece type or if 2) the edge of the board has been reached. 
-     * @param currentIndex the current index of the piece, that is after the move has been made.
-     * @param pieceType the type of piece that made the move.
-     * @param direction the direction of the attacking piece.
-     * @param attackType whether the attack was a WITHDRAW or APPROACH.
+     * Works out which of the opponent's pieces a single move would capture, without changing the board.
+     * @param fromIndex where the piece is before the move.
+     * @param direction the direction the piece moves in.
+     * @param attackType whether the move approaches or withdraws (NONE captures nothing).
+     * @returns the captured cells, in order along the line away from the piece.
      */
-    private removeAttackedPieces(currentIndex: number, pieceType: PieceType, direction: Direction, attackType: AttackType): void {
-        // In this function, the default move is considered APPROACH. If it is a WITHDRAW, we set the direction to the opposite, and first return
-        // the piece index to where it was before the move. Then we can continue "as if" the move was an APPROACH, and it should work the same.
-        let deltaIndexFromDirection: number = getDeltaIndex(direction, this.columns);
-        if (attackType === AttackType.WITHDRAW) {
-            deltaIndexFromDirection *= -1;
-            // If we are withdrawing, we first need to return to the index where the piece was moved from.
-            currentIndex += deltaIndexFromDirection;
-        }
-        currentIndex += deltaIndexFromDirection;
+    public getPiecesCapturedByMove(fromIndex: number, direction: Direction, attackType: AttackType): number[] {
+        return this.piecesCapturedByMove(fromIndex, this.board[fromIndex].getPieceType(), direction, attackType);
+    }
+
+    /**
+     * Captures at least one of the opponents pieces including all those in the same direction of the WITHDRAW or APPROACH until
+     * there is 1) a cell that doesnt contain the opponents piece type or if 2) the edge of the board has been reached.
+     * Only reads the board: it doesn't depend on where the moving piece ends up, so it can be worked out before the move.
+     * @param fromIndex the index of the piece before the move has been made.
+     * @param pieceType the type of piece that makes the move.
+     * @param direction the direction of the attacking piece.
+     * @param attackType whether the attack is a WITHDRAW or APPROACH.
+     * @returns the captured cells, in order along the line away from the piece.
+     */
+    private piecesCapturedByMove(fromIndex: number, pieceType: PieceType, direction: Direction, attackType: AttackType): number[] {
+        const captured: number[] = [];
+        if (attackType === AttackType.NONE) return captured;
+        // In this function, the default move is considered APPROACH. If it is a WITHDRAW, we set the direction to the opposite, and start
+        // from the index where the piece was before the move. Then we can continue "as if" the move was an APPROACH, and it should work the same.
+        const attackDirection = attackType === AttackType.WITHDRAW ? getOppositeDirection(direction) : direction;
+        // For an approach, the line starts from the cell the piece moves to
+        let currentIndex = attackType === AttackType.APPROACH ? this.tables.neighbour[fromIndex * 8 + direction] : fromIndex;
+        if (currentIndex === NO_NEIGHBOUR) return captured;
+        // Follow the line away from the piece, taking the opponent's pieces until the line is broken or ends
+        currentIndex = this.tables.neighbour[currentIndex * 8 + attackDirection];
         const oppositePieceType = getOppositePieceType(pieceType);
-        let isChainStillConnected: boolean = true;
-        while (this.isPositionOnBoard(currentIndex) && this.board[currentIndex].getPieceType() === oppositePieceType && isChainStillConnected) {
-            this.board[currentIndex].removePiece();
+        while (currentIndex !== NO_NEIGHBOUR && this.board[currentIndex].getPieceType() === oppositePieceType) {
+            captured.push(currentIndex);
+            currentIndex = this.tables.neighbour[currentIndex * 8 + attackDirection];
+        }
+        return captured;
+    }
+
+    /**
+     * Removes the captured pieces (from piecesCapturedByMove) from the board.
+     * @param captured the cells of the captured pieces.
+     * @param pieceType the type of piece that made the capture.
+     */
+    private removeAttackedPieces(captured: number[], pieceType: PieceType): void {
+        for (const index of captured) {
+            this.board[index].removePiece();
             // Track the removal of this piece so we can easily know how many pieces of each type on the board.
             pieceType === PieceType.WHITE ? this.numBlackPieces-- : this.numWhitePieces--;
-            const previousIndex = currentIndex;
-            currentIndex += deltaIndexFromDirection;
-            isChainStillConnected = this.board[previousIndex].getCellConnections().some(connection => connection.index === currentIndex);
         }
     }
 
@@ -568,13 +618,12 @@ export default class Board {
      * @returns a list of Move[] that a piece in the cell could move to.
      */
     private getEmptyNeighbouringCellsAsMoves(index: number): { index: number, direction: Direction }[] {
-        return this.board[index].getNeighbours()
-            .filter((neighbour) => neighbour.cell.getPieceType() === PieceType.EMPTY)
-            .map(neighbour => ({index: neighbour.cell.getIndex(), direction: neighbour.direction}));
-    }
-
-    private isPositionOnBoard(index: number): boolean {
-        return index >= 0 && index < this.rows * this.columns;
+        const moves: { index: number, direction: Direction }[] = [];
+        for (const direction of this.tables.directions[index]) {
+            const neighbour = this.tables.neighbour[index * 8 + direction];
+            if (this.board[neighbour].getPieceType() === PieceType.EMPTY) moves.push({ index: neighbour, direction });
+        }
+        return moves;
     }
 
     private setCell(index: number, pieceType: PieceType): void {
@@ -738,8 +787,8 @@ export default class Board {
     /**
      * @returns the indexes of all the cells connected to this cell.
      */
-    public getConnectedIndexes(index: number): number[] {
-        return this.board[index].getCellConnections().map(connection => connection.index);
+    public getConnectedIndexes(index: number): readonly number[] {
+        return this.tables.connected[index];
     }
 
     /**
@@ -751,19 +800,12 @@ export default class Board {
      */
     public getCapturablePieces(attacker: PieceType): Set<number> {
         const capturable = new Set<number>();
-        const defender = getOppositePieceType(attacker);
-        const boardState = this.saveBoardState();
         for (const index of this.getPiecesThatPlayerCanMove(attacker)) {
             for (const move of this.getPossibleMovesForCell(index)) {
-                if (move.attackType === AttackType.NONE) continue;
-                this.setAttackOrWithdraw(move.attackType);
-                this.performMove(index, move.direction, true);
-                for (let i = 0; i < this.board.length; i++) {
-                    if (boardState.positions[i] === defender && this.board[i].getPieceType() === PieceType.EMPTY) {
-                        capturable.add(i);
-                    }
+                // Walk the line instead of playing the move, so the board is only read
+                for (const captured of this.piecesCapturedByMove(index, attacker, move.direction, move.attackType)) {
+                    capturable.add(captured);
                 }
-                this.resetBoardState(boardState);
             }
         }
         return capturable;

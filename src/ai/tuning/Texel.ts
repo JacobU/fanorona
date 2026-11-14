@@ -36,6 +36,17 @@ export function recordPosition(board: Board, sideToMove: PieceType): RecordedPos
     };
 }
 
+/**
+ * Reorders features saved under an older list of evaluator names into the current EVALUATOR_NAMES order.
+ * Evaluators that have since been removed (e.g. mobility) are dropped, and ones added since count as 0.
+ */
+export function remapFeatures(features: number[], savedNames: string[]): number[] {
+    return EVALUATOR_NAMES.map(name => {
+        const i = savedNames.indexOf(name);
+        return i === -1 ? 0 : features[i] ?? 0;
+    });
+}
+
 export function labelPositions(positions: RecordedPosition[], result: 'WHITE' | 'BLACK' | 'DRAW', game: number): Sample[] {
     return positions.map(p => ({
         features: p.features,

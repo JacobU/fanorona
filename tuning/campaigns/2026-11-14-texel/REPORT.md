@@ -121,6 +121,15 @@ useful for showing which metrics matter, but its weights can't be used directly 
 All of these run from a campaign folder (e.g. `node ../../../dist/src/RunHalving.js s4-halving.json s4-state.json`)
 after `npm run build:src`, and write results next to the configs.
 
+## Update 2026-11-15: mobility removed
+The `mobility` evaluator has been removed from the code, along with the Strangler and AllRounder presets. It was the
+slowest metric (it made depth 4 about 3–4× slower) and added little, and the other metrics are expected to cover it.
+Consequences for this campaign:
+- configs here that use mobility (including `s5c-cmaes-4d.json`, and s030's mobility −1) no longer run as written;
+- s030 without mobility is material 100, vulnerability −3, strongPoints 12, lineExposure 9. Step 2 below becomes a
+  3-weight refinement (vulnerability, strongPoints, lineExposure), and step 3 tests that version;
+- saved Texel position files are still readable: `fit` maps their features by name and drops mobility.
+
 ## Next steps (in order)
 1. **Merge the endgame work** (being done separately):
    - two new metrics, edgeExposure and centrality, blended in as the board empties (none at ≥10 pieces, full strength at ≤6);

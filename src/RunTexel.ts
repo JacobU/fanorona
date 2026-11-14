@@ -6,7 +6,7 @@ import { seededRng } from './ai/random.js';
 import { findBuiltInSpec } from './ai/tuning/BotSpec.js';
 import { GameJob, runGames } from './ai/tuning/GamePool.js';
 import { generateOpenings } from './ai/tuning/Openings.js';
-import { Sample, bootstrapWeights, fitLogistic, labelPositions, toWeights } from './ai/tuning/Texel.js';
+import { Sample, bootstrapWeights, fitLogistic, labelPositions, remapFeatures, toWeights } from './ai/tuning/Texel.js';
 
 // Texel tuning in two steps:
 //   npm run texel -- collect <data.json> [--games 600] [--bots Lookahead,Sentinel,...] [--opening-turns 4] [--seed 1] [--workers N]
@@ -19,7 +19,7 @@ const option = (flag: string, fallback?: string) => {
     const i = rest.indexOf(flag);
     return i === -1 ? fallback : rest[i + 1];
 };
-const DEFAULT_BOTS = ['Greedy', 'Guardian', 'Lookahead', 'Sentinel', 'Strangler', 'Positional', 'AllRounder', 'Fortress'];
+const DEFAULT_BOTS = ['Greedy', 'Guardian', 'Lookahead', 'Sentinel', 'Positional', 'Fortress'];
 
 if (command === 'collect') {
     const games = Number(option('--games', '600'));
@@ -70,7 +70,9 @@ if (command === 'collect') {
     const data = JSON.parse(readFileSync(file, 'utf8'));
     const quietOnly = rest.includes('--quiet-only');
     const resamples = Number(option('--bootstrap', '100'));
-    const allSamples: Sample[] = data.samples.map((s: { f: number[], r: number, q: number, g: number }) => ({ features: s.f, result: s.r, quiet: s.q === 1, game: s.g }));
+    // The file lists the evaluator names its features were saved under, which may be an older set than today's
+    const savedNames: string[] = data.features;
+    const allSamples: Sample[] = data.samples.map((s: { f: number[], r: number, q: number, g: number }) => ({ features: remapFeatures(s.f, savedNames), result: s.r, quiet: s.q === 1, game: s.g }));
     const samples = quietOnly ? allSamples.filter(s => s.quiet) : allSamples;
 
     const constant = fitLogistic(samples, EVALUATOR_NAMES.map(() => false));

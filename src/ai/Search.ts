@@ -11,10 +11,16 @@ export const WIN_SCORE = 1_000_000;
 
 export type Rng = () => number;
 
-interface Candidate {
+export interface Candidate {
     startIndex: number,
     move: CompleteMove,
 }
+
+/**
+ * Counts the positions the search visits (each call to negamax), so the benchmark can measure how much work a search
+ * does. Reset it to 0 before measuring.
+ */
+export const searchStats = { nodes: 0 };
 
 /**
  * Chooses the best complete turn for pieceType by searching depth turns ahead (negamax with alpha-beta pruning).
@@ -29,6 +35,21 @@ interface Candidate {
  * @returns the best move along with its score, or null if the player can't move.
  */
 export function chooseMove(board: Board, pieceType: PieceType, evaluator: Evaluator, depth: number, rng: Rng = Math.random): BestMove | null {
+    const best = findBestMoves(board, pieceType, evaluator, depth);
+    if (best === null) {
+        return null;
+    }
+    const chosen = best.moves[Math.floor(rng() * best.moves.length)];
+    return { startIndex: chosen.startIndex, move: chosen.move, score: best.score };
+}
+
+/**
+ * The search behind chooseMove: finds every complete turn that ties for the best score (see chooseMove for the
+ * parameters). The board is left exactly as it was found.
+ * @returns the best score and every move with that score (in the order they were generated), or null if the
+ * player can't move.
+ */
+export function findBestMoves(board: Board, pieceType: PieceType, evaluator: Evaluator, depth: number): { score: number, moves: Candidate[] } | null {
     if (depth < 1) {
         throw new Error('The search depth must be at least 1.');
     }
@@ -56,8 +77,7 @@ export function chooseMove(board: Board, pieceType: PieceType, evaluator: Evalua
         }
     }
 
-    const chosen = bestCandidates[Math.floor(rng() * bestCandidates.length)];
-    return { startIndex: chosen.startIndex, move: chosen.move, score: bestScore };
+    return { score: bestScore, moves: bestCandidates };
 }
 
 /**
@@ -74,6 +94,7 @@ export function getBestMoveSimple(board: Board, pieceType: PieceType, rng: Rng =
  * alpha or beta is exact. chooseMove relies on this to find every move that ties for best.
  */
 function negamax(board: Board, pieceType: PieceType, evaluator: Evaluator, depth: number, alpha: number, beta: number, ply: number): number {
+    searchStats.nodes++;
     const winner = board.getWinner();
     // A draw is neutral, so a bot that is ahead will avoid it and a bot that is behind will aim for it.
     if (winner === Winner.DRAW) {

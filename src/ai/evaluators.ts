@@ -22,14 +22,6 @@ export const vulnerability: Evaluator = (board, pieceType) => {
 };
 
 /**
- * Number of complete turns we could take minus the number the opponent could take.
- * Because captures are compulsory, leaving the opponent with few options can force them into bad moves.
- */
-export const mobility: Evaluator = (board, pieceType) => {
-    return countCompleteMoves(board, pieceType) - countCompleteMoves(board, getOppositePieceType(pieceType));
-};
-
-/**
  * Number of our pieces on strong intersections (which connect in 8 directions instead of 4) minus theirs.
  */
 export const strongPoints: Evaluator = (board, pieceType) => {
@@ -52,11 +44,6 @@ export const strongPoints: Evaluator = (board, pieceType) => {
 export const lineExposure: Evaluator = (board, pieceType) => {
     return countConnectedPairs(board, getOppositePieceType(pieceType)) - countConnectedPairs(board, pieceType);
 };
-
-function countCompleteMoves(board: Board, pieceType: PieceType): number {
-    const allMoves = board.getAllPossibleCompleteMoves(pieceType);
-    return allMoves.moves.reduce((total, movesForPiece) => total + movesForPiece.length, 0);
-}
 
 function countConnectedPairs(board: Board, pieceType: PieceType): number {
     let pairs = 0;

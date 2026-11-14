@@ -18,13 +18,14 @@ and saves the full results to `tuning/results/<date>-<config>.json` (this folder
 | `mode` | `"gauntlet"` | `"gauntlet"`: each variant plays each opponent, variants don't play each other. `"roundRobin"`: everyone (variants and opponents) plays everyone. |
 | `gamesPerPair` | `20` | Games per pairing. Colours alternate, so use an even number. |
 | `maxTurns` | `1000` | Safety limit: a game is stopped and counted as a draw after this many turns. Games normally end long before this, because they're drawn after 60 turns without a capture (`NO_CAPTURE_DRAW_TURNS` in `src/Board.ts`). |
-| `opponents` | `[]` | Built-in bots to play against: `Random` or any preset name (`Greedy`, `Lookahead`, `Guardian`, `Sentinel`, `Strangler`, `Positional`, `AllRounder`, `Fortress`, `DeepSentinel`, `DeepPositional`, `DeepFortress`, `FortressEndgame`, `DeepFortressEndgame`). |
+| `opponents` | `[]` | Built-in bots to play against: `Random` or any preset name (`Greedy`, `Lookahead`, `Guardian`, `Sentinel`, `Positional`, `Fortress`, `DeepSentinel`, `DeepPositional`, `DeepFortress`, `FortressEndgame`, `DeepFortressEndgame`). |
 | `base` | required | `{ "depth": 2, "weights": { ... } }`. The starting point for the grid and variants. Can also have `endgameWeights` (extra weights blended in as the board empties: none at 10+ pieces, in full at 6 or fewer) and `endgameDepth` (search depth once 10 or fewer pieces are left). |
-| `grid` | none | Lists of values to try, e.g. `{ "mobility": [0, 2, 5] }`. Every combination is tried on top of `base`. Keys can be any evaluator name or `depth`. |
-| `variants` | none | Hand-picked bots, e.g. `{ "name": "No mobility", "weights": { "mobility": 0 } }`. Each one changes only the weights it lists (and likewise for `endgameWeights`, and `endgameDepth` if given). |
+| `grid` | none | Lists of values to try, e.g. `{ "strongPoints": [0, 5, 15] }`. Every combination is tried on top of `base`. Keys can be any evaluator name or `depth`. |
+| `variants` | none | Hand-picked bots, e.g. `{ "name": "No strongPoints", "weights": { "strongPoints": 0 } }`. Each one changes only the weights it lists (and likewise for `endgameWeights`, and `endgameDepth` if given). |
 
-Weight names: `material`, `vulnerability`, `mobility`, `strongPoints`, `lineExposure`, `edgeExposure`, `centrality` (a missing or 0 weight
-switches that evaluator off). Without a `grid`, `base` also plays, as `Base`.
+Weight names: `material`, `vulnerability`, `strongPoints`, `lineExposure`, `edgeExposure`, `centrality` (a missing or 0 weight
+switches that evaluator off). The `mobility` evaluator has been removed (along with the Strangler and AllRounder presets),
+so older configs in `campaigns/` that use it no longer run. Without a `grid`, `base` also plays, as `Base`.
 
 ## Reading the results
 
@@ -42,6 +43,6 @@ switches that evaluator off). Without a `grid`, `base` also plays, as `Base`.
 
 ## Example configs
 
-- `grid.json`: vulnerability × mobility around the AllRounder weights, to see how they interact.
+- `grid.json`: vulnerability × strongPoints around the Fortress weights, to see how they interact.
 - `sweep.json`: tries a range of values for one weight (strongPoints).
-- `ablation.json`: AllRounder with each metric switched off in turn, to see which ones are pulling their weight.
+- `ablation.json`: Fortress with each metric switched off in turn, to see which ones are pulling their weight.

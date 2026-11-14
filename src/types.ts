@@ -53,6 +53,19 @@ export interface BoardState {
     turnsWithoutCapture: number,
 }
 
+/**
+ * Every piece of a board's state, including what BoardState leaves out. Used by tests that check a board is left
+ * exactly as it was found (e.g. after a search).
+ */
+export interface FullBoardState extends BoardState {
+    // The approach-or-withdraw choice waiting to be used by the next performMove
+    attackOrWithdraw: AttackType,
+    // The layout that reset() goes back to
+    startingPiecePositions: number[],
+    rows: number,
+    columns: number,
+}
+
 export interface CompleteMove {
     moveIndexes: number[],
     moveTypes: AttackType[],

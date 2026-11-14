@@ -1,14 +1,13 @@
 {
   "mode": "gauntlet",
   "gamesPerPair": 20,
-  "opponents": ["Lookahead", "AllRounder"],
+  "opponents": ["Lookahead", "Fortress"],
   "base": {
     "depth": 2,
-    "weights": { "material": 100, "vulnerability": 30, "mobility": 2, "strongPoints": 5, "lineExposure": 5 }
+    "weights": { "material": 100, "vulnerability": 30, "strongPoints": 5, "lineExposure": 5 }
   },
   "variants": [
     { "name": "No vulnerability", "weights": { "vulnerability": 0 } },
-    { "name": "No mobility", "weights": { "mobility": 0 } },
     { "name": "No strongPoints", "weights": { "strongPoints": 0 } },
     { "name": "No lineExposure", "weights": { "lineExposure": 0 } }
   ]

@@ -1,10 +1,25 @@
 import Board from '../src/Board.js';
 import { Direction, getDeltaIndex, PieceType } from '../src/types.js'; 
+import { CAPTURE_FADE_MS, MOVE_ANIMATION_MS, capturedIndexes } from './animationHelpers.js';
+
+/**
+ * A piece drawn partly transparent (e.g. a captured piece fading out).
+ */
+interface FadingPiece {
+    index: number,
+    pieceType: PieceType,
+    alpha: number,
+}
 
 const cellSize: number = 100;
 const pieceWidth: number = 60;
 
-export function drawBoard(board: Board, ctx: CanvasRenderingContext2D, lightPiece: HTMLImageElement, darkPiece: HTMLImageElement, wood: HTMLImageElement, indexesToExclude: null | number[]) {
+/**
+ * @param positions the pieces to draw. Defaults to the board's current pieces, but animations pass the positions from
+ * before a move so captured pieces stay visible until the moving piece arrives.
+ * @param fadingPieces extra pieces drawn partly transparent on top (e.g. captured pieces fading out).
+ */
+export function drawBoard(board: Board, ctx: CanvasRenderingContext2D, lightPiece: HTMLImageElement, darkPiece: HTMLImageElement, wood: HTMLImageElement, indexesToExclude: null | number[], positions?: number[], fadingPieces: FadingPiece[] = []) {
     const rows = board.getBoardsNumberOfRows();
     const cols = board.getBoardsNumberOfColumns();
     ctx.clearRect(0, 0, cols * cellSize, rows * cellSize);
@@ -45,7 +60,7 @@ export function drawBoard(board: Board, ctx: CanvasRenderingContext2D, lightPiec
         }
     }
 
-    let boardPositions = board.getBoardPiecePositions();
+    let boardPositions = positions ? [...positions] : board.getBoardPiecePositions();
     // Exclude the current piece from being drawn temporarily
     if (indexesToExclude) {
         for(let i = 0; i < indexesToExclude.length; i++) {
@@ -53,6 +68,14 @@ export function drawBoard(board: Board, ctx: CanvasRenderingContext2D, lightPiec
         }
     }
     drawPieces(ctx, lightPiece, darkPiece, boardPositions, rows, cols, cellSize);
+
+    for (const piece of fadingPieces) {
+        const x = (piece.index % cols) * cellSize + cellSize / 2 - pieceWidth / 2;
+        const y = Math.floor(piece.index / cols) * cellSize + cellSize / 2 - pieceWidth / 2;
+        ctx.globalAlpha = piece.alpha;
+        ctx.drawImage(piece.pieceType === PieceType.WHITE ? lightPiece : darkPiece, x, y, pieceWidth, pieceWidth);
+    }
+    ctx.globalAlpha = 1;
 }
 
 function drawPieces(ctx: CanvasRenderingContext2D, lightPiece: HTMLImageElement, darkPiece: HTMLImageElement, boardPositions: number[], rows: number, cols: number, cellSize: number) {
@@ -99,7 +122,8 @@ export function animatePieceMove(
     indexToAnimate: number, 
     direction: Direction, 
     pieceImage: HTMLImageElement, 
-    callback?: () => void
+    callback?: () => void,
+    positionsBeforeMove?: number[],
 ): Promise<void> {
     return new Promise((resolve) => {
         const cols = board.getBoardsNumberOfColumns();
@@ -118,7 +142,7 @@ export function animatePieceMove(
         const endX = endCol * cellSize + cellSize / 2 - pieceWidth / 2;
         const endY = endRow * cellSize + cellSize / 2 - pieceWidth / 2;
 
-        const duration = 1000; // Animation duration in milliseconds
+        const duration = MOVE_ANIMATION_MS; // Animation duration in milliseconds
         let startTime: number;
 
         const indexesToExclude: number[] = [indexToAnimate, endIndex];
@@ -133,9 +157,11 @@ export function animatePieceMove(
             const currentX = startX + (endX - startX) * progress;
             const currentY = startY + (endY - startY) * progress;
 
-            // Clear the canvas and redraw the board without the animated piece
+            // Clear the canvas and redraw the board without the animated piece.
+            // If we know the positions from before the move, draw those so that captured pieces are still shown
+            // while the piece is moving (they fade out after it arrives).
             ctx.clearRect(0, 0, cols * cellSize, rows * cellSize);
-            drawBoard(board, ctx, lightPiece, darkPiece, wood, indexesToExclude);
+            drawBoard(board, ctx, lightPiece, darkPiece, wood, indexesToExclude, positionsBeforeMove);
 
             // Draw the animated piece at its current position
             ctx.drawImage(pieceImage, currentX, currentY, pieceWidth, pieceWidth);
@@ -143,10 +169,37 @@ export function animatePieceMove(
             if (progress < 1) {
                 requestAnimationFrame(animateFrame);
             } else {
-                // Animation complete
-                if (callback) callback();
-                resolve();
+                // Animation complete. Fade out any captured pieces before finishing.
+                const captured = positionsBeforeMove
+                    ? capturedIndexes(positionsBeforeMove, board.getBoardPiecePositions(), indexToAnimate)
+                    : [];
+                if (captured.length > 0) {
+                    fadeStartTime = undefined;
+                    requestAnimationFrame(timestamp => fadeFrame(timestamp, captured));
+                } else {
+                    finish();
+                }
             }
+        }
+
+        let fadeStartTime: number | undefined;
+        function fadeFrame(timestamp: number, captured: number[]) {
+            if (fadeStartTime === undefined) fadeStartTime = timestamp;
+            const progress = Math.min((timestamp - fadeStartTime) / CAPTURE_FADE_MS, 1);
+            // The board now has the piece at its destination and the captured pieces removed, so draw those on top, fading out
+            const fadingPieces = captured.map(index => ({ index, pieceType: positionsBeforeMove![index] as PieceType, alpha: 1 - progress }));
+            drawBoard(board, ctx, lightPiece, darkPiece, wood, null, undefined, fadingPieces);
+            if (progress < 1) {
+                requestAnimationFrame(timestamp => fadeFrame(timestamp, captured));
+            } else {
+                finish();
+            }
+        }
+
+        function finish() {
+            drawBoard(board, ctx, lightPiece, darkPiece, wood, null);
+            if (callback) callback();
+            resolve();
         }
 
         requestAnimationFrame(animateFrame);

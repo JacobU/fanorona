@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import Board from '../src/Board.js';
 import CellClickHandler from '../src/CellClickHandler.js';
-import { AttackType, Direction, Turn } from '../src/types.js';
+import { AttackType, Direction, PieceType, Turn } from '../src/types.js';
 
 const emptyRow5 = '00000';
 
@@ -290,6 +290,97 @@ describe('CellClickHandler tests', () => {
         expect(handler.getHandlerState()).to.deep.equal(emptyHandlerState);
 
         // TODO: Click on FINISH TURN
+    });
+
+    it('should let both colours play when both are controlled (2 Player)', () => {
+        // White at 0, black at 24
+        const board = new Board(5, 5, '1000000000000000000000002');
+        const handler = new CellClickHandler(board);
+        handler.setControlledColours([PieceType.WHITE, PieceType.BLACK]);
+
+        // White moves 0 -> 1
+        handler.handleCellClick(0);
+        expect(handler.handleCellClick(1)).to.equal(true);
+        expect(board.getTurn()).to.equal(Turn.BLACK);
+
+        // White's piece can't be selected on black's turn
+        handler.handleCellClick(1);
+        expect(handler.getHandlerState()).to.deep.equal(emptyHandlerState);
+
+        // Black can select and move
+        handler.handleCellClick(24);
+        expect(handler.getHandlerState().selectedCell).to.equal(24);
+        // Clicking white's piece while black's piece is selected does nothing
+        handler.handleCellClick(1);
+        expect(handler.getHandlerState().selectedCell).to.equal(24);
+        expect(handler.handleCellClick(23)).to.equal(true);
+        expect(board.getBoardPositionsAsString()).to.equal('0100000000000000000000020');
+        expect(board.getTurn()).to.equal(Turn.WHITE);
+    });
+
+    it('should only let the human colour play (vs Bot as black)', () => {
+        const board = new Board(5, 5, '1000000000000000000000002');
+        const handler = new CellClickHandler(board);
+        handler.setControlledColours([PieceType.BLACK]);
+
+        // It's white's (the bot's) turn, so clicks do nothing
+        expect(handler.canEndTurn()).to.equal(false);
+        handler.handleCellClick(0);
+        handler.handleCellClick(1);
+        expect(handler.getHandlerState()).to.deep.equal(emptyHandlerState);
+        expect(board.getBoardPositionsAsString()).to.equal('1000000000000000000000002');
+
+        // After the bot moves, black can play
+        board.performMove(0, Direction.RIGHT);
+        handler.handleCellClick(24);
+        expect(handler.handleCellClick(23)).to.equal(true);
+        expect(board.getTurn()).to.equal(Turn.WHITE);
+    });
+
+    it('should let black end their turn in the middle of a capture chain', () => {
+        // The same position as the white end-turn test below, with the colours swapped and black to move.
+        const board = new Board(5, 9, '100101011100020111000100012200010000020000022');
+        board.resetBoardState({ ...board.saveBoardState(), turn: Turn.BLACK });
+        const handler = new CellClickHandler(board);
+        handler.setControlledColours([PieceType.BLACK]);
+
+        // Black approaches DOWN from 13 to 22, capturing 31, and could keep capturing.
+        handler.handleCellClick(13);
+        handler.handleCellClick(22);
+        expect(handler.getHandlerState().attackingChain).to.equal(true);
+        expect(handler.canEndTurn()).to.equal(true);
+
+        expect(handler.handleEndTurn()).to.equal(true);
+        expect(board.getBoardPositionsAsString()).to.equal('100101011100000111000120012200000000020000022');
+        expect(board.getTurn()).to.equal(Turn.WHITE);
+        expect(handler.getHandlerState()).to.deep.equal(emptyHandlerState);
+    });
+
+    it('should clear the selection and chain state when reset, without touching the board', () => {
+        const board = new Board(5, 9, '200202022200010222000200021100020000010000011');
+        const handler = new CellClickHandler(board);
+        handler.handleCellClick(13);
+        handler.handleCellClick(22);
+        expect(handler.getHandlerState().attackingChain).to.equal(true);
+        const boardBefore = board.saveBoardState();
+
+        handler.reset();
+        expect(handler.getHandlerState()).to.deep.equal(emptyHandlerState);
+        expect(board.saveBoardState()).to.deep.equal(boardBefore);
+    });
+
+    it('should clear a pending approach or withdraw choice when reset', () => {
+        const board = new Board(5, 9, '220202222000000222010122121100210111010101111');
+        const handler = new CellClickHandler(board);
+        handler.handleCellClick(19);
+        handler.handleCellClick(10);
+        handler.handleCellClick(20);
+        expect(handler.getHandlerState().approachOrWithdrawPieces).to.not.equal(null);
+        const boardBefore = board.saveBoardState();
+
+        handler.reset();
+        expect(handler.getHandlerState()).to.deep.equal(emptyHandlerState);
+        expect(board.saveBoardState()).to.deep.equal(boardBefore);
     });
 
     it('should let the player end their turn in the middle of a capture chain', () => {

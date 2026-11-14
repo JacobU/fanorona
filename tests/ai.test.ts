@@ -1,10 +1,10 @@
 import { expect } from 'chai';
 import { AttackType, PieceType, Turn, Winner } from '../src/types.js';
 import Board, { NO_CAPTURE_DRAW_TURNS } from '../src/Board.js';
-import { material, vulnerability, strongPoints, lineExposure, mobility } from '../src/ai/evaluators.js';
+import { material, vulnerability, strongPoints, lineExposure } from '../src/ai/evaluators.js';
 import { weighted } from '../src/ai/Evaluator.js';
 import { chooseMove, getBestMoveSimple, WIN_SCORE } from '../src/ai/Search.js';
-import { ALL_PRESETS, AllRounder } from '../src/ai/presets.js';
+import { ALL_PRESETS, EVALUATOR_NAMES, Fortress } from '../src/ai/presets.js';
 import { RandomContestant, contestantFromPreset, playGame } from '../src/ai/Tournament.js';
 
 const moveKey = (m: { startIndex: number, move: { moveIndexes: number[] } }) => `${m.startIndex}:${m.move.moveIndexes.join(',')}`;
@@ -44,9 +44,17 @@ describe('Evaluator tests', () => {
 
     it('evaluators should be symmetric on the starting board', () => {
         const board = new Board();
-        for (const evaluator of [material, vulnerability, strongPoints, lineExposure, mobility]) {
+        for (const evaluator of [material, vulnerability, strongPoints, lineExposure]) {
             expect(evaluator(board, PieceType.WHITE)).to.equal(-evaluator(board, PieceType.BLACK));
         }
+    });
+
+    it('mobility should no longer be an evaluator, nor used by any preset', () => {
+        expect(EVALUATOR_NAMES as string[]).to.not.include('mobility');
+        for (const preset of ALL_PRESETS) {
+            expect(Object.keys(preset.weights)).to.not.include('mobility');
+        }
+        expect(ALL_PRESETS.map(p => p.name)).to.not.include.members(['Strangler', 'AllRounder']);
     });
 
     it('weighted should sum the weighted scores', () => {
@@ -137,7 +145,7 @@ describe('Search tests', () => {
     it('should leave the board unchanged after searching', () => {
         const board = new Board();
         const before = board.saveBoardState();
-        chooseMove(board, PieceType.WHITE, AllRounder.evaluator, 2);
+        chooseMove(board, PieceType.WHITE, Fortress.evaluator, 2);
         expect(board.saveBoardState()).to.deep.equal(before);
     });
 
