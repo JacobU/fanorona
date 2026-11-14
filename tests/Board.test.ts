@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import Board from '../src/Board.js';
+import Board, { NO_CAPTURE_DRAW_TURNS } from '../src/Board.js';
 import { AttackType, BoardState, Direction, Move, PieceType, Turn, Winner } from '../src/types.js';
 
 describe('Board Tests', () => {
@@ -50,7 +50,7 @@ describe('Board Tests', () => {
 
         let boardPositions = board.saveBoardPositions();
         // THIS IS AN INCORRECT STATE JUST TO ALLOW US TO TEST THE MULTIPLE POSITIONS!
-        let boardState: BoardState = { positions: boardPositions, numWhitePieces: 1, numBlackPieces: 1, turn: Turn.WHITE, turnMoveIndexes: [], currentlyMovingPiece: null };
+        let boardState: BoardState = { positions: boardPositions, numWhitePieces: 1, numBlackPieces: 1, turn: Turn.WHITE, turnMoveIndexes: [], currentlyMovingPiece: null, turnsWithoutCapture: 0 };
 
         board.resetBoardState(boardState);
 
@@ -239,5 +239,66 @@ describe('Board Tests', () => {
         const boardPositionsAfterDiagonalWithdrawal: string = emptyRow5 + emptyRow5 + '00100' + emptyRow5 + '00002';
         expect(board.getBoardPositionsAsString()).to.equal(boardPositionsAfterDiagonalWithdrawal);
         expect(board.getWinner()).to.be.equal(Winner.NONE);
+    });
+
+    it('should be a draw after NO_CAPTURE_DRAW_TURNS turns without a capture', () => {
+        // White at 0 and black at 24 shuffle back and forth without ever being able to attack.
+        const board = new Board(5, 5, '1000000000000000000000002');
+        const turns: [number, Direction][] = [[0, Direction.RIGHT], [24, Direction.LEFT], [1, Direction.LEFT], [23, Direction.RIGHT]];
+        for (let i = 0; i < NO_CAPTURE_DRAW_TURNS; i++) {
+            expect(board.getWinner()).to.equal(Winner.NONE);
+            const [index, direction] = turns[i % turns.length];
+            expect(board.performMove(index, direction)).to.equal(false);
+            expect(board.getTurnsWithoutCapture()).to.equal(i + 1);
+        }
+        expect(board.getWinner()).to.equal(Winner.DRAW);
+        expect(board.getPossibleMovesForCell(0)).to.deep.equal([]);
+
+        board.reset();
+        expect(board.getTurnsWithoutCapture()).to.equal(0);
+        expect(board.getWinner()).to.equal(Winner.NONE);
+    });
+
+    it('should reset the no-capture count after a capture', () => {
+        // White at 4 withdraws from 8 by moving to 0, leaving black at 3.
+        const board = new Board(3, 3, '000210002');
+        board.resetBoardState({ ...board.saveBoardState(), turnsWithoutCapture: 10 });
+        expect(board.getTurnsWithoutCapture()).to.equal(10);
+        board.performMove(4, Direction.UPLEFT);
+        expect(board.getTurnsWithoutCapture()).to.equal(0);
+        expect(board.getWinner()).to.equal(Winner.NONE);
+    });
+
+    it('should not count virtual moves towards the no-capture draw', () => {
+        const board = new Board(5, 5, '1000000000000000000000002');
+        board.performMove(0, Direction.RIGHT, true);
+        expect(board.getTurnsWithoutCapture()).to.equal(0);
+    });
+
+    it('should reset the number of pieces when the board is reset', () => {
+        // White at 4 withdraws from 3 to 5, capturing the only black piece and winning.
+        const board = new Board(3, 3, '000210000');
+        board.performMove(4, Direction.RIGHT);
+        expect(board.getWinner()).to.equal(Winner.WHITE);
+
+        board.reset();
+        expect(board.getBoardPositionsAsString()).to.equal('000210000');
+        expect(board.getNumPieces(PieceType.WHITE)).to.equal(1);
+        expect(board.getNumPieces(PieceType.BLACK)).to.equal(1);
+        expect(board.getWinner()).to.equal(Winner.NONE);
+        expect(board.getTurn()).to.equal(Turn.WHITE);
+    });
+
+    it('should not offer a move in the same direction as the previous move when another attack is available', () => {
+        const board = new Board(5, 9, '200202022200010222000200021100020000010000011');
+
+        // White approaches DOWN from 13 to 22 (capturing 31), then withdraws RIGHT from 22 to 23 (capturing 21).
+        expect(board.performMove(13, Direction.DOWN)).to.equal(true);
+        expect(board.performMove(22, Direction.RIGHT)).to.equal(true);
+
+        // From 23, approaching UP to 14 is allowed, but approaching RIGHT to 24 would be a second move to the RIGHT.
+        expect(board.getPossibleMovesForCell(23)).to.deep.equal([
+            { index: 14, direction: Direction.UP, attackType: AttackType.APPROACH },
+        ]);
     });
 });

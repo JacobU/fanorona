@@ -83,6 +83,10 @@ export default class Cell {
         return this.pieceType;
     }
 
+    public getCellType(): CellType {
+        return this.cellType;
+    }
+
     public getCellConnections(): Connection[] {
         return this.connections;
     }

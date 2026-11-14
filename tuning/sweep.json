@@ -1,0 +1,12 @@
+{
+  "mode": "gauntlet",
+  "gamesPerPair": 20,
+  "opponents": ["Lookahead", "Positional", "AllRounder"],
+  "base": {
+    "depth": 2,
+    "weights": { "material": 100, "vulnerability": 30, "mobility": 2, "strongPoints": 5, "lineExposure": 5 }
+  },
+  "grid": {
+    "strongPoints": [0, 5, 10, 20, 40]
+  }
+}

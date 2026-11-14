@@ -11,6 +11,7 @@ export enum Winner {
     NONE = 0,
     WHITE = 1,
     BLACK = 2,
+    DRAW = 3,
 }
 
 export enum Turn {
@@ -40,7 +41,6 @@ export interface TreeNode<T> {
     children: TreeNode<T>[];
     isComplete: boolean; // Tracks if the node represents a complete move
     attackType: AttackType;
-    rating: number | null;
 }
 
 export interface BoardState {
@@ -50,17 +50,18 @@ export interface BoardState {
     turn: Turn,
     turnMoveIndexes: number[],
     currentlyMovingPiece: number | null,
+    turnsWithoutCapture: number,
 }
 
 export interface CompleteMove {
     moveIndexes: number[],
     moveTypes: AttackType[],
-    rating: number | null,
 }
 
 export interface BestMove {
     startIndex: number,
-    move: CompleteMove
+    move: CompleteMove,
+    score: number,
 }
 
 export function getOppositeDirection(direction: Direction): Direction {

@@ -1,0 +1,534 @@
+{
+  "mode": "gauntlet",
+  "gamesPerPair": 20,
+  "opponents": [
+    "Lookahead",
+    "Fortress",
+    "AllRounder"
+  ],
+  "base": {
+    "depth": 2,
+    "weights": {
+      "material": 100
+    }
+  },
+  "variants": [
+    {
+      "name": "v30 m0 s0 l0",
+      "depth": 2,
+      "weights": {
+        "material": 100,
+        "vulnerability": 30,
+        "mobility": 0,
+        "strongPoints": 0,
+        "lineExposure": 0
+      }
+    },
+    {
+      "name": "v30 m5 s0 l0",
+      "depth": 2,
+      "weights": {
+        "material": 100,
+        "vulnerability": 30,
+        "mobility": 5,
+        "strongPoints": 0,
+        "lineExposure": 0
+      }
+    },
+    {
+      "name": "v30 m8 s0 l0",
+      "depth": 2,
+      "weights": {
+        "material": 100,
+        "vulnerability": 30,
+        "mobility": 8,
+        "strongPoints": 0,
+        "lineExposure": 0
+      }
+    },
+    {
+      "name": "v120 m0 s0 l0",
+      "depth": 2,
+      "weights": {
+        "material": 100,
+        "vulnerability": 120,
+        "mobility": 0,
+        "strongPoints": 0,
+        "lineExposure": 0
+      }
+    },
+    {
+      "name": "v120 m5 s0 l0",
+      "depth": 2,
+      "weights": {
+        "material": 100,
+        "vulnerability": 120,
+        "mobility": 5,
+        "strongPoints": 0,
+        "lineExposure": 0
+      }
+    },
+    {
+      "name": "v120 m8 s0 l0",
+      "depth": 2,
+      "weights": {
+        "material": 100,
+        "vulnerability": 120,
+        "mobility": 8,
+        "strongPoints": 0,
+        "lineExposure": 0
+      }
+    },
+    {
+      "name": "v200 m0 s0 l0",
+      "depth": 2,
+      "weights": {
+        "material": 100,
+        "vulnerability": 200,
+        "mobility": 0,
+        "strongPoints": 0,
+        "lineExposure": 0
+      }
+    },
+    {
+      "name": "v200 m5 s0 l0",
+      "depth": 2,
+      "weights": {
+        "material": 100,
+        "vulnerability": 200,
+        "mobility": 5,
+        "strongPoints": 0,
+        "lineExposure": 0
+      }
+    },
+    {
+      "name": "v200 m8 s0 l0",
+      "depth": 2,
+      "weights": {
+        "material": 100,
+        "vulnerability": 200,
+        "mobility": 8,
+        "strongPoints": 0,
+        "lineExposure": 0
+      }
+    },
+    {
+      "name": "v30 m0 s20 l0",
+      "depth": 2,
+      "weights": {
+        "material": 100,
+        "vulnerability": 30,
+        "mobility": 0,
+        "strongPoints": 20,
+        "lineExposure": 0
+      }
+    },
+    {
+      "name": "v30 m0 s40 l0",
+      "depth": 2,
+      "weights": {
+        "material": 100,
+        "vulnerability": 30,
+        "mobility": 0,
+        "strongPoints": 40,
+        "lineExposure": 0
+      }
+    },
+    {
+      "name": "v120 m0 s20 l0",
+      "depth": 2,
+      "weights": {
+        "material": 100,
+        "vulnerability": 120,
+        "mobility": 0,
+        "strongPoints": 20,
+        "lineExposure": 0
+      }
+    },
+    {
+      "name": "v120 m0 s40 l0",
+      "depth": 2,
+      "weights": {
+        "material": 100,
+        "vulnerability": 120,
+        "mobility": 0,
+        "strongPoints": 40,
+        "lineExposure": 0
+      }
+    },
+    {
+      "name": "v200 m0 s20 l0",
+      "depth": 2,
+      "weights": {
+        "material": 100,
+        "vulnerability": 200,
+        "mobility": 0,
+        "strongPoints": 20,
+        "lineExposure": 0
+      }
+    },
+    {
+      "name": "v200 m0 s40 l0",
+      "depth": 2,
+      "weights": {
+        "material": 100,
+        "vulnerability": 200,
+        "mobility": 0,
+        "strongPoints": 40,
+        "lineExposure": 0
+      }
+    },
+    {
+      "name": "v30 m0 s0 l10",
+      "depth": 2,
+      "weights": {
+        "material": 100,
+        "vulnerability": 30,
+        "mobility": 0,
+        "strongPoints": 0,
+        "lineExposure": 10
+      }
+    },
+    {
+      "name": "v30 m0 s0 l40",
+      "depth": 2,
+      "weights": {
+        "material": 100,
+        "vulnerability": 30,
+        "mobility": 0,
+        "strongPoints": 0,
+        "lineExposure": 40
+      }
+    },
+    {
+      "name": "v30 m0 s0 l60",
+      "depth": 2,
+      "weights": {
+        "material": 100,
+        "vulnerability": 30,
+        "mobility": 0,
+        "strongPoints": 0,
+        "lineExposure": 60
+      }
+    },
+    {
+      "name": "v120 m0 s0 l10",
+      "depth": 2,
+      "weights": {
+        "material": 100,
+        "vulnerability": 120,
+        "mobility": 0,
+        "strongPoints": 0,
+        "lineExposure": 10
+      }
+    },
+    {
+      "name": "v120 m0 s0 l40",
+      "depth": 2,
+      "weights": {
+        "material": 100,
+        "vulnerability": 120,
+        "mobility": 0,
+        "strongPoints": 0,
+        "lineExposure": 40
+      }
+    },
+    {
+      "name": "v120 m0 s0 l60",
+      "depth": 2,
+      "weights": {
+        "material": 100,
+        "vulnerability": 120,
+        "mobility": 0,
+        "strongPoints": 0,
+        "lineExposure": 60
+      }
+    },
+    {
+      "name": "v200 m0 s0 l10",
+      "depth": 2,
+      "weights": {
+        "material": 100,
+        "vulnerability": 200,
+        "mobility": 0,
+        "strongPoints": 0,
+        "lineExposure": 10
+      }
+    },
+    {
+      "name": "v200 m0 s0 l40",
+      "depth": 2,
+      "weights": {
+        "material": 100,
+        "vulnerability": 200,
+        "mobility": 0,
+        "strongPoints": 0,
+        "lineExposure": 40
+      }
+    },
+    {
+      "name": "v200 m0 s0 l60",
+      "depth": 2,
+      "weights": {
+        "material": 100,
+        "vulnerability": 200,
+        "mobility": 0,
+        "strongPoints": 0,
+        "lineExposure": 60
+      }
+    },
+    {
+      "name": "v0 m0 s20 l0",
+      "depth": 2,
+      "weights": {
+        "material": 100,
+        "vulnerability": 0,
+        "mobility": 0,
+        "strongPoints": 20,
+        "lineExposure": 0
+      }
+    },
+    {
+      "name": "v0 m0 s40 l0",
+      "depth": 2,
+      "weights": {
+        "material": 100,
+        "vulnerability": 0,
+        "mobility": 0,
+        "strongPoints": 40,
+        "lineExposure": 0
+      }
+    },
+    {
+      "name": "v0 m5 s0 l0",
+      "depth": 2,
+      "weights": {
+        "material": 100,
+        "vulnerability": 0,
+        "mobility": 5,
+        "strongPoints": 0,
+        "lineExposure": 0
+      }
+    },
+    {
+      "name": "v0 m5 s20 l0",
+      "depth": 2,
+      "weights": {
+        "material": 100,
+        "vulnerability": 0,
+        "mobility": 5,
+        "strongPoints": 20,
+        "lineExposure": 0
+      }
+    },
+    {
+      "name": "v0 m5 s40 l0",
+      "depth": 2,
+      "weights": {
+        "material": 100,
+        "vulnerability": 0,
+        "mobility": 5,
+        "strongPoints": 40,
+        "lineExposure": 0
+      }
+    },
+    {
+      "name": "v0 m8 s0 l0",
+      "depth": 2,
+      "weights": {
+        "material": 100,
+        "vulnerability": 0,
+        "mobility": 8,
+        "strongPoints": 0,
+        "lineExposure": 0
+      }
+    },
+    {
+      "name": "v0 m8 s20 l0",
+      "depth": 2,
+      "weights": {
+        "material": 100,
+        "vulnerability": 0,
+        "mobility": 8,
+        "strongPoints": 20,
+        "lineExposure": 0
+      }
+    },
+    {
+      "name": "v0 m8 s40 l0",
+      "depth": 2,
+      "weights": {
+        "material": 100,
+        "vulnerability": 0,
+        "mobility": 8,
+        "strongPoints": 40,
+        "lineExposure": 0
+      }
+    },
+    {
+      "name": "v0 m0 s0 l10",
+      "depth": 2,
+      "weights": {
+        "material": 100,
+        "vulnerability": 0,
+        "mobility": 0,
+        "strongPoints": 0,
+        "lineExposure": 10
+      }
+    },
+    {
+      "name": "v0 m0 s0 l40",
+      "depth": 2,
+      "weights": {
+        "material": 100,
+        "vulnerability": 0,
+        "mobility": 0,
+        "strongPoints": 0,
+        "lineExposure": 40
+      }
+    },
+    {
+      "name": "v0 m0 s0 l60",
+      "depth": 2,
+      "weights": {
+        "material": 100,
+        "vulnerability": 0,
+        "mobility": 0,
+        "strongPoints": 0,
+        "lineExposure": 60
+      }
+    },
+    {
+      "name": "v0 m5 s0 l10",
+      "depth": 2,
+      "weights": {
+        "material": 100,
+        "vulnerability": 0,
+        "mobility": 5,
+        "strongPoints": 0,
+        "lineExposure": 10
+      }
+    },
+    {
+      "name": "v0 m5 s0 l40",
+      "depth": 2,
+      "weights": {
+        "material": 100,
+        "vulnerability": 0,
+        "mobility": 5,
+        "strongPoints": 0,
+        "lineExposure": 40
+      }
+    },
+    {
+      "name": "v0 m5 s0 l60",
+      "depth": 2,
+      "weights": {
+        "material": 100,
+        "vulnerability": 0,
+        "mobility": 5,
+        "strongPoints": 0,
+        "lineExposure": 60
+      }
+    },
+    {
+      "name": "v0 m8 s0 l10",
+      "depth": 2,
+      "weights": {
+        "material": 100,
+        "vulnerability": 0,
+        "mobility": 8,
+        "strongPoints": 0,
+        "lineExposure": 10
+      }
+    },
+    {
+      "name": "v0 m8 s0 l40",
+      "depth": 2,
+      "weights": {
+        "material": 100,
+        "vulnerability": 0,
+        "mobility": 8,
+        "strongPoints": 0,
+        "lineExposure": 40
+      }
+    },
+    {
+      "name": "v0 m8 s0 l60",
+      "depth": 2,
+      "weights": {
+        "material": 100,
+        "vulnerability": 0,
+        "mobility": 8,
+        "strongPoints": 0,
+        "lineExposure": 60
+      }
+    },
+    {
+      "name": "v0 m0 s20 l10",
+      "depth": 2,
+      "weights": {
+        "material": 100,
+        "vulnerability": 0,
+        "mobility": 0,
+        "strongPoints": 20,
+        "lineExposure": 10
+      }
+    },
+    {
+      "name": "v0 m0 s20 l40",
+      "depth": 2,
+      "weights": {
+        "material": 100,
+        "vulnerability": 0,
+        "mobility": 0,
+        "strongPoints": 20,
+        "lineExposure": 40
+      }
+    },
+    {
+      "name": "v0 m0 s20 l60",
+      "depth": 2,
+      "weights": {
+        "material": 100,
+        "vulnerability": 0,
+        "mobility": 0,
+        "strongPoints": 20,
+        "lineExposure": 60
+      }
+    },
+    {
+      "name": "v0 m0 s40 l10",
+      "depth": 2,
+      "weights": {
+        "material": 100,
+        "vulnerability": 0,
+        "mobility": 0,
+        "strongPoints": 40,
+        "lineExposure": 10
+      }
+    },
+    {
+      "name": "v0 m0 s40 l40",
+      "depth": 2,
+      "weights": {
+        "material": 100,
+        "vulnerability": 0,
+        "mobility": 0,
+        "strongPoints": 40,
+        "lineExposure": 40
+      }
+    },
+    {
+      "name": "v0 m0 s40 l60",
+      "depth": 2,
+      "weights": {
+        "material": 100,
+        "vulnerability": 0,
+        "mobility": 0,
+        "strongPoints": 40,
+        "lineExposure": 60
+      }
+    }
+  ]
+}

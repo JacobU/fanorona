@@ -1,5 +1,6 @@
-import Board from './Board.js';
-import BotRandomPlayer from './BotRandomPlayer.js';
+import Board, { NO_CAPTURE_DRAW_TURNS } from './Board.js';
+import SearchBot from './ai/SearchBot.js';
+import { AllRounder } from './ai/presets.js';
 import CellClickHandler from './CellClickHandler.js';
 import { PieceType, Turn, Direction, Winner } from './types.js';
 import { drawBoard, animatePieceMove } from './DrawBoardAndPieces.js';
@@ -18,7 +19,7 @@ wood.src = "./assets/svg/wood.svg";
 
 const board = new Board();
 const cellClickHandler = new CellClickHandler(board);
-const botPlayer = new BotRandomPlayer(PieceType.BLACK, board);
+const botPlayer = new SearchBot(PieceType.BLACK, board, AllRounder);
 
 let imagesLoaded = 0;
 
@@ -103,6 +104,8 @@ function endGame() {
     let message: string;
     if (board.getWinner() === Winner.WHITE) {
         message = 'You won!';
+    } else if (board.getWinner() === Winner.DRAW) {
+        message = `Draw! No pieces were captured in ${NO_CAPTURE_DRAW_TURNS} turns.`;
     } else {
         message = 'You lost!'
     }

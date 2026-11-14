@@ -1,13 +1,14 @@
 import { expect } from 'chai';
 import { PieceType, Winner } from '../src/types.js';
-import SimpleBot from '../src/SimpleBot.js';
-import BotRandomPlayer from '../src/BotRandomPlayer.js';
+import SimpleBot from '../src/ai/SimpleBot.js';
+import BotRandomPlayer from '../src/ai/BotRandomPlayer.js';
 import Board from '../src/Board.js';
 
 describe('MoveTreeBuilder tests', () => {
     it('simple bot should beat random bot', () => {
         let whiteWins = 0;
         let blackWins = 0;
+        let draws = 0;
 
 
         while (whiteWins < 100) {
@@ -31,16 +32,20 @@ describe('MoveTreeBuilder tests', () => {
             if (board.getWinner() === Winner.WHITE) {
                 whiteWins++;
                 winMessage = "WHITE WON!";
+            } else if (board.getWinner() === Winner.DRAW) {
+                draws++;
+                winMessage = "DRAW!";
             } else {
                 blackWins++;
                 winMessage = "BLACK WON!";
             }
 
-            console.log(winMessage);        
+            console.log(winMessage);
         }
 
         console.log('No. of white wins was: ' + whiteWins);
         console.log('No. of black wins was: ' + blackWins);
+        console.log('No. of draws was: ' + draws);
     });
 
     

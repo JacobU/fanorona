@@ -8,7 +8,9 @@
     "build:src": "tsc -p tsconfig.json",
     "build:test": "tsc -p tsconfig.test.json",
     "test": "npm run build:src && npm run build:test && mocha 'dist/tests/**/*.js'",
-    "start": "node --loader ts-node/esm src/FanoronaBotsGame.ts"
+    "start": "node --loader ts-node/esm src/FanoronaBotsGame.ts",
+    "tournament": "npm run build:src && node dist/src/RunTournament.js",
+    "tune": "npm run build:src && node dist/src/RunTuning.js"
   },
   "keywords": [],
   "author": "",

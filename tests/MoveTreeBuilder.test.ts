@@ -20,8 +20,8 @@ describe('MoveTreeBuilder tests', () => {
         const board = new Board(3, 3, '000210002');
         const possibleMoves = board.getAllPossibleMovesForSinglePiece(4);
         const expectedPossibleMoves: CompleteMove[] = [
-            { moveIndexes: [ 0 ], moveTypes: [ AttackType.WITHDRAW ], rating: 0 },
-            { moveIndexes: [ 5, 2 ], moveTypes: [ AttackType.WITHDRAW, AttackType.WITHDRAW ], rating: 1 }
+            { moveIndexes: [ 0 ], moveTypes: [ AttackType.WITHDRAW ] },
+            { moveIndexes: [ 5, 2 ], moveTypes: [ AttackType.WITHDRAW, AttackType.WITHDRAW ] }
         ];
         expect(possibleMoves).to.deep.equals(expectedPossibleMoves);
     });
@@ -31,14 +31,14 @@ describe('MoveTreeBuilder tests', () => {
         const board = new Board(5, 5, '0000000010000000000020000');
         const possibleMoves = board.getAllPossibleMovesForSinglePiece(8);
         const expectedPossibleMoves: CompleteMove[] = [
-            { moveIndexes: [ 2 ], moveTypes: [ AttackType.NONE ], rating: 0 },
-            { moveIndexes: [ 3 ], moveTypes: [ AttackType.NONE ], rating: 0 },
-            { moveIndexes: [ 4 ], moveTypes: [ AttackType.NONE ], rating: 0 },
-            { moveIndexes: [ 7 ], moveTypes: [ AttackType.NONE ], rating: 0 },
-            { moveIndexes: [ 9 ], moveTypes: [ AttackType.NONE ], rating: 0 },
-            { moveIndexes: [ 12 ], moveTypes: [ AttackType.NONE ], rating: 0 },
-            { moveIndexes: [ 13 ], moveTypes: [ AttackType.NONE ], rating: 0 },
-            { moveIndexes: [ 14 ], moveTypes: [ AttackType.NONE ], rating: 0 }
+            { moveIndexes: [ 2 ], moveTypes: [ AttackType.NONE ] },
+            { moveIndexes: [ 3 ], moveTypes: [ AttackType.NONE ] },
+            { moveIndexes: [ 4 ], moveTypes: [ AttackType.NONE ] },
+            { moveIndexes: [ 7 ], moveTypes: [ AttackType.NONE ] },
+            { moveIndexes: [ 9 ], moveTypes: [ AttackType.NONE ] },
+            { moveIndexes: [ 12 ], moveTypes: [ AttackType.NONE ] },
+            { moveIndexes: [ 13 ], moveTypes: [ AttackType.NONE ] },
+            { moveIndexes: [ 14 ], moveTypes: [ AttackType.NONE ] }
         ];
         expect(possibleMoves).to.deep.equals(expectedPossibleMoves);
     });
@@ -48,9 +48,9 @@ describe('MoveTreeBuilder tests', () => {
 
         const possibleMoves = board.getAllPossibleMovesForSinglePiece(4);
         const expectedPossibleMoves: CompleteMove[] = [
-            { moveIndexes: [ 1, 2 ], moveTypes: [ AttackType.WITHDRAW, AttackType.WITHDRAW ], rating: 0 },
-            { moveIndexes: [ 2, 1 ], moveTypes: [ AttackType.WITHDRAW, AttackType.APPROACH ], rating: 0 },
-            { moveIndexes: [ 8 ], moveTypes: [ AttackType.WITHDRAW ], rating: -1 }
+            { moveIndexes: [ 1, 2 ], moveTypes: [ AttackType.WITHDRAW, AttackType.WITHDRAW ] },
+            { moveIndexes: [ 2, 1 ], moveTypes: [ AttackType.WITHDRAW, AttackType.APPROACH ] },
+            { moveIndexes: [ 8 ], moveTypes: [ AttackType.WITHDRAW ] }
         ];
         expect(possibleMoves).to.deep.equals(expectedPossibleMoves);
     });
@@ -60,14 +60,14 @@ describe('MoveTreeBuilder tests', () => {
 
         const possibleMoves = board.getAllPossibleMovesForSinglePiece(12);
         const expectedPossibleMoves: CompleteMove[] = [
-            { moveIndexes: [ 7, 8, 2, 6, 11 ], moveTypes: [ AttackType.APPROACH, AttackType.WITHDRAW, AttackType.WITHDRAW, AttackType.APPROACH, AttackType.APPROACH ], rating: 0 },
-            { moveIndexes: [ 8, 7 ], moveTypes: [ AttackType.WITHDRAW, AttackType.APPROACH ], rating: -3 },
-            { moveIndexes: [ 11 ], moveTypes: [ AttackType.APPROACH ], rating: -4 },
-            { moveIndexes: [ 13 ], moveTypes: [ AttackType.APPROACH ], rating: -4 },
-            { moveIndexes: [ 18, 17 ], moveTypes: [ AttackType.APPROACH, AttackType.APPROACH ], rating: -3 },
-            { moveIndexes: [ 18, 22 ], moveTypes: [ AttackType.APPROACH, AttackType.WITHDRAW ], rating: -3 },
-            { moveIndexes: [ 18, 17 ], moveTypes: [ AttackType.WITHDRAW, AttackType.APPROACH ], rating: -3 },
-            { moveIndexes: [ 18, 22, 23 ], moveTypes: [ AttackType.WITHDRAW, AttackType.WITHDRAW, AttackType.APPROACH ], rating: -2 }
+            { moveIndexes: [ 7, 8, 2, 6, 11 ], moveTypes: [ AttackType.APPROACH, AttackType.WITHDRAW, AttackType.WITHDRAW, AttackType.APPROACH, AttackType.APPROACH ] },
+            { moveIndexes: [ 8, 7 ], moveTypes: [ AttackType.WITHDRAW, AttackType.APPROACH ] },
+            { moveIndexes: [ 11 ], moveTypes: [ AttackType.APPROACH ] },
+            { moveIndexes: [ 13 ], moveTypes: [ AttackType.APPROACH ] },
+            { moveIndexes: [ 18, 17 ], moveTypes: [ AttackType.APPROACH, AttackType.APPROACH ] },
+            { moveIndexes: [ 18, 22 ], moveTypes: [ AttackType.APPROACH, AttackType.WITHDRAW ] },
+            { moveIndexes: [ 18, 17 ], moveTypes: [ AttackType.WITHDRAW, AttackType.APPROACH ] },
+            { moveIndexes: [ 18, 22, 23 ], moveTypes: [ AttackType.WITHDRAW, AttackType.WITHDRAW, AttackType.APPROACH ] }
         ];
         expect(possibleMoves).to.deep.equals(expectedPossibleMoves);
         const repeatedPossibleMoves = board.getAllPossibleMovesForSinglePiece(12);
@@ -81,43 +81,35 @@ describe('MoveTreeBuilder tests', () => {
             startIndexes: [1, 8],
             moves: [
                 [
-                    { moveIndexes: [2, 4, 5], moveTypes: [AttackType.WITHDRAW, AttackType.APPROACH, AttackType.WITHDRAW], rating: 2 }
+                    { moveIndexes: [2, 4, 5], moveTypes: [AttackType.WITHDRAW, AttackType.APPROACH, AttackType.WITHDRAW] }
                 ],
                 [
-                    { moveIndexes: [4, 2], moveTypes: [AttackType.APPROACH, AttackType.WITHDRAW], rating: 1 },
-                    { moveIndexes: [4, 5], moveTypes: [AttackType.APPROACH, AttackType.WITHDRAW], rating: 1 },
-                    { moveIndexes: [7], moveTypes: [AttackType.APPROACH], rating: 0 }
+                    { moveIndexes: [4, 2], moveTypes: [AttackType.APPROACH, AttackType.WITHDRAW] },
+                    { moveIndexes: [4, 5], moveTypes: [AttackType.APPROACH, AttackType.WITHDRAW] },
+                    { moveIndexes: [7], moveTypes: [AttackType.APPROACH] }
                 ]
             ]
         };
         expect(allMoves).to.deep.equals(expectedPossibleMoves);
     });
 
-    it('should return the best move for two white pieces on a 3x3 board', () => {
-        const board = new Board(3, 3, '210200201');
-        const bestMove = board.getBestMoveSimple(PieceType.WHITE);
-        const expectedBestMove = {
-            startIndex: 1,
-            move: { moveIndexes: [ 2, 4, 5 ], moveTypes: [ AttackType.WITHDRAW, AttackType.APPROACH, AttackType.WITHDRAW ], rating: 2 }
-        };
-        expect(bestMove).to.deep.equals(expectedBestMove);
-    });
-
-    it('should assign correct non-null rating to a one-move win', () => {
-        // White at index 4, only black at index 3. WITHDRAW RIGHT (4→5) captures the last black piece.
-        // After capture: numWhitePieces=1, numBlackPieces=0 → rating = 1.
-        const board = new Board(3, 3, '000210000');
-        const possibleMoves = board.getAllPossibleMovesForSinglePiece(4);
-        const expected: CompleteMove[] = [
-            { moveIndexes: [5], moveTypes: [AttackType.WITHDRAW], rating: 1 },
-        ];
-        expect(possibleMoves).to.deep.equal(expected);
-    });
-
-    it('should never return a CompleteMove with null rating', () => {
-        const board = new Board(3, 3, '000210002');
-        const possibleMoves = board.getAllPossibleMovesForSinglePiece(4);
+    it('should not include chains that move in the same direction twice in a row', () => {
+        const board = new Board(5, 9, '200202022200010222000200021100020000010000011');
+        const possibleMoves = board.getAllPossibleMovesForSinglePiece(13);
         expect(possibleMoves.length).to.be.greaterThan(0);
-        expect(possibleMoves.every(m => m.rating !== null)).to.be.true;
+        for (const move of possibleMoves) {
+            const path = [13, ...move.moveIndexes];
+            for (let i = 2; i < path.length; i++) {
+                expect(path[i] - path[i - 1]).to.not.equal(path[i - 1] - path[i - 2]);
+            }
+        }
+    });
+
+    it('should not allow an attack after a paika move', () => {
+        // Black at 10 has no attacks, but after a paika move to 20 it would be able to withdraw. That must end the turn.
+        const board = new Board(5, 9, '220002000220000000210000000110000000111100020');
+        const possibleMoves = board.getAllPossibleMovesForSinglePiece(10);
+        expect(possibleMoves.length).to.be.greaterThan(0);
+        expect(possibleMoves.every(m => m.moveTypes[0] === AttackType.NONE && m.moveIndexes.length === 1)).to.be.true;
     });
 });

@@ -1,10 +1,11 @@
 import Board from './Board.js';
-import BotRandomPlayer from './BotRandomPlayer.js';
-import SimpleBot from './SimpleBot.js';
+import BotRandomPlayer from './ai/BotRandomPlayer.js';
+import SimpleBot from './ai/SimpleBot.js';
 import { PieceType, Winner } from './types.js';
 
 let whiteWins = 0;
 let blackWins = 0;
+let draws = 0;
 
 
 while (whiteWins < 1000) {
@@ -28,14 +29,18 @@ while (whiteWins < 1000) {
     if (board.getWinner() === Winner.WHITE) {
         whiteWins++;
         winMessage = "White won!";
+    } else if (board.getWinner() === Winner.DRAW) {
+        draws++;
+        winMessage = "Draw!";
     } else {
         blackWins++;
         winMessage = "Black won!";
     }
 
-    console.log(winMessage);        
+    console.log(winMessage);
 }
 
 console.log('No. of white wins was: ' + whiteWins);
 console.log('No. of black wins was: ' + blackWins);
+console.log('No. of draws was: ' + draws);
 

@@ -1,5 +1,5 @@
-import Board from './Board.js';
-import { PieceType, Move } from './types.js';
+import Board from '../Board.js';
+import { PieceType, Move } from '../types.js';
 
 export default class BotRandomPlayer {
     private pieceType: PieceType;
@@ -7,13 +7,15 @@ export default class BotRandomPlayer {
     private pieceTypeString: string;
     private inMiddleOfMoveChain: boolean;
     private indexOfPieceThatMustBeMoved: number | null;
+    private verbose: boolean;
 
-    constructor(pieceType: PieceType, board: Board) {
+    constructor(pieceType: PieceType, board: Board, verbose: boolean = true) {
         this.pieceType = pieceType;
         this.board = board;
         this.pieceTypeString = pieceType === PieceType.WHITE ? 'White' : 'Black';
         this.inMiddleOfMoveChain = false;
         this.indexOfPieceThatMustBeMoved = null;
+        this.verbose = verbose;
     }
 
     public makeMove() {
@@ -37,11 +39,11 @@ export default class BotRandomPlayer {
             this.inMiddleOfMoveChain = false;
             this.indexOfPieceThatMustBeMoved = null;
         }
-        console.log(moveIndex, moveChoice.direction);
+        if (this.verbose) console.log(moveIndex, moveChoice.direction);
         return { canMoveAgain: canMoveAgain, move: { index: moveIndex, direction: moveChoice.direction } };
     }
 
     private playerIsMovingLog() {
-        console.log(this.pieceTypeString + ' is moving!');
+        if (this.verbose) console.log(this.pieceTypeString + ' is moving!');
     }
 }

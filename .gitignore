@@ -43,3 +43,5 @@ package-lock.json
 *.pid
 *.seed
 *.pid.lock
+# Tuning run output
+tuning/results/

@@ -11,10 +11,15 @@ import {
     CellType, 
     Turn, 
     CompleteMove, 
-    TreeNode, 
+    TreeNode,
     BoardState,
-    BestMove 
+    getDirectionFromDeltaIndex,
 } from './types.js';
+
+/**
+ * The game is a draw if this many turns in a row (counting both players' turns) pass without a capture.
+ */
+export const NO_CAPTURE_DRAW_TURNS = 60;
 
 export default class Board {
     private rows: number;
@@ -28,6 +33,7 @@ export default class Board {
     private currentlyMovingPiece: number | null;
     private currentTurn: Turn;
     private attackOrWithdraw: AttackType;
+    private turnsWithoutCapture: number;
 
     constructor(rows: number = 5, columns: number = 9, startingPieces?: string) {
         this.numWhitePieces = 0;
@@ -50,6 +56,7 @@ export default class Board {
         this.currentlyMovingPiece = null;
         this.currentTurn = Turn.WHITE;
         this.attackOrWithdraw = AttackType.NONE;
+        this.turnsWithoutCapture = 0;
     }
 
     // Initialize the board with empty cells
@@ -82,6 +89,7 @@ export default class Board {
         this.currentTurn = boardState.turn;
         this.turnMoveIndexes = [...boardState.turnMoveIndexes]; 
         this.currentlyMovingPiece = boardState.currentlyMovingPiece;
+        this.turnsWithoutCapture = boardState.turnsWithoutCapture;
         this.attackOrWithdraw = AttackType.NONE;
     }
 
@@ -93,10 +101,13 @@ export default class Board {
 
     public reset() {
         this.resetPiecePositions(this.startingPiecePositions);
+        this.numWhitePieces = this.startingPiecePositions.filter(piece => piece === PieceType.WHITE).length;
+        this.numBlackPieces = this.startingPiecePositions.filter(piece => piece === PieceType.BLACK).length;
         this.turnMoveIndexes = []; 
         this.currentlyMovingPiece = null;
         this.currentTurn = Turn.WHITE;
         this.attackOrWithdraw = AttackType.NONE;
+        this.turnsWithoutCapture = 0;
     }
 
     /**
@@ -121,12 +132,14 @@ export default class Board {
             turn: this.currentTurn,
             turnMoveIndexes: [...this.turnMoveIndexes],
             currentlyMovingPiece: this.currentlyMovingPiece, 
+            turnsWithoutCapture: this.turnsWithoutCapture,
         };
     }
 
 
     /**
-     * @returns {Winner} the winner of the game or Winner.None if there is no winner yet.
+     * @returns {Winner} the winner of the game, Winner.DRAW if NO_CAPTURE_DRAW_TURNS turns have passed without a capture,
+     * or Winner.NONE if the game isn't over yet.
      */
     public getWinner(): Winner {
         if (this.numBlackPieces === 0) {
@@ -135,7 +148,17 @@ export default class Board {
         if (this.numWhitePieces === 0) {
             return Winner.BLACK;
         }
+        if (this.turnsWithoutCapture >= NO_CAPTURE_DRAW_TURNS) {
+            return Winner.DRAW;
+        }
         return Winner.NONE;
+    }
+
+    /**
+     * @returns the number of turns in a row (counting both players) that have passed without a capture.
+     */
+    public getTurnsWithoutCapture(): number {
+        return this.turnsWithoutCapture;
     }
 
     /**
@@ -276,6 +299,8 @@ export default class Board {
         }
         // If the player cant move again, reset the index tracker and the turn
         if (!virtualMove) {
+            // Every move in a capture chain is an attack, so the turn captured something exactly when its last move did.
+            this.turnsWithoutCapture = attackType === AttackType.NONE ? this.turnsWithoutCapture + 1 : 0;
             this.turnMoveIndexes = [];
             this.currentlyMovingPiece = null;
             this.currentTurn = this.currentTurn ? Turn.WHITE : Turn.BLACK;
@@ -315,6 +340,11 @@ export default class Board {
 
         // If player is in the middle of a turn with previous moves, filter out all the indexes they have been to as they can't move there again.
         if (this.turnMoveIndexes.length !== 0) {
+            // The piece also can't move in the same direction as its previous move (moving in the opposite direction
+            // is already prevented since that would return it to the cell it just left).
+            const previousMoveDelta = index - this.turnMoveIndexes[this.turnMoveIndexes.length - 1];
+            moves = moves.filter(move => move.index - index !== previousMoveDelta);
+
             let attackingMoves: Move[] = [];
             for (let i = 0; i < moves.length; i++) {
                 if (this.willMoveApproach(index, pieceType, moves[i].direction)) {
@@ -551,12 +581,10 @@ export default class Board {
             const newPath: CompleteMove = {
                 moveIndexes: isRoot ? [...currentPath.moveIndexes] : [...currentPath.moveIndexes, currentNode.value],
                 moveTypes: isRoot ? [...currentPath.moveTypes] : [...currentPath.moveTypes, currentNode.attackType],
-                rating: 0,
             };
-    
+
             // If the node has no children, it’s a leaf node—record the path
             if (currentNode.children.length === 0) {
-                newPath.rating = currentNode.rating;
                 paths.push(newPath);
                 return;
             }
@@ -570,7 +598,6 @@ export default class Board {
         const initialMove: CompleteMove = {
             moveIndexes: [],
             moveTypes: [],
-            rating: 0,
         };
     
         traverse(node, initialMove, true); // Start traversal with the root node
@@ -595,19 +622,19 @@ export default class Board {
         const node: TreeNode<number> =  {
             value: index,
             children: [],
-            isComplete: !this.hasLegalMove(index, pieceType, previousMoveDirection),
+            // A paika (non-attacking) move always ends the turn, so it can't be followed by an attack.
+            isComplete: (previousMoveDirection !== null && attackType === AttackType.NONE)
+                || !this.hasLegalMove(index, pieceType, previousMoveDirection),
             attackType: attackType,
-            rating: null,
         };
 
         const boardState = this.saveBoardState();
 
         // Get possible moves from the current index
         const possibleMoves = this.getPossibleMovesForCell(index);
-    
+
         // If the chain is complete, stop recursion
         if (node.isComplete) {
-            node.rating = this.rateBoardPositionSimple(boardState, pieceType);
             return node;
         }
     
@@ -631,45 +658,75 @@ export default class Board {
     }
 
     /**
-     * @param boardState the state of the board to give a rating for.
-     * @param pieceType the player who we want the rating to be relative to (positive if good position, negative if bad position).
-     * @returns a number representing the rating of the overall board positions.
+     * Plays a complete turn (every step of a CompleteMove) for real, so that afterwards the turn has passed to the
+     * opponent. Use saveBoardState/resetBoardState around this to explore a move without keeping it.
+     * @param startIndex the index of the piece being moved at the start of the turn.
+     * @param move the complete move, as returned by getAllPossibleCompleteMoves.
      */
-    private rateBoardPositionSimple(boardState: BoardState, pieceType: PieceType): number {
-        if (pieceType === PieceType.WHITE) {
-            return boardState.numWhitePieces - boardState.numBlackPieces;
-        } else {
-            return boardState.numBlackPieces - boardState.numWhitePieces;
+    public applyCompleteMove(startIndex: number, move: CompleteMove): void {
+        let index = startIndex;
+        for (let i = 0; i < move.moveIndexes.length; i++) {
+            const nextIndex = move.moveIndexes[i];
+            const direction = getDirectionFromDeltaIndex(nextIndex - index, this.columns);
+            this.setAttackOrWithdraw(move.moveTypes[i]);
+            const canMoveAgain = this.performMove(index, direction);
+            const isLastStep = i === move.moveIndexes.length - 1;
+            if (canMoveAgain === isLastStep) {
+                throw new Error('The complete move does not match the moves allowed by the board.');
+            }
+            index = nextIndex;
         }
     }
 
-    public getBestMoveSimple(pieceType: PieceType): BestMove | null {
-        const allMoves = this.getAllPossibleCompleteMoves(pieceType);
-        let highestRatingMove: CompleteMove | null = null;
-        let startIndex: number | null = null;
-    
-        // Iterate through the startIndexes and moves
-        for (let i = 0; i < allMoves.startIndexes.length; i++) {
-            const currentStartIndex = allMoves.startIndexes[i];
-            const currentMoves = allMoves.moves[i];
-    
-            // Iterate through the moves in the current group
-            for (const move of currentMoves) {
-                if (!highestRatingMove || move.rating! > highestRatingMove.rating!) {
-                    highestRatingMove = move;
-                    startIndex = currentStartIndex;
+    /**
+     * @param pieceType the player whose pieces we want to count.
+     * @returns the number of pieces that player has left on the board.
+     */
+    public getNumPieces(pieceType: PieceType): number {
+        if (pieceType === PieceType.WHITE) return this.numWhitePieces;
+        if (pieceType === PieceType.BLACK) return this.numBlackPieces;
+        return 0;
+    }
+
+    /**
+     * @returns whether the cell at this index is a strong intersection (connected in all 8 directions).
+     */
+    public isStrongCell(index: number): boolean {
+        return this.board[index].getCellType() === CellType.STRONG;
+    }
+
+    /**
+     * @returns the indexes of all the cells connected to this cell.
+     */
+    public getConnectedIndexes(index: number): number[] {
+        return this.board[index].getCellConnections().map(connection => connection.index);
+    }
+
+    /**
+     * Finds every one of the defender's pieces that the attacker could capture with the first step of their
+     * next turn. Only the first step is considered (not the whole capture chain) to keep this cheap.
+     * Should only be called between turns (not in the middle of a capture chain).
+     * @param attacker the player who would be attacking.
+     * @returns the indexes of the defender's pieces that could be captured.
+     */
+    public getCapturablePieces(attacker: PieceType): Set<number> {
+        const capturable = new Set<number>();
+        const defender = getOppositePieceType(attacker);
+        const boardState = this.saveBoardState();
+        for (const index of this.getPiecesThatPlayerCanMove(attacker)) {
+            for (const move of this.getPossibleMovesForCell(index)) {
+                if (move.attackType === AttackType.NONE) continue;
+                this.setAttackOrWithdraw(move.attackType);
+                this.performMove(index, move.direction, true);
+                for (let i = 0; i < this.board.length; i++) {
+                    if (boardState.positions[i] === defender && this.board[i].getPieceType() === PieceType.EMPTY) {
+                        capturable.add(i);
+                    }
                 }
+                this.resetBoardState(boardState);
             }
         }
-    
-        if (highestRatingMove && startIndex !== null) {
-            return {
-                startIndex,
-                move: highestRatingMove,
-            };
-        }
-    
-        return null;
+        return capturable;
     }
 
 }
