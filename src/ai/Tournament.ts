@@ -4,6 +4,7 @@ import BotRandomPlayer from './BotRandomPlayer.js';
 import SearchBot from './SearchBot.js';
 import { BotPreset } from './presets.js';
 import { Rng } from './Search.js';
+import { Opening, applyOpening } from './tuning/Openings.js';
 
 export interface Player {
     makeMove(): { canMoveAgain: boolean };
@@ -53,9 +54,19 @@ export const RandomContestant: Contestant = {
 /**
  * Plays one game. A player who can't move on their turn loses. The game is a draw if nobody captures for
  * NO_CAPTURE_DRAW_TURNS turns, or (as a safety net) once maxTurns is reached.
+ * @param opening turns to play before the bots take over (not counted in the stats).
+ * @param onTurnStart called with the board before each turn the bots play (e.g. to record positions).
  */
-export function playGame(white: Contestant, black: Contestant, maxTurns: number = DEFAULT_MAX_TURNS, rng: Rng = Math.random): GameStats {
+export function playGame(
+    white: Contestant,
+    black: Contestant,
+    maxTurns: number = DEFAULT_MAX_TURNS,
+    rng: Rng = Math.random,
+    opening: Opening = [],
+    onTurnStart?: (board: Board) => void,
+): GameStats {
     const board = new Board();
+    applyOpening(board, opening);
     const whitePlayer = white.create(PieceType.WHITE, board, rng);
     const blackPlayer = black.create(PieceType.BLACK, board, rng);
     let whiteMs = 0;
@@ -69,6 +80,7 @@ export function playGame(white: Contestant, black: Contestant, maxTurns: number 
             return { result: isWhitesTurn ? 'BLACK' : 'WHITE', turns, whiteMs, blackMs };
         }
 
+        onTurnStart?.(board);
         const player = isWhitesTurn ? whitePlayer : blackPlayer;
         const start = performance.now();
         while (player.makeMove().canMoveAgain) {}

@@ -28,16 +28,23 @@ if (gamesOverride !== undefined) config.gamesPerPair = gamesOverride;
 
 const percent = (x: number) => `${(x * 100).toFixed(1)}%`;
 const wholePercent = (x: number) => `${Math.round(x * 100)}%`;
+const listWeights = (weights: Weights) => EVALUATOR_NAMES.filter(n => (weights[n] ?? 0) !== 0).map(n => `${n} ${weights[n]}`).join(', ');
 const formatWeights = (spec: BotSpec) => spec.kind === 'random'
     ? 'random moves'
-    : `depth ${spec.depth}: ` + EVALUATOR_NAMES.filter(n => (spec.weights[n] ?? 0) !== 0).map(n => `${n} ${spec.weights[n]}`).join(', ');
+    : `depth ${spec.depth}: ` + listWeights(spec.weights)
+        // Endgame settings, when the bot has any
+        + (spec.endgameWeights !== undefined ? `; endgame: ${listWeights(spec.endgameWeights)}` : '')
+        + (spec.endgameDepth !== undefined ? `; endgame depth ${spec.endgameDepth}` : '');
 
 function printTable(rows: string[][]): void {
     const widths = rows[0].map((_, col) => Math.max(...rows.map(row => row[col].length)));
     for (const row of rows) console.log(row.map((cell, col) => cell.padEnd(widths[col] + 2)).join('').trimEnd());
 }
 
-console.log(`Tuning with ${basename(configPath)} (${config.mode ?? 'gauntlet'}, ${config.gamesPerPair ?? 20} games per pair, ${workers} worker${workers === 1 ? '' : 's'})`);
+const gamesDescription = config.openings
+    ? `${config.openings.count} openings of ${config.openings.turns} turns, each played with both colours`
+    : `${config.gamesPerPair ?? 20} games per pair`;
+console.log(`Tuning with ${basename(configPath)} (${config.mode ?? 'gauntlet'}, ${gamesDescription}, ${workers} worker${workers === 1 ? '' : 's'})`);
 
 let lastPrinted = 0;
 const result = await runTuning(config, workers, (completed, total) => {
@@ -121,6 +128,9 @@ writeFileSync(resultsPath, JSON.stringify({
         isVariant: p.isVariant,
         depth: p.spec.kind === 'search' ? p.spec.depth : null,
         weights: p.spec.kind === 'search' ? p.spec.weights : null as Weights | null,
+        // Left out of the JSON (undefined) for bots without endgame settings
+        endgameWeights: p.spec.kind === 'search' ? p.spec.endgameWeights : undefined,
+        endgameDepth: p.spec.kind === 'search' ? p.spec.endgameDepth : undefined,
         score: p.score,
         margin: p.margin,
         winRate: p.winRate,

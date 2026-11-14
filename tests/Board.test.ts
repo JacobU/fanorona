@@ -241,6 +241,38 @@ describe('Board Tests', () => {
         expect(board.getWinner()).to.be.equal(Winner.NONE);
     });
 
+    it('should let the player end their turn in the middle of a capture chain', () => {
+        const board = new Board(5, 9, '200202022200010222000200021100020000010000011');
+        expect(board.canEndTurn()).to.equal(false);
+        expect(() => board.endTurn()).to.throw();
+
+        // White approaches DOWN from 13 to 22, capturing 31, and could keep capturing.
+        expect(board.performMove(13, Direction.DOWN)).to.equal(true);
+        expect(board.canEndTurn()).to.equal(true);
+        // Only the piece in the middle of the chain can move, from where it is now.
+        expect(board.getPiecesThatPlayerCanMove(PieceType.WHITE)).to.deep.equal([22]);
+
+        board.resetBoardState({ ...board.saveBoardState(), turnsWithoutCapture: 7 });
+        board.endTurn();
+        expect(board.getTurn()).to.equal(Turn.BLACK);
+        expect(board.getTurnsWithoutCapture()).to.equal(0);
+        expect(board.canEndTurn()).to.equal(false);
+        expect(board.getBoardPositionsAsString()).to.equal('200202022200000222000210021100000000010000011');
+        expect(() => board.endTurn()).to.throw();
+    });
+
+    it('should not let the player end their turn after a paika move or a finished chain', () => {
+        const paikaBoard = new Board(5, 5, '1000000000000000000000002');
+        paikaBoard.performMove(0, Direction.RIGHT);
+        expect(paikaBoard.canEndTurn()).to.equal(false);
+
+        // White withdraws from 8 by moving to 0, and can't capture again from there.
+        const chainBoard = new Board(3, 3, '000210002');
+        expect(chainBoard.performMove(4, Direction.UPLEFT)).to.equal(false);
+        expect(chainBoard.canEndTurn()).to.equal(false);
+        expect(chainBoard.getTurn()).to.equal(Turn.BLACK);
+    });
+
     it('should be a draw after NO_CAPTURE_DRAW_TURNS turns without a capture', () => {
         // White at 0 and black at 24 shuffle back and forth without ever being able to attack.
         const board = new Board(5, 5, '1000000000000000000000002');

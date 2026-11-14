@@ -1,0 +1,20 @@
+Tuning with b3-roundrobin.json (roundRobin, 12 games per pair, 3 workers)
+  1/72 games played  2/72 games played  3/72 games played  5/72 games played  7/72 games played  8/72 games played  10/72 games played  12/72 games played  13/72 games played  14/72 games played  15/72 games played  16/72 games played  17/72 games played  18/72 games played  19/72 games played  20/72 games played  21/72 games played  22/72 games played  24/72 games played  25/72 games played  27/72 games played  28/72 games played  30/72 games played  31/72 games played  32/72 games played  34/72 games played  35/72 games played  36/72 games played  37/72 games played  38/72 games played  40/72 games played  41/72 games played  42/72 games played  43/72 games played  44/72 games played  46/72 games played  47/72 games played  48/72 games played  49/72 games played  51/72 games played  52/72 games played  54/72 games played  55/72 games played  56/72 games played  57/72 games played  58/72 games played  59/72 games played  60/72 games played  62/72 games played  63/72 games played  64/72 games played  66/72 games played  67/72 games played  68/72 games played  69/72 games played  70/72 games played  71/72 games played  72/72 games played in 186.2s
+
+Score         = points per game (win 1, draw ½). ± is how much of that could be luck (95% confidence).
+Win/Draw/Loss = share of games with each result.
+Decisive      = share of the games with a winner that this bot won (ignores draws).
+
+Bot             Score  ±      Win  Draw  Loss  Decisive  vs DeepFortress  vs Base  vs DeepSentinel  vs DeepPositional  ms/turn
+DeepFortress    52.8%  16.3%  31%  44%   25%   55%       -                45.8%    54.2%            58.3%              70.5
+Base            50.0%  16.3%  33%  33%   33%   50%       54.2%            -        58.3%            37.5%              55.5
+DeepSentinel    50.0%  16.3%  36%  28%   36%   50%       45.8%            41.7%    -                62.5%              92.9
+DeepPositional  47.2%  16.3%  17%  61%   22%   43%       41.7%            62.5%    37.5%            -                  36.4
+
+Bots:
+  DeepFortress: depth 4: material 100, vulnerability 30, strongPoints 5, lineExposure 5
+  Base: depth 4: material 100, vulnerability 6, strongPoints 15, lineExposure 31
+  DeepSentinel: depth 4: material 100, vulnerability 30
+  DeepPositional: depth 4: material 100, strongPoints 5, lineExposure 5
+
+Saved results to tuning\results\2026-11-14T12-39-51-b3-roundrobin.json

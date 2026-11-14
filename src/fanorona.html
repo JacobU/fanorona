@@ -20,7 +20,50 @@
             position: relative;
             width: 900px;
             height: 500px;
+        }
+
+        /* Row under the board for controls, with the End turn button on the right */
+        #board-controls {
+            width: 900px;
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 12px;
             margin-bottom: 20px;
+        }
+
+        /* Wooden buttons (End turn and Play Again). The border and text use the dark brown from the edge of the dark pieces. */
+        .wood-button {
+            padding: 10px 22px;
+            font-family: Georgia, 'Times New Roman', serif;
+            font-size: 16px;
+            font-weight: bold;
+            color: #a57e5a;
+            text-shadow: 0 1px 1px rgba(255, 255, 255, 0.6);
+            background: url('./assets/svg/wood.svg') center / cover;
+            border: 2px solid #a57e5a;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: filter 0.2s ease, box-shadow 0.2s ease, transform 0.1s ease;
+        }
+
+        .wood-button:hover {
+            filter: brightness(0.9);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+        }
+
+        .wood-button:active {
+            transform: translateY(1px);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25);
+        }
+
+        /* The End turn button is only made visible when the player can stop a capture chain,
+           and keeps its space when hidden so the page doesn't jump around. */
+        #end-turn-button {
+            visibility: hidden;
+        }
+
+        #end-turn-button.visible {
+            visibility: visible;
         }
 
         /* Optional: Add border for better visibility of the canvas */
@@ -150,29 +193,20 @@
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
         }
         
+        /* "You won!" / "You lost!" message, in the same font and dark brown as the buttons */
         #game-message {
             flex-grow: 1;
             text-align: center;
-            font-size: 16px;
-            color: #333;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            font-family: Georgia, 'Times New Roman', serif;
+            font-size: 26px;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+            color: #a57e5a;
+            text-shadow: 0 1px 1px rgba(255, 255, 255, 0.6);
         }
-        
+
         #play-again-button {
-            padding: 10px 20px;
-            font-size: 16px;
-            border: 1px solid #e0d6cc;
-            background-color: #ffffff;
-            color: #333;
-            cursor: pointer;
-            border-radius: 5px;
-            margin-right: 10px;
-            transition: background-color 0.3s ease, color 0.3s ease;
-        }
-        
-        #play-again-button:hover {
-            background-color: #f1e4d4;
-            color: #000;
+            margin-right: 20px;
         }
 
     </style>
@@ -190,9 +224,13 @@
         </div>
     </div>
 
+    <div id="board-controls">
+        <button id="end-turn-button" class="wood-button">End turn</button>
+    </div>
+
     <div id="message-container" style="display: none;">
         <p id="game-message"></p>
-        <button id="play-again-button">Play Again</button>
+        <button id="play-again-button" class="wood-button">Play Again</button>
     </div>
     
     <script type="module" src="./bundle.js"></script>

@@ -1,11 +1,12 @@
 import { Evaluator, WeightedTerm, weighted } from './Evaluator.js';
-import { material, vulnerability, mobility, strongPoints, lineExposure } from './evaluators.js';
+import { material, vulnerability, mobility, strongPoints, lineExposure, edgeExposure, centrality } from './evaluators.js';
+import { blendEndgame } from './endgame.js';
 
 /**
  * Every evaluator that can be weighted, by name. Add new evaluators here to make them available to presets
  * and to the tuning script.
  */
-export const EVALUATORS = { material, vulnerability, mobility, strongPoints, lineExposure };
+export const EVALUATORS = { material, vulnerability, mobility, strongPoints, lineExposure, edgeExposure, centrality };
 
 export type EvaluatorName = keyof typeof EVALUATORS;
 export const EVALUATOR_NAMES = Object.keys(EVALUATORS) as EvaluatorName[];
@@ -23,7 +24,17 @@ export interface BotPreset {
     description: string,
     depth: number,
     weights: Weights,
+    // Extra weights that fade in as the board empties (see endgame.ts). Not set = no endgame blending.
+    endgameWeights?: Weights,
+    // Search depth to use once there are few pieces left (see searchDepthFor). Not set = always use depth.
+    endgameDepth?: number,
+    // Rates positions using weights, plus endgameWeights blended in during the endgame.
     evaluator: Evaluator,
+}
+
+export interface EndgameOptions {
+    endgameWeights?: Weights,
+    endgameDepth?: number,
 }
 
 export function evaluatorFromWeights(weights: Weights): Evaluator {
@@ -33,8 +44,15 @@ export function evaluatorFromWeights(weights: Weights): Evaluator {
     return weighted(terms);
 }
 
-export function createPreset(name: string, depth: number, weights: Weights, description: string = ''): BotPreset {
-    return { name, description, depth, weights, evaluator: evaluatorFromWeights(weights) };
+export function createPreset(name: string, depth: number, weights: Weights, description: string = '', options: EndgameOptions = {}): BotPreset {
+    const preset: BotPreset = { name, description, depth, weights, evaluator: evaluatorFromWeights(weights) };
+    // Only add the endgame fields when they're set, so presets without them look exactly as they did before.
+    if (options.endgameWeights !== undefined) {
+        preset.endgameWeights = options.endgameWeights;
+        preset.evaluator = blendEndgame(preset.evaluator, evaluatorFromWeights(options.endgameWeights));
+    }
+    if (options.endgameDepth !== undefined) preset.endgameDepth = options.endgameDepth;
+    return preset;
 }
 
 // Weights are integers (to avoid floating point ties being missed) and are just starting guesses to be tuned
@@ -91,7 +109,21 @@ export const DeepFortress = createPreset('DeepFortress', 4,
     Fortress.weights,
     'Fortress, searching 4 turns ahead.');
 
+// Endgame variants: once only a few pieces are left, also push the opponent's pieces towards the edge (keeping
+// ours in the middle) and search deeper. These weights are starting guesses (relative to material's 100).
+const FORTRESS_ENDGAME: EndgameOptions = { endgameWeights: { edgeExposure: 40, centrality: 20 }, endgameDepth: 6 };
+
+export const FortressEndgame = createPreset('FortressEndgame', 2,
+    Fortress.weights,
+    'Fortress, also pushing opponent pieces to the edge and searching 6 turns ahead once few pieces are left.',
+    FORTRESS_ENDGAME);
+
+export const DeepFortressEndgame = createPreset('DeepFortressEndgame', 4,
+    Fortress.weights,
+    'DeepFortress, also pushing opponent pieces to the edge and searching 6 turns ahead once few pieces are left.',
+    FORTRESS_ENDGAME);
+
 export const ALL_PRESETS: BotPreset[] = [
     Greedy, Lookahead, Guardian, Sentinel, Strangler, Positional, AllRounder, Fortress,
-    DeepSentinel, DeepPositional, DeepFortress,
+    DeepSentinel, DeepPositional, DeepFortress, FortressEndgame, DeepFortressEndgame,
 ];

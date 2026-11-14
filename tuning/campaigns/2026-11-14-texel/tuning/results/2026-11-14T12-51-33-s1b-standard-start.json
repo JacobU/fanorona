@@ -1,0 +1,448 @@
+{
+  "date": "2026-11-14T12:51:33.898Z",
+  "configFile": "s1b-standard-start.json",
+  "config": {
+    "mode": "roundRobin",
+    "opponents": [
+      "Fortress",
+      "AllRounder"
+    ],
+    "base": {
+      "depth": 2,
+      "weights": {
+        "material": 100,
+        "vulnerability": 6,
+        "mobility": 0,
+        "strongPoints": 15,
+        "lineExposure": 31
+      }
+    },
+    "variants": [
+      {
+        "name": "v0 m0 s20 l40",
+        "weights": {
+          "vulnerability": 0,
+          "mobility": 0,
+          "strongPoints": 20,
+          "lineExposure": 40
+        }
+      },
+      {
+        "name": "v5 m0 s19 l34",
+        "weights": {
+          "vulnerability": 5,
+          "mobility": 0,
+          "strongPoints": 19,
+          "lineExposure": 34
+        }
+      },
+      {
+        "name": "v0 m2 s17 l37",
+        "weights": {
+          "vulnerability": 0,
+          "mobility": 2,
+          "strongPoints": 17,
+          "lineExposure": 37
+        }
+      },
+      {
+        "name": "v4 m0 s0 l29",
+        "weights": {
+          "vulnerability": 4,
+          "mobility": 0,
+          "strongPoints": 0,
+          "lineExposure": 29
+        }
+      }
+    ],
+    "gamesPerPair": 40
+  },
+  "totalGames": 840,
+  "elapsedMs": 31486,
+  "results": [
+    {
+      "name": "v0 m2 s17 l37",
+      "isVariant": true,
+      "depth": 2,
+      "weights": {
+        "material": 100,
+        "vulnerability": 0,
+        "mobility": 2,
+        "strongPoints": 17,
+        "lineExposure": 37
+      },
+      "score": 0.71875,
+      "margin": 0.05688341283933305,
+      "winRate": 0.4708333333333333,
+      "drawRate": 0.49583333333333335,
+      "lossRate": 0.03333333333333333,
+      "decisiveWinRate": 0.9338842975206612,
+      "wins": 113,
+      "draws": 119,
+      "losses": 8,
+      "turnLimitDraws": 0,
+      "msPerTurn": 2.4918758374011056,
+      "vs": {
+        "Base": {
+          "wins": 17,
+          "draws": 23,
+          "losses": 0
+        },
+        "v0 m0 s20 l40": {
+          "wins": 7,
+          "draws": 27,
+          "losses": 6
+        },
+        "v5 m0 s19 l34": {
+          "wins": 23,
+          "draws": 17,
+          "losses": 0
+        },
+        "v4 m0 s0 l29": {
+          "wins": 22,
+          "draws": 17,
+          "losses": 1
+        },
+        "Fortress": {
+          "wins": 25,
+          "draws": 15,
+          "losses": 0
+        },
+        "AllRounder": {
+          "wins": 19,
+          "draws": 20,
+          "losses": 1
+        }
+      }
+    },
+    {
+      "name": "v0 m0 s20 l40",
+      "isVariant": true,
+      "depth": 2,
+      "weights": {
+        "material": 100,
+        "vulnerability": 0,
+        "mobility": 0,
+        "strongPoints": 20,
+        "lineExposure": 40
+      },
+      "score": 0.6895833333333333,
+      "margin": 0.058535097249032594,
+      "winRate": 0.5291666666666667,
+      "drawRate": 0.32083333333333336,
+      "lossRate": 0.15,
+      "decisiveWinRate": 0.7791411042944786,
+      "wins": 127,
+      "draws": 77,
+      "losses": 36,
+      "turnLimitDraws": 0,
+      "msPerTurn": 0.4246743177570075,
+      "vs": {
+        "Base": {
+          "wins": 19,
+          "draws": 11,
+          "losses": 10
+        },
+        "v5 m0 s19 l34": {
+          "wins": 25,
+          "draws": 3,
+          "losses": 12
+        },
+        "v0 m2 s17 l37": {
+          "wins": 6,
+          "draws": 27,
+          "losses": 7
+        },
+        "v4 m0 s0 l29": {
+          "wins": 26,
+          "draws": 8,
+          "losses": 6
+        },
+        "Fortress": {
+          "wins": 23,
+          "draws": 16,
+          "losses": 1
+        },
+        "AllRounder": {
+          "wins": 28,
+          "draws": 12,
+          "losses": 0
+        }
+      }
+    },
+    {
+      "name": "Base",
+      "isVariant": true,
+      "depth": 2,
+      "weights": {
+        "material": 100,
+        "vulnerability": 6,
+        "mobility": 0,
+        "strongPoints": 15,
+        "lineExposure": 31
+      },
+      "score": 0.5979166666666667,
+      "margin": 0.06203386148761671,
+      "winRate": 0.48333333333333334,
+      "drawRate": 0.22916666666666666,
+      "lossRate": 0.2875,
+      "decisiveWinRate": 0.6270270270270271,
+      "wins": 116,
+      "draws": 55,
+      "losses": 69,
+      "turnLimitDraws": 0,
+      "msPerTurn": 0.9041028619272358,
+      "vs": {
+        "v0 m0 s20 l40": {
+          "wins": 10,
+          "draws": 11,
+          "losses": 19
+        },
+        "v5 m0 s19 l34": {
+          "wins": 17,
+          "draws": 4,
+          "losses": 19
+        },
+        "v0 m2 s17 l37": {
+          "wins": 0,
+          "draws": 23,
+          "losses": 17
+        },
+        "v4 m0 s0 l29": {
+          "wins": 20,
+          "draws": 6,
+          "losses": 14
+        },
+        "Fortress": {
+          "wins": 37,
+          "draws": 3,
+          "losses": 0
+        },
+        "AllRounder": {
+          "wins": 32,
+          "draws": 8,
+          "losses": 0
+        }
+      }
+    },
+    {
+      "name": "v5 m0 s19 l34",
+      "isVariant": true,
+      "depth": 2,
+      "weights": {
+        "material": 100,
+        "vulnerability": 5,
+        "mobility": 0,
+        "strongPoints": 19,
+        "lineExposure": 34
+      },
+      "score": 0.54375,
+      "margin": 0.06301610037323795,
+      "winRate": 0.42916666666666664,
+      "drawRate": 0.22916666666666666,
+      "lossRate": 0.3416666666666667,
+      "decisiveWinRate": 0.5567567567567567,
+      "wins": 103,
+      "draws": 55,
+      "losses": 82,
+      "turnLimitDraws": 0,
+      "msPerTurn": 0.7891426776139383,
+      "vs": {
+        "Base": {
+          "wins": 19,
+          "draws": 4,
+          "losses": 17
+        },
+        "v0 m0 s20 l40": {
+          "wins": 12,
+          "draws": 3,
+          "losses": 25
+        },
+        "v0 m2 s17 l37": {
+          "wins": 0,
+          "draws": 17,
+          "losses": 23
+        },
+        "v4 m0 s0 l29": {
+          "wins": 20,
+          "draws": 3,
+          "losses": 17
+        },
+        "Fortress": {
+          "wins": 18,
+          "draws": 22,
+          "losses": 0
+        },
+        "AllRounder": {
+          "wins": 34,
+          "draws": 6,
+          "losses": 0
+        }
+      }
+    },
+    {
+      "name": "v4 m0 s0 l29",
+      "isVariant": true,
+      "depth": 2,
+      "weights": {
+        "material": 100,
+        "vulnerability": 4,
+        "mobility": 0,
+        "strongPoints": 0,
+        "lineExposure": 29
+      },
+      "score": 0.47708333333333336,
+      "margin": 0.06319224942769074,
+      "winRate": 0.32083333333333336,
+      "drawRate": 0.3125,
+      "lossRate": 0.36666666666666664,
+      "decisiveWinRate": 0.4666666666666667,
+      "wins": 77,
+      "draws": 75,
+      "losses": 88,
+      "turnLimitDraws": 0,
+      "msPerTurn": 0.795977321785472,
+      "vs": {
+        "Base": {
+          "wins": 14,
+          "draws": 6,
+          "losses": 20
+        },
+        "v0 m0 s20 l40": {
+          "wins": 6,
+          "draws": 8,
+          "losses": 26
+        },
+        "v5 m0 s19 l34": {
+          "wins": 17,
+          "draws": 3,
+          "losses": 20
+        },
+        "v0 m2 s17 l37": {
+          "wins": 1,
+          "draws": 17,
+          "losses": 22
+        },
+        "Fortress": {
+          "wins": 18,
+          "draws": 22,
+          "losses": 0
+        },
+        "AllRounder": {
+          "wins": 21,
+          "draws": 19,
+          "losses": 0
+        }
+      }
+    },
+    {
+      "name": "Fortress",
+      "isVariant": false,
+      "depth": 2,
+      "weights": {
+        "material": 100,
+        "vulnerability": 30,
+        "strongPoints": 5,
+        "lineExposure": 5
+      },
+      "score": 0.25,
+      "margin": 0.05478366544874484,
+      "winRate": 0.004166666666666667,
+      "drawRate": 0.49166666666666664,
+      "lossRate": 0.5041666666666667,
+      "decisiveWinRate": 0.00819672131147541,
+      "wins": 1,
+      "draws": 118,
+      "losses": 121,
+      "turnLimitDraws": 0,
+      "msPerTurn": 0.9716725336454088,
+      "vs": {
+        "Base": {
+          "wins": 0,
+          "draws": 3,
+          "losses": 37
+        },
+        "v0 m0 s20 l40": {
+          "wins": 1,
+          "draws": 16,
+          "losses": 23
+        },
+        "v5 m0 s19 l34": {
+          "wins": 0,
+          "draws": 22,
+          "losses": 18
+        },
+        "v0 m2 s17 l37": {
+          "wins": 0,
+          "draws": 15,
+          "losses": 25
+        },
+        "v4 m0 s0 l29": {
+          "wins": 0,
+          "draws": 22,
+          "losses": 18
+        },
+        "AllRounder": {
+          "wins": 0,
+          "draws": 40,
+          "losses": 0
+        }
+      }
+    },
+    {
+      "name": "AllRounder",
+      "isVariant": false,
+      "depth": 2,
+      "weights": {
+        "material": 100,
+        "vulnerability": 30,
+        "mobility": 2,
+        "strongPoints": 5,
+        "lineExposure": 5
+      },
+      "score": 0.22291666666666668,
+      "margin": 0.052656927886064034,
+      "winRate": 0.004166666666666667,
+      "drawRate": 0.4375,
+      "lossRate": 0.5583333333333333,
+      "decisiveWinRate": 0.007407407407407408,
+      "wins": 1,
+      "draws": 105,
+      "losses": 134,
+      "turnLimitDraws": 0,
+      "msPerTurn": 4.303401201602149,
+      "vs": {
+        "Base": {
+          "wins": 0,
+          "draws": 8,
+          "losses": 32
+        },
+        "v0 m0 s20 l40": {
+          "wins": 0,
+          "draws": 12,
+          "losses": 28
+        },
+        "v5 m0 s19 l34": {
+          "wins": 0,
+          "draws": 6,
+          "losses": 34
+        },
+        "v0 m2 s17 l37": {
+          "wins": 1,
+          "draws": 20,
+          "losses": 19
+        },
+        "v4 m0 s0 l29": {
+          "wins": 0,
+          "draws": 19,
+          "losses": 21
+        },
+        "Fortress": {
+          "wins": 0,
+          "draws": 40,
+          "losses": 0
+        }
+      }
+    }
+  ]
+}

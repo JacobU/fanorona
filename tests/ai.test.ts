@@ -65,6 +65,16 @@ describe('Board.applyCompleteMove tests', () => {
         expect(board.getTurn()).to.equal(Turn.BLACK);
     });
 
+    it('should end the turn when the move stops part way through a capture chain', () => {
+        // White withdraws from 3 by moving to 5 and could then capture 8, but stops.
+        const board = new Board(3, 3, '000210002');
+        board.applyCompleteMove(4, { moveIndexes: [5], moveTypes: [AttackType.WITHDRAW] });
+        expect(board.getBoardPositionsAsString()).to.equal('000001002');
+        expect(board.getTurn()).to.equal(Turn.BLACK);
+        expect(board.canEndTurn()).to.equal(false);
+        expect(board.getTurnsWithoutCapture()).to.equal(0);
+    });
+
     it('should play a multi-step capture chain', () => {
         const board = new Board(3, 3, '000210002');
         board.applyCompleteMove(4, { moveIndexes: [5, 2], moveTypes: [AttackType.WITHDRAW, AttackType.WITHDRAW] });
@@ -104,6 +114,21 @@ describe('Search tests', () => {
         expect(chooseMove(board, PieceType.WHITE, material, 1)!.score).to.equal(0);
     });
 
+    it('depth 2 should stop a capture chain early when continuing would be punished', () => {
+        // Found from random play. White to move. Approaching from 33 to 24 captures, and the chain could
+        // continue, but continuing leaves white worse off after black's reply.
+        const board = new Board(5, 9, '220202222222000220212000012111100110111101010');
+        const rngs = [() => 0, () => 0.5, () => 0.999];
+        for (const rng of rngs) {
+            const best = chooseMove(board, PieceType.WHITE, material, 2, rng)!;
+            expect(moveKey(best)).to.equal('33:24');
+        }
+        const movesFrom33 = board.getAllPossibleCompleteMoves(PieceType.WHITE);
+        const longerChains = movesFrom33.moves[movesFrom33.startIndexes.indexOf(33)]
+            .filter(m => m.moveIndexes[0] === 24 && m.moveIndexes.length > 1);
+        expect(longerChains.length).to.be.greaterThan(0);
+    });
+
     it('should return null when the player has no moves', () => {
         const board = new Board(3, 3, '222212222');
         expect(chooseMove(board, PieceType.WHITE, material, 2)).to.be.null;
@@ -141,7 +166,9 @@ describe('Search tests', () => {
 });
 
 describe('Tournament tests', () => {
-    it('every preset should be able to play a full game', () => {
+    it('every preset should be able to play a full game', function () {
+        // The depth 4 presets take a few seconds per game.
+        this.timeout(60000);
         for (const preset of ALL_PRESETS) {
             const stats = playGame(contestantFromPreset(preset), RandomContestant);
             expect(['WHITE', 'BLACK', 'DRAW']).to.include(stats.result);

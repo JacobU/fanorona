@@ -1,0 +1,10 @@
+{
+  "mode": "gauntlet",
+  "openings": { "count": 50, "turns": 4, "seed": 2 },
+  "opponents": ["Fortress", "AllRounder", "Lookahead"],
+  "base": { "depth": 2, "weights": { "material": 100, "vulnerability": 37, "mobility": 0, "strongPoints": 20, "lineExposure": 44 } },
+  "variants": [
+    { "name": "Old + Texel vuln v37 s15 l31", "weights": { "vulnerability": 37, "mobility": 0, "strongPoints": 15, "lineExposure": 31 } },
+    { "name": "Old + Texel strong v6 s65 l31", "weights": { "vulnerability": 6, "mobility": 0, "strongPoints": 65, "lineExposure": 31 } }
+  ]
+}

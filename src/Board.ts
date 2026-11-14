@@ -262,8 +262,6 @@ export default class Board {
             throw new Error('Cant move an EMPTY piece.')
         }
 
-        this.currentlyMovingPiece = index;
-
         // Always add the index that is has been to
         this.turnMoveIndexes.push(index);
 
@@ -290,6 +288,8 @@ export default class Board {
 
         // Set the new index after moving
         index = this.movePiece(pieceType, index, direction);
+        // Track where the piece is now, since only this piece can move again in this turn.
+        this.currentlyMovingPiece = index;
         if (attackType !== AttackType.NONE) {
             this.removeAttackedPieces(index, pieceType, direction, attackType);
             const canMoveAgain = this.canContinueAttackChain(index, pieceType, direction);
@@ -300,12 +300,42 @@ export default class Board {
         // If the player cant move again, reset the index tracker and the turn
         if (!virtualMove) {
             // Every move in a capture chain is an attack, so the turn captured something exactly when its last move did.
-            this.turnsWithoutCapture = attackType === AttackType.NONE ? this.turnsWithoutCapture + 1 : 0;
-            this.turnMoveIndexes = [];
-            this.currentlyMovingPiece = null;
-            this.currentTurn = this.currentTurn ? Turn.WHITE : Turn.BLACK;
+            this.finishTurn(attackType !== AttackType.NONE);
         }
         return false;
+    }
+
+    /**
+     * Only the first capture of a turn is compulsory, so after any capture the player may stop even if they
+     * could keep capturing.
+     * @returns whether the current player is in the middle of a capture chain and can choose to end their turn.
+     */
+    public canEndTurn(): boolean {
+        return this.currentlyMovingPiece !== null
+            && this.turnMoveIndexes.length > 0
+            && this.getWinner() === Winner.NONE;
+    }
+
+    /**
+     * Ends the current player's turn in the middle of a capture chain (see canEndTurn).
+     */
+    public endTurn(): void {
+        if (!this.canEndTurn()) {
+            throw new Error('The turn can only be ended in the middle of a capture chain.');
+        }
+        // A turn can only be in the middle of a chain after a capture.
+        this.finishTurn(true);
+    }
+
+    /**
+     * Resets the turn tracking and passes the turn to the other player.
+     * @param captured whether any pieces were captured during the turn.
+     */
+    private finishTurn(captured: boolean): void {
+        this.turnsWithoutCapture = captured ? 0 : this.turnsWithoutCapture + 1;
+        this.turnMoveIndexes = [];
+        this.currentlyMovingPiece = null;
+        this.currentTurn = this.currentTurn ? Turn.WHITE : Turn.BLACK;
     }
 
     public getTurn() {
@@ -588,6 +618,12 @@ export default class Board {
                 paths.push(newPath);
                 return;
             }
+
+            // Only the first capture is compulsory, so the player can also stop after any capture in the chain.
+            // Record that as a complete move too (before the moves that continue the chain).
+            if (!isRoot && currentNode.attackType !== AttackType.NONE) {
+                paths.push(newPath);
+            }
     
             // Traverse all children
             for (const child of currentNode.children) {
@@ -671,8 +707,12 @@ export default class Board {
             this.setAttackOrWithdraw(move.moveTypes[i]);
             const canMoveAgain = this.performMove(index, direction);
             const isLastStep = i === move.moveIndexes.length - 1;
-            if (canMoveAgain === isLastStep) {
+            if (!canMoveAgain && !isLastStep) {
                 throw new Error('The complete move does not match the moves allowed by the board.');
+            }
+            // The move stops part way through a capture chain, so end the turn here.
+            if (canMoveAgain && isLastStep) {
+                this.endTurn();
             }
             index = nextIndex;
         }

@@ -1,0 +1,11 @@
+{
+  "mode": "gauntlet",
+  "openings": { "count": 64, "turns": 4, "seed": 6 },
+  "opponents": ["Fortress", "AllRounder", "Lookahead"],
+  "base": { "depth": 2, "weights": { "material": 100, "vulnerability": -3, "mobility": -1, "strongPoints": 12, "lineExposure": 9 } },
+  "variants": [
+    { "name": "s030 m-2", "weights": { "mobility": -2 } },
+    { "name": "s030 m0", "weights": { "mobility": 0 } },
+    { "name": "s030 m+1", "weights": { "mobility": 1 } }
+  ]
+}

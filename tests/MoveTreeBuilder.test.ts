@@ -21,6 +21,8 @@ describe('MoveTreeBuilder tests', () => {
         const possibleMoves = board.getAllPossibleMovesForSinglePiece(4);
         const expectedPossibleMoves: CompleteMove[] = [
             { moveIndexes: [ 0 ], moveTypes: [ AttackType.WITHDRAW ] },
+            // Stopping after the first capture is allowed too
+            { moveIndexes: [ 5 ], moveTypes: [ AttackType.WITHDRAW ] },
             { moveIndexes: [ 5, 2 ], moveTypes: [ AttackType.WITHDRAW, AttackType.WITHDRAW ] }
         ];
         expect(possibleMoves).to.deep.equals(expectedPossibleMoves);
@@ -48,7 +50,9 @@ describe('MoveTreeBuilder tests', () => {
 
         const possibleMoves = board.getAllPossibleMovesForSinglePiece(4);
         const expectedPossibleMoves: CompleteMove[] = [
+            { moveIndexes: [ 1 ], moveTypes: [ AttackType.WITHDRAW ] },
             { moveIndexes: [ 1, 2 ], moveTypes: [ AttackType.WITHDRAW, AttackType.WITHDRAW ] },
+            { moveIndexes: [ 2 ], moveTypes: [ AttackType.WITHDRAW ] },
             { moveIndexes: [ 2, 1 ], moveTypes: [ AttackType.WITHDRAW, AttackType.APPROACH ] },
             { moveIndexes: [ 8 ], moveTypes: [ AttackType.WITHDRAW ] }
         ];
@@ -60,13 +64,21 @@ describe('MoveTreeBuilder tests', () => {
 
         const possibleMoves = board.getAllPossibleMovesForSinglePiece(12);
         const expectedPossibleMoves: CompleteMove[] = [
+            { moveIndexes: [ 7 ], moveTypes: [ AttackType.APPROACH ] },
+            { moveIndexes: [ 7, 8 ], moveTypes: [ AttackType.APPROACH, AttackType.WITHDRAW ] },
+            { moveIndexes: [ 7, 8, 2 ], moveTypes: [ AttackType.APPROACH, AttackType.WITHDRAW, AttackType.WITHDRAW ] },
+            { moveIndexes: [ 7, 8, 2, 6 ], moveTypes: [ AttackType.APPROACH, AttackType.WITHDRAW, AttackType.WITHDRAW, AttackType.APPROACH ] },
             { moveIndexes: [ 7, 8, 2, 6, 11 ], moveTypes: [ AttackType.APPROACH, AttackType.WITHDRAW, AttackType.WITHDRAW, AttackType.APPROACH, AttackType.APPROACH ] },
+            { moveIndexes: [ 8 ], moveTypes: [ AttackType.WITHDRAW ] },
             { moveIndexes: [ 8, 7 ], moveTypes: [ AttackType.WITHDRAW, AttackType.APPROACH ] },
             { moveIndexes: [ 11 ], moveTypes: [ AttackType.APPROACH ] },
             { moveIndexes: [ 13 ], moveTypes: [ AttackType.APPROACH ] },
+            { moveIndexes: [ 18 ], moveTypes: [ AttackType.APPROACH ] },
             { moveIndexes: [ 18, 17 ], moveTypes: [ AttackType.APPROACH, AttackType.APPROACH ] },
             { moveIndexes: [ 18, 22 ], moveTypes: [ AttackType.APPROACH, AttackType.WITHDRAW ] },
+            { moveIndexes: [ 18 ], moveTypes: [ AttackType.WITHDRAW ] },
             { moveIndexes: [ 18, 17 ], moveTypes: [ AttackType.WITHDRAW, AttackType.APPROACH ] },
+            { moveIndexes: [ 18, 22 ], moveTypes: [ AttackType.WITHDRAW, AttackType.WITHDRAW ] },
             { moveIndexes: [ 18, 22, 23 ], moveTypes: [ AttackType.WITHDRAW, AttackType.WITHDRAW, AttackType.APPROACH ] }
         ];
         expect(possibleMoves).to.deep.equals(expectedPossibleMoves);
@@ -81,9 +93,12 @@ describe('MoveTreeBuilder tests', () => {
             startIndexes: [1, 8],
             moves: [
                 [
+                    { moveIndexes: [2], moveTypes: [AttackType.WITHDRAW] },
+                    { moveIndexes: [2, 4], moveTypes: [AttackType.WITHDRAW, AttackType.APPROACH] },
                     { moveIndexes: [2, 4, 5], moveTypes: [AttackType.WITHDRAW, AttackType.APPROACH, AttackType.WITHDRAW] }
                 ],
                 [
+                    { moveIndexes: [4], moveTypes: [AttackType.APPROACH] },
                     { moveIndexes: [4, 2], moveTypes: [AttackType.APPROACH, AttackType.WITHDRAW] },
                     { moveIndexes: [4, 5], moveTypes: [AttackType.APPROACH, AttackType.WITHDRAW] },
                     { moveIndexes: [7], moveTypes: [AttackType.APPROACH] }

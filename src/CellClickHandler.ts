@@ -88,6 +88,33 @@ export default class CellClickHandler {
         return performedMove;
     }
 
+    /**
+     * @returns whether the player is in the middle of a capture chain and can choose to stop (only the first
+     * capture of a turn is compulsory).
+     */
+    public canEndTurn(): boolean {
+        return this.board.getTurn() === Turn.WHITE && this.board.canEndTurn();
+    }
+
+    /**
+     * Ends the player's turn in the middle of a capture chain. If they were choosing between approach and withdraw,
+     * that move is cancelled (it hasn't been played yet) and the turn ends where the piece is.
+     * @returns whether the turn was ended.
+     */
+    public handleEndTurn(): boolean {
+        if (!this.canEndTurn()) {
+            return false;
+        }
+        this.isSelectingAttackOrWithdraw = false;
+        this.approachOrWithdrawPieces = null;
+        this.approachOrWithdrawMoveIndex = null;
+        this.moveDirectionBeforeApproachWithdrawSelection = null;
+        this.board.endTurn();
+        this.deselectCell();
+        this.inTheMiddleOfAttackingChain = false;
+        return true;
+    }
+
     private deselectCell(): void {
         this.currentlySelectedCell = null;
         this.possibleMoveIndexes = [];

@@ -70,3 +70,47 @@ function countConnectedPairs(board: Board, pieceType: PieceType): number {
     }
     return pairs;
 }
+
+/**
+ * Edge cells (weighted by how many edges they touch, so corners count 2) occupied by the opponent minus those
+ * occupied by us. Pieces on the edge have fewer lines to move along and escape by, which matters most in the
+ * endgame when a few pieces are chasing each other around an empty board.
+ */
+export const edgeExposure: Evaluator = (board, pieceType) => {
+    const opponent = getOppositePieceType(pieceType);
+    const rows = board.getBoardsNumberOfRows();
+    const cols = board.getBoardsNumberOfColumns();
+    let score = 0;
+    for (let i = 0; i < rows * cols; i++) {
+        const piece = board.getPieceTypeAtIndex(i);
+        if (piece === PieceType.EMPTY) continue;
+        const row = Math.floor(i / cols);
+        const col = i % cols;
+        // 1 for each edge (top/bottom row, left/right column) the cell is on, so corners count 2.
+        const edges = (row === 0 || row === rows - 1 ? 1 : 0) + (col === 0 || col === cols - 1 ? 1 : 0);
+        if (piece === opponent) score += edges;
+        else if (piece === pieceType) score -= edges;
+    }
+    return score;
+};
+
+/**
+ * Sum of how far each of our pieces is from the nearest edge, minus the same for the opponent's pieces.
+ * A finer-grained version of edgeExposure that rewards holding the middle of the board.
+ */
+export const centrality: Evaluator = (board, pieceType) => {
+    const opponent = getOppositePieceType(pieceType);
+    const rows = board.getBoardsNumberOfRows();
+    const cols = board.getBoardsNumberOfColumns();
+    let score = 0;
+    for (let i = 0; i < rows * cols; i++) {
+        const piece = board.getPieceTypeAtIndex(i);
+        if (piece === PieceType.EMPTY) continue;
+        const row = Math.floor(i / cols);
+        const col = i % cols;
+        const distanceToEdge = Math.min(row, rows - 1 - row, col, cols - 1 - col);
+        if (piece === pieceType) score += distanceToEdge;
+        else if (piece === opponent) score -= distanceToEdge;
+    }
+    return score;
+};

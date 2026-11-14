@@ -11,17 +11,22 @@ export interface TuningConfig {
     // 'roundRobin': every variant and opponent plays every other one.
     mode?: 'gauntlet' | 'roundRobin',
     gamesPerPair?: number,
+    // Play every pairing from the same set of random openings, once with each colour. When set, each pair plays
+    // 2 × count games and gamesPerPair is ignored.
+    openings?: { count: number, turns: number, seed?: number },
     // Safety limit on game length (games normally end sooner through the no-capture draw rule).
     maxTurns?: number,
     // Built-in bots (preset names or 'Random') for the variants to play against.
     opponents?: string[],
-    // The starting point that the grid and variants change.
-    base: { depth?: number, weights: Weights },
+    // The starting point that the grid and variants change. endgameWeights and endgameDepth are optional
+    // (see BotPreset): extra weights blended in as the board empties, and a deeper search once few pieces are left.
+    base: { depth?: number, weights: Weights, endgameWeights?: Weights, endgameDepth?: number },
     // Every combination of these values is tried, each applied on top of base.
     grid?: Partial<Record<GridKey, number[]>>,
     // Hand-picked variants, each applied on top of base. Weights listed here replace the base weight
     // (use 0 to switch an evaluator off).
-    variants?: { name: string, depth?: number, weights?: Weights }[],
+    // endgameWeights are applied on top of the base endgameWeights in the same way.
+    variants?: { name: string, depth?: number, weights?: Weights, endgameWeights?: Weights, endgameDepth?: number }[],
 }
 
 export const DEFAULT_GAMES_PER_PAIR = 20;
@@ -33,7 +38,18 @@ export { DEFAULT_MAX_TURNS } from '../Tournament.js';
  */
 export function buildVariants(config: TuningConfig): BotSpec[] {
     validateWeights(config.base.weights, 'base');
+    validateWeights(config.base.endgameWeights ?? {}, 'base endgameWeights');
     const baseDepth = config.base.depth ?? 2;
+    // Adds the base's endgame settings (overridden by the variant's) to a spec, leaving them out when neither has any.
+    const withEndgame = (spec: BotSpec, variant: { endgameWeights?: Weights, endgameDepth?: number } = {}): BotSpec => {
+        if (spec.kind !== 'search') return spec;
+        if (config.base.endgameWeights !== undefined || variant.endgameWeights !== undefined) {
+            spec.endgameWeights = { ...config.base.endgameWeights, ...variant.endgameWeights };
+        }
+        const endgameDepth = variant.endgameDepth ?? config.base.endgameDepth;
+        if (endgameDepth !== undefined) spec.endgameDepth = endgameDepth;
+        return spec;
+    };
     const variants: BotSpec[] = [];
 
     const grid = config.grid ?? {};
@@ -57,20 +73,21 @@ export function buildVariants(config: TuningConfig): BotSpec[] {
                 else weights[key] = combination[i];
                 nameParts.push(`${key}=${combination[i]}`);
             });
-            variants.push({ kind: 'search', name: nameParts.join(' '), depth, weights });
+            variants.push(withEndgame({ kind: 'search', name: nameParts.join(' '), depth, weights }));
         }
     } else {
-        variants.push({ kind: 'search', name: 'Base', depth: baseDepth, weights: { ...config.base.weights } });
+        variants.push(withEndgame({ kind: 'search', name: 'Base', depth: baseDepth, weights: { ...config.base.weights } }));
     }
 
     for (const variant of config.variants ?? []) {
         validateWeights(variant.weights ?? {}, variant.name);
-        variants.push({
+        validateWeights(variant.endgameWeights ?? {}, `${variant.name} endgameWeights`);
+        variants.push(withEndgame({
             kind: 'search',
             name: variant.name,
             depth: variant.depth ?? baseDepth,
             weights: { ...config.base.weights, ...variant.weights },
-        });
+        }, variant));
     }
 
     const names = new Set<string>();

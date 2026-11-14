@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import Board from '../src/Board.js';
 import CellClickHandler from '../src/CellClickHandler.js';
-import { AttackType, Direction } from '../src/types.js';
+import { AttackType, Direction, Turn } from '../src/types.js';
 
 const emptyRow5 = '00000';
 
@@ -290,5 +290,59 @@ describe('CellClickHandler tests', () => {
         expect(handler.getHandlerState()).to.deep.equal(emptyHandlerState);
 
         // TODO: Click on FINISH TURN
+    });
+
+    it('should let the player end their turn in the middle of a capture chain', () => {
+        const board = new Board(5, 9, '200202022200010222000200021100020000010000011');
+        const handler = new CellClickHandler(board);
+        expect(handler.canEndTurn()).to.equal(false);
+        expect(handler.handleEndTurn()).to.equal(false);
+
+        // White approaches DOWN from 13 to 22, capturing 31, and could keep capturing.
+        handler.handleCellClick(13);
+        expect(handler.canEndTurn()).to.equal(false);
+        handler.handleCellClick(22);
+        expect(handler.getHandlerState().attackingChain).to.equal(true);
+        expect(handler.canEndTurn()).to.equal(true);
+
+        const boardAfterCapture = board.getBoardPositionsAsString();
+        expect(handler.handleEndTurn()).to.equal(true);
+        expect(board.getBoardPositionsAsString()).to.equal(boardAfterCapture);
+        expect(board.getTurn()).to.equal(Turn.BLACK);
+        expect(handler.getHandlerState()).to.deep.equal(emptyHandlerState);
+
+        // It's now black's turn, so the turn can't be ended again.
+        expect(handler.canEndTurn()).to.equal(false);
+        expect(handler.handleEndTurn()).to.equal(false);
+    });
+
+    it('should not let the player end their turn once the chain has finished', () => {
+        // White withdraws from 8 by moving to 0, and can't capture again from there.
+        const board = new Board(3, 3, '000210002');
+        const handler = new CellClickHandler(board);
+        handler.handleCellClick(4);
+        handler.handleCellClick(0);
+        expect(board.getTurn()).to.equal(Turn.BLACK);
+        expect(handler.canEndTurn()).to.equal(false);
+        expect(handler.handleEndTurn()).to.equal(false);
+    });
+
+    it('should cancel a pending approach or withdraw choice when ending the turn', () => {
+        const board = new Board(5, 9, '220202222000000222010122121100210111010101111');
+        const handler = new CellClickHandler(board);
+
+        // White moves UP from 19 to 10, capturing, then picks a move to 20 that could either approach or withdraw.
+        handler.handleCellClick(19);
+        handler.handleCellClick(10);
+        const boardAfterFirstCapture = board.getBoardPositionsAsString();
+        expect(handler.handleCellClick(20)).to.equal(false);
+        expect(handler.getHandlerState().approachOrWithdrawPieces).to.not.equal(null);
+        expect(handler.canEndTurn()).to.equal(true);
+
+        // Ending the turn cancels that move, so the piece stays at 10 and nothing else is captured.
+        expect(handler.handleEndTurn()).to.equal(true);
+        expect(board.getBoardPositionsAsString()).to.equal(boardAfterFirstCapture);
+        expect(board.getTurn()).to.equal(Turn.BLACK);
+        expect(handler.getHandlerState()).to.deep.equal(emptyHandlerState);
     });
 });

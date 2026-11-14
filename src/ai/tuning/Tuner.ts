@@ -1,5 +1,6 @@
 import { BotSpec, findBuiltInSpec } from './BotSpec.js';
 import { GameJob, runGames } from './GamePool.js';
+import { Opening, generateOpenings } from './Openings.js';
 import { DEFAULT_GAMES_PER_PAIR, DEFAULT_MAX_TURNS, TuningConfig, buildVariants } from './TuningConfig.js';
 
 export interface PairRecord {
@@ -68,7 +69,8 @@ export async function runTuning(config: TuningConfig, numWorkers: number, onProg
         pairs = allPairs(everyone);
     }
 
-    const { participants, totalGames } = await playPairings(everyone, pairs, gamesPerPair, maxTurns, numWorkers, onProgress);
+    const openings = config.openings ? generateOpenings(config.openings.count, config.openings.turns, config.openings.seed ?? 1) : undefined;
+    const { participants, totalGames } = await playPairings(everyone, pairs, gamesPerPair, maxTurns, numWorkers, onProgress, openings);
     for (const participant of participants) participant.isVariant = variants.includes(participant.spec);
 
     participants.sort((x, y) => {
@@ -89,9 +91,10 @@ export async function runRoundRobin(
     maxTurns: number,
     numWorkers: number,
     onProgress?: (completed: number, total: number) => void,
+    openings?: Opening[],
 ): Promise<TuningResult> {
     const start = performance.now();
-    const { participants, totalGames } = await playPairings(bots, allPairs(bots), gamesPerPair, maxTurns, numWorkers, onProgress);
+    const { participants, totalGames } = await playPairings(bots, allPairs(bots), gamesPerPair, maxTurns, numWorkers, onProgress, openings);
     participants.sort((x, y) => y.score - x.score);
     return { participants, totalGames, elapsedMs: performance.now() - start };
 }
@@ -106,26 +109,35 @@ function allPairs(bots: BotSpec[]): [BotSpec, BotSpec][] {
 
 /**
  * Plays gamesPerPair games for each pair (spread over numWorkers threads) and adds up each bot's results.
+ * If openings are given, each pair instead plays every opening twice, once with each bot as white.
  * Every participant is returned with isVariant set to false and in no particular order.
  */
-async function playPairings(
+export async function playPairings(
     everyone: BotSpec[],
     pairs: [BotSpec, BotSpec][],
     gamesPerPair: number,
     maxTurns: number,
     numWorkers: number,
     onProgress?: (completed: number, total: number) => void,
+    openings?: Opening[],
 ): Promise<{ participants: ParticipantResult[], totalGames: number }> {
     // Colours alternate each game so neither bot gets the advantage of always moving first.
     const jobs: (GameJob & { a: BotSpec, b: BotSpec, aIsWhite: boolean })[] = [];
     for (const [a, b] of pairs) {
-        for (let game = 0; game < gamesPerPair; game++) {
-            const aIsWhite = game % 2 === 0;
-            jobs.push({ white: aIsWhite ? a : b, black: aIsWhite ? b : a, maxTurns, a, b, aIsWhite });
+        if (openings) {
+            for (const opening of openings) {
+                jobs.push({ white: a, black: b, maxTurns, opening, a, b, aIsWhite: true });
+                jobs.push({ white: b, black: a, maxTurns, opening, a, b, aIsWhite: false });
+            }
+        } else {
+            for (let game = 0; game < gamesPerPair; game++) {
+                const aIsWhite = game % 2 === 0;
+                jobs.push({ white: aIsWhite ? a : b, black: aIsWhite ? b : a, maxTurns, a, b, aIsWhite });
+            }
         }
     }
 
-    const stats = await runGames(jobs.map(({ white, black, maxTurns }) => ({ white, black, maxTurns })), numWorkers, onProgress);
+    const stats = await runGames(jobs.map(({ white, black, maxTurns, opening }) => ({ white, black, maxTurns, opening })), numWorkers, onProgress);
 
     const totals = new Map<string, { record: PairRecord, turnLimitDraws: number, ms: number, turns: number, vs: Record<string, PairRecord> }>();
     for (const spec of everyone) totals.set(spec.name, { record: { wins: 0, draws: 0, losses: 0 }, turnLimitDraws: 0, ms: 0, turns: 0, vs: {} });

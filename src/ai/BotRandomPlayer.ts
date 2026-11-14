@@ -31,7 +31,15 @@ export default class BotRandomPlayer {
         const moveIndex: number = possiblePiecesToMove.at(Math.floor(Math.random() * possiblePiecesToMove.length))!;
         const possibleMoves = this.board.getPossibleMovesForCell(moveIndex);
         const moveChoice: Move = possibleMoves.at(Math.floor(Math.random() * possibleMoves.length))!;
-        const canMoveAgain = this.board.performMove(moveIndex, moveChoice.direction)
+        let canMoveAgain = this.board.performMove(moveIndex, moveChoice.direction)
+        // Only the first capture is compulsory, so stopping is one more option alongside each way of continuing.
+        if (canMoveAgain) {
+            const numberOfContinuations = this.board.getPossibleMovesForCell(moveChoice.index).length;
+            if (Math.random() < 1 / (numberOfContinuations + 1)) {
+                this.board.endTurn();
+                canMoveAgain = false;
+            }
+        }
         if (canMoveAgain) {
             this.inMiddleOfMoveChain = true;
             this.indexOfPieceThatMustBeMoved = moveChoice.index;

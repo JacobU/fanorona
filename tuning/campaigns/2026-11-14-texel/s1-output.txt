@@ -1,0 +1,26 @@
+Tuning with s1-depth2-finals.json (roundRobin, 30 openings of 4 turns, each played with both colours, 3 workers)
+  1/1260 games played  32/1260 games played  64/1260 games played  104/1260 games played  126/1260 games played  140/1260 games played  154/1260 games played  169/1260 games played  178/1260 games played  212/1260 games played  243/1260 games played  270/1260 games played  302/1260 games played  308/1260 games played  319/1260 games played  327/1260 games played  340/1260 games played  350/1260 games played  356/1260 games played  386/1260 games played  428/1260 games played  438/1260 games played  450/1260 games played  465/1260 games played  475/1260 games played  509/1260 games played  557/1260 games played  602/1260 games played  611/1260 games played  624/1260 games played  633/1260 games played  643/1260 games played  652/1260 games played  665/1260 games played  681/1260 games played  689/1260 games played  701/1260 games played  712/1260 games played  737/1260 games played  772/1260 games played  800/1260 games played  830/1260 games played  848/1260 games played  857/1260 games played  866/1260 games played  877/1260 games played  887/1260 games played  894/1260 games played  905/1260 games played  920/1260 games played  935/1260 games played  949/1260 games played  964/1260 games played  971/1260 games played  990/1260 games played  1007/1260 games played  1022/1260 games played  1025/1260 games played  1032/1260 games played  1042/1260 games played  1046/1260 games played  1053/1260 games played  1061/1260 games played  1066/1260 games played  1071/1260 games played  1078/1260 games played  1101/1260 games played  1129/1260 games played  1148/1260 games played  1162/1260 games played  1170/1260 games played  1178/1260 games played  1186/1260 games played  1192/1260 games played  1203/1260 games played  1211/1260 games played  1221/1260 games played  1230/1260 games played  1242/1260 games played  1253/1260 games played  1260/1260 games played in 86.3s
+
+Score         = points per game (win 1, draw ½). ± is how much of that could be luck (95% confidence).
+Win/Draw/Loss = share of games with each result.
+Decisive      = share of the games with a winner that this bot won (ignores draws).
+
+Bot            Score  ±     Win  Draw  Loss  Decisive  vs Fortress  vs Base  vs v5 m0 s19 l34  vs v0 m0 s20 l40  vs AllRounder  vs v0 m2 s17 l37  vs v4 m0 s0 l29  ms/turn
+Fortress       54.3%  5.1%  18%  72%   10%   65%       -            51.7%    52.5%             54.2%             53.3%          52.5%             61.7%            1.1
+Base           52.1%  5.2%  17%  70%   13%   57%       48.3%        -        50.8%             48.3%             50.0%          54.2%             60.8%            1.1
+v5 m0 s19 l34  51.7%  5.2%  16%  71%   13%   56%       47.5%        49.2%    -                 50.0%             54.2%          54.2%             55.0%            1.1
+v0 m0 s20 l40  51.4%  5.2%  16%  70%   14%   55%       45.8%        51.7%    50.0%             -                 49.2%          54.2%             57.5%            0.5
+AllRounder     50.3%  5.2%  11%  78%   11%   51%       46.7%        50.0%    45.8%             50.8%             -              51.7%             56.7%            5.0
+v0 m2 s17 l37  47.4%  5.2%  9%   76%   15%   39%       47.5%        45.8%    45.8%             45.8%             48.3%          -                 50.8%            4.3
+v4 m0 s0 l29   42.9%  5.1%  13%  61%   27%   32%       38.3%        39.2%    45.0%             42.5%             43.3%          49.2%             -                1.0
+
+Bots:
+  Fortress: depth 2: material 100, vulnerability 30, strongPoints 5, lineExposure 5
+  Base: depth 2: material 100, vulnerability 6, strongPoints 15, lineExposure 31
+  v5 m0 s19 l34: depth 2: material 100, vulnerability 5, strongPoints 19, lineExposure 34
+  v0 m0 s20 l40: depth 2: material 100, strongPoints 20, lineExposure 40
+  AllRounder: depth 2: material 100, vulnerability 30, mobility 2, strongPoints 5, lineExposure 5
+  v0 m2 s17 l37: depth 2: material 100, mobility 2, strongPoints 17, lineExposure 37
+  v4 m0 s0 l29: depth 2: material 100, vulnerability 4, lineExposure 29
+
+Saved results to tuning\results\2026-11-14T12-50-35-s1-depth2-finals.json

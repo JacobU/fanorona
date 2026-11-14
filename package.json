@@ -10,7 +10,10 @@
     "test": "npm run build:src && npm run build:test && mocha 'dist/tests/**/*.js'",
     "start": "node --loader ts-node/esm src/FanoronaBotsGame.ts",
     "tournament": "npm run build:src && node dist/src/RunTournament.js",
-    "tune": "npm run build:src && node dist/src/RunTuning.js"
+    "tune": "npm run build:src && node dist/src/RunTuning.js",
+    "texel": "npm run build:src && node dist/src/RunTexel.js",
+    "halving": "npm run build:src && node dist/src/RunHalving.js",
+    "cmaes": "npm run build:src && node dist/src/RunCmaes.js"
   },
   "keywords": [],
   "author": "",

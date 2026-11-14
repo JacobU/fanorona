@@ -1,0 +1,286 @@
+{
+  "date": "2026-11-14T12:55:34.781Z",
+  "configFile": "s3b-attribution.json",
+  "config": {
+    "mode": "gauntlet",
+    "openings": {
+      "count": 50,
+      "turns": 4,
+      "seed": 2
+    },
+    "opponents": [
+      "Fortress",
+      "AllRounder",
+      "Lookahead"
+    ],
+    "base": {
+      "depth": 2,
+      "weights": {
+        "material": 100,
+        "vulnerability": 37,
+        "mobility": 0,
+        "strongPoints": 20,
+        "lineExposure": 44
+      }
+    },
+    "variants": [
+      {
+        "name": "Old + Texel vuln v37 s15 l31",
+        "weights": {
+          "vulnerability": 37,
+          "mobility": 0,
+          "strongPoints": 15,
+          "lineExposure": 31
+        }
+      },
+      {
+        "name": "Old + Texel strong v6 s65 l31",
+        "weights": {
+          "vulnerability": 6,
+          "mobility": 0,
+          "strongPoints": 65,
+          "lineExposure": 31
+        }
+      }
+    ]
+  },
+  "totalGames": 900,
+  "elapsedMs": 47219,
+  "results": [
+    {
+      "name": "Old + Texel vuln v37 s15 l31",
+      "isVariant": true,
+      "depth": 2,
+      "weights": {
+        "material": 100,
+        "vulnerability": 37,
+        "mobility": 0,
+        "strongPoints": 15,
+        "lineExposure": 31
+      },
+      "score": 0.54,
+      "margin": 0.05639897871415758,
+      "winRate": 0.19333333333333333,
+      "drawRate": 0.6933333333333334,
+      "lossRate": 0.11333333333333333,
+      "decisiveWinRate": 0.6304347826086957,
+      "wins": 58,
+      "draws": 208,
+      "losses": 34,
+      "turnLimitDraws": 0,
+      "msPerTurn": 0.9813004864831426,
+      "vs": {
+        "Fortress": {
+          "wins": 12,
+          "draws": 73,
+          "losses": 15
+        },
+        "AllRounder": {
+          "wins": 7,
+          "draws": 84,
+          "losses": 9
+        },
+        "Lookahead": {
+          "wins": 39,
+          "draws": 51,
+          "losses": 10
+        }
+      }
+    },
+    {
+      "name": "Base",
+      "isVariant": true,
+      "depth": 2,
+      "weights": {
+        "material": 100,
+        "vulnerability": 37,
+        "mobility": 0,
+        "strongPoints": 20,
+        "lineExposure": 44
+      },
+      "score": 0.5066666666666667,
+      "margin": 0.056575296794691296,
+      "winRate": 0.17666666666666667,
+      "drawRate": 0.66,
+      "lossRate": 0.16333333333333333,
+      "decisiveWinRate": 0.5196078431372549,
+      "wins": 53,
+      "draws": 198,
+      "losses": 49,
+      "turnLimitDraws": 0,
+      "msPerTurn": 1.0349509227220348,
+      "vs": {
+        "Fortress": {
+          "wins": 9,
+          "draws": 73,
+          "losses": 18
+        },
+        "AllRounder": {
+          "wins": 8,
+          "draws": 84,
+          "losses": 8
+        },
+        "Lookahead": {
+          "wins": 36,
+          "draws": 41,
+          "losses": 23
+        }
+      }
+    },
+    {
+      "name": "Old + Texel strong v6 s65 l31",
+      "isVariant": true,
+      "depth": 2,
+      "weights": {
+        "material": 100,
+        "vulnerability": 6,
+        "mobility": 0,
+        "strongPoints": 65,
+        "lineExposure": 31
+      },
+      "score": 0.47,
+      "margin": 0.05647838996760915,
+      "winRate": 0.14666666666666667,
+      "drawRate": 0.6466666666666666,
+      "lossRate": 0.20666666666666667,
+      "decisiveWinRate": 0.41509433962264153,
+      "wins": 44,
+      "draws": 194,
+      "losses": 62,
+      "turnLimitDraws": 0,
+      "msPerTurn": 0.9661074901445511,
+      "vs": {
+        "Fortress": {
+          "wins": 11,
+          "draws": 64,
+          "losses": 25
+        },
+        "AllRounder": {
+          "wins": 7,
+          "draws": 77,
+          "losses": 16
+        },
+        "Lookahead": {
+          "wins": 26,
+          "draws": 53,
+          "losses": 21
+        }
+      }
+    },
+    {
+      "name": "Fortress",
+      "isVariant": false,
+      "depth": 2,
+      "weights": {
+        "material": 100,
+        "vulnerability": 30,
+        "strongPoints": 5,
+        "lineExposure": 5
+      },
+      "score": 0.5433333333333333,
+      "margin": 0.056367435305883506,
+      "winRate": 0.19333333333333333,
+      "drawRate": 0.7,
+      "lossRate": 0.10666666666666667,
+      "decisiveWinRate": 0.6444444444444445,
+      "wins": 58,
+      "draws": 210,
+      "losses": 32,
+      "turnLimitDraws": 0,
+      "msPerTurn": 1.1374023385059298,
+      "vs": {
+        "Base": {
+          "wins": 18,
+          "draws": 73,
+          "losses": 9
+        },
+        "Old + Texel vuln v37 s15 l31": {
+          "wins": 15,
+          "draws": 73,
+          "losses": 12
+        },
+        "Old + Texel strong v6 s65 l31": {
+          "wins": 25,
+          "draws": 64,
+          "losses": 11
+        }
+      }
+    },
+    {
+      "name": "AllRounder",
+      "isVariant": false,
+      "depth": 2,
+      "weights": {
+        "material": 100,
+        "vulnerability": 30,
+        "mobility": 2,
+        "strongPoints": 5,
+        "lineExposure": 5
+      },
+      "score": 0.5183333333333333,
+      "margin": 0.056542279035413125,
+      "winRate": 0.11,
+      "drawRate": 0.8166666666666667,
+      "lossRate": 0.07333333333333333,
+      "decisiveWinRate": 0.6,
+      "wins": 33,
+      "draws": 245,
+      "losses": 22,
+      "turnLimitDraws": 0,
+      "msPerTurn": 4.466356114642176,
+      "vs": {
+        "Base": {
+          "wins": 8,
+          "draws": 84,
+          "losses": 8
+        },
+        "Old + Texel vuln v37 s15 l31": {
+          "wins": 9,
+          "draws": 84,
+          "losses": 7
+        },
+        "Old + Texel strong v6 s65 l31": {
+          "wins": 16,
+          "draws": 77,
+          "losses": 7
+        }
+      }
+    },
+    {
+      "name": "Lookahead",
+      "isVariant": false,
+      "depth": 2,
+      "weights": {
+        "material": 100
+      },
+      "score": 0.4216666666666667,
+      "margin": 0.05588164622830277,
+      "winRate": 0.18,
+      "drawRate": 0.48333333333333334,
+      "lossRate": 0.33666666666666667,
+      "decisiveWinRate": 0.34838709677419355,
+      "wins": 54,
+      "draws": 145,
+      "losses": 101,
+      "turnLimitDraws": 0,
+      "msPerTurn": 0.27123125043199897,
+      "vs": {
+        "Base": {
+          "wins": 23,
+          "draws": 41,
+          "losses": 36
+        },
+        "Old + Texel vuln v37 s15 l31": {
+          "wins": 10,
+          "draws": 51,
+          "losses": 39
+        },
+        "Old + Texel strong v6 s65 l31": {
+          "wins": 21,
+          "draws": 53,
+          "losses": 26
+        }
+      }
+    }
+  ]
+}

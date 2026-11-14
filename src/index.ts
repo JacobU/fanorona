@@ -20,6 +20,9 @@ wood.src = "./assets/svg/wood.svg";
 const board = new Board();
 const cellClickHandler = new CellClickHandler(board);
 const botPlayer = new SearchBot(PieceType.BLACK, board, AllRounder);
+const endTurnButton = document.getElementById('end-turn-button')!;
+// True while a move is being processed or animated (including the bot's turn). All input is ignored meanwhile.
+let inputLocked = false;
 
 let imagesLoaded = 0;
 
@@ -45,6 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 document.getElementById('play-again-button')!.addEventListener('click', playAgain);
+endTurnButton.addEventListener('click', onEndTurnClicked);
 
 // Initial highlighting
 highlightMoveablePieces(board.getPiecesThatPlayerCanMove(PieceType.WHITE));
@@ -114,34 +118,78 @@ function endGame() {
 
     const winLossMessageDiv = document.getElementById('game-message');
     winLossMessageDiv!.textContent = message;
+    updateEndTurnButton();
 }
 
 function playAgain() {
+    if (inputLocked) return;
     const messageContainer = document.getElementById('message-container');
     messageContainer!.style.display = 'none';
     board.reset();
     removeAllHighlighting();
     highlightMoveablePieces(board.getPiecesThatPlayerCanMove(PieceType.WHITE));
     drawBoard(board, ctx, lightPiece, darkPiece, wood, null);
+    updateEndTurnButton();
 }
 
-async function onCellClicked(index: number) {
+/**
+ * The only place that shows or hides the End turn button. It's shown exactly when the player is in the middle of
+ * a capture chain and can choose to stop, and nothing is being animated or processed.
+ */
+function updateEndTurnButton() {
+    const canEndTurn = !inputLocked && board.getWinner() === Winner.NONE && cellClickHandler.canEndTurn();
+    endTurnButton.classList.toggle('visible', canEndTurn);
+}
 
-    const handlerState = cellClickHandler.getHandlerState();
-    // If a move was made, we know it was made by white, so animate the white piece
-    const moveWasPerformed = cellClickHandler.handleCellClick(index);
-    if (moveWasPerformed) {
-        // If a move was performed, but it was done by selecting the approach or withdraw piece, we need to check what the selectedPiece 
-        // was before the current click. This will give us the actual direction.
-        const direction: Direction = handlerState.approachOrWithdrawPieces 
-            ? handlerState.possibleMoves.find(move => move.index === handlerState.approachOrWithdrawMoveIndex)!.direction
-            : handlerState.possibleMoves.find(move => move.index === index)!.direction;
-        
-        await animatePieceMove(board, ctx, lightPiece, darkPiece, wood, handlerState.selectedCell!, direction, lightPiece);
+/**
+ * Runs an action with all input locked, so clicks during animations or the bot's turn are ignored and the
+ * End turn button stays hidden until everything has finished.
+ */
+async function withInputLocked(action: () => Promise<void>) {
+    if (inputLocked) return;
+    inputLocked = true;
+    updateEndTurnButton();
+    try {
+        await action();
+    } finally {
+        inputLocked = false;
+        updateEndTurnButton();
     }
+}
 
-    removeAllHighlighting();
+function onEndTurnClicked() {
+    return withInputLocked(async () => {
+        if (!cellClickHandler.handleEndTurn()) return;
+        removeAllHighlighting();
+        drawBoard(board, ctx, lightPiece, darkPiece, wood, null);
+        await runBotTurnAndRefresh();
+    });
+}
 
+function onCellClicked(index: number) {
+    return withInputLocked(async () => {
+        const handlerState = cellClickHandler.getHandlerState();
+        // If a move was made, we know it was made by white, so animate the white piece
+        const moveWasPerformed = cellClickHandler.handleCellClick(index);
+        if (moveWasPerformed) {
+            // If a move was performed, but it was done by selecting the approach or withdraw piece, we need to check what the selectedPiece
+            // was before the current click. This will give us the actual direction.
+            const direction: Direction = handlerState.approachOrWithdrawPieces
+                ? handlerState.possibleMoves.find(move => move.index === handlerState.approachOrWithdrawMoveIndex)!.direction
+                : handlerState.possibleMoves.find(move => move.index === index)!.direction;
+
+            await animatePieceMove(board, ctx, lightPiece, darkPiece, wood, handlerState.selectedCell!, direction, lightPiece);
+        }
+
+        removeAllHighlighting();
+        await runBotTurnAndRefresh();
+    });
+}
+
+/**
+ * If it's now the bot's turn, plays it, then highlights what white can do next (or ends the game).
+ */
+async function runBotTurnAndRefresh() {
     if (board.getWinner() !== Winner.NONE) {
         endGame();
         return;

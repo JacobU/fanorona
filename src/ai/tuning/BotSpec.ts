@@ -6,11 +6,15 @@ import { Contestant, RandomContestant, contestantFromPreset } from '../Tournamen
  * JSON and sent to worker threads.
  */
 export type BotSpec =
-    | { kind: 'search', name: string, depth: number, weights: Weights }
+    | { kind: 'search', name: string, depth: number, weights: Weights, endgameWeights?: Weights, endgameDepth?: number }
     | { kind: 'random', name: string };
 
 export function specFromPreset(preset: BotPreset): BotSpec {
-    return { kind: 'search', name: preset.name, depth: preset.depth, weights: { ...preset.weights } };
+    const spec: BotSpec = { kind: 'search', name: preset.name, depth: preset.depth, weights: { ...preset.weights } };
+    // Endgame settings are optional, so only add them when the preset has them.
+    if (preset.endgameWeights !== undefined) spec.endgameWeights = { ...preset.endgameWeights };
+    if (preset.endgameDepth !== undefined) spec.endgameDepth = preset.endgameDepth;
+    return spec;
 }
 
 export const RANDOM_SPEC: BotSpec = { kind: 'random', name: 'Random' };
@@ -27,9 +31,16 @@ export function findBuiltInSpec(name: string): BotSpec {
     return specFromPreset(preset);
 }
 
+/**
+ * Turns a search spec back into a preset (the reverse of specFromPreset), including any endgame settings.
+ */
+export function presetFromSpec(spec: Extract<BotSpec, { kind: 'search' }>): BotPreset {
+    return createPreset(spec.name, spec.depth, spec.weights, '', { endgameWeights: spec.endgameWeights, endgameDepth: spec.endgameDepth });
+}
+
 export function contestantFromSpec(spec: BotSpec): Contestant {
     if (spec.kind === 'random') {
         return { ...RandomContestant, name: spec.name };
     }
-    return contestantFromPreset(createPreset(spec.name, spec.depth, spec.weights));
+    return contestantFromPreset(presetFromSpec(spec));
 }

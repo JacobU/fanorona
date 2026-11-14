@@ -1,0 +1,12 @@
+{
+  "mode": "gauntlet",
+  "gamesPerPair": 12,
+  "opponents": ["DeepFortress", "DeepPositional"],
+  "base": { "depth": 4, "weights": { "material": 100, "vulnerability": 0, "mobility": 0, "strongPoints": 20, "lineExposure": 40 } },
+  "variants": [
+    { "name": "d4 v6 m0 s15 l31", "weights": { "vulnerability": 6, "mobility": 0, "strongPoints": 15, "lineExposure": 31 } },
+    { "name": "d4 v4 m0 s0 l29", "weights": { "vulnerability": 4, "mobility": 0, "strongPoints": 0, "lineExposure": 29 } },
+    { "name": "d4 v0 m2 s12 l17", "weights": { "vulnerability": 0, "mobility": 2, "strongPoints": 12, "lineExposure": 17 } },
+    { "name": "d4 v0 m0 s12 l33", "weights": { "vulnerability": 0, "mobility": 0, "strongPoints": 12, "lineExposure": 33 } }
+  ]
+}

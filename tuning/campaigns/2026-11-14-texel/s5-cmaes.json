@@ -1,0 +1,14 @@
+{
+  "depth": 2,
+  "seed": 5,
+  "names": ["vulnerability", "strongPoints", "lineExposure"],
+  "fixed": { "material": 100, "mobility": 0 },
+  "start": [-3, 12, 9],
+  "sigma": 6,
+  "lambda": 8,
+  "reference": { "name": "s030", "weights": { "material": 100, "vulnerability": -3, "mobility": -1, "strongPoints": 12, "lineExposure": 9 } },
+  "opponents": ["Fortress", "AllRounder", "Lookahead"],
+  "openingTurns": 4,
+  "openingsPerGeneration": 16,
+  "generationsPerRun": 4
+}

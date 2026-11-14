@@ -2,6 +2,7 @@ import Board from '../Board.js';
 import { PieceType, Direction, BestMove, getDirectionFromDeltaIndex } from '../types.js';
 import { BotPreset } from './presets.js';
 import { chooseMove, Rng } from './Search.js';
+import { searchDepthFor } from './endgame.js';
 
 export interface SearchBotOptions {
     verbose?: boolean,
@@ -39,7 +40,9 @@ export default class SearchBot {
         this.playerIsMovingLog();
 
         if (this.currentMove === null) {
-            this.currentMove = chooseMove(this.board, this.pieceType, this.preset.evaluator, this.preset.depth, this.rng);
+            // The depth can change during the game (presets with an endgameDepth search deeper once few pieces are left).
+            const depth = searchDepthFor(this.preset, this.board);
+            this.currentMove = chooseMove(this.board, this.pieceType, this.preset.evaluator, depth, this.rng);
             this.currentMoveIndex = 0;
             if (this.currentMove === null) {
                 throw new Error(this.pieceTypeString + ' has no moves available.');
@@ -60,7 +63,14 @@ export default class SearchBot {
         }
 
 
-        const canMoveAgain = this.board.performMove(index, direction);
+        let canMoveAgain = this.board.performMove(index, direction);
+
+        // The chosen move may stop part way through a capture chain (only the first capture is compulsory).
+        const isLastStep = this.currentMoveIndex === this.currentMove.move.moveIndexes.length - 1;
+        if (canMoveAgain && isLastStep) {
+            this.board.endTurn();
+            canMoveAgain = false;
+        }
 
         if (canMoveAgain) {
             this.currentMoveIndex++;

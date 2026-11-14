@@ -1,0 +1,341 @@
+{
+  "date": "2026-11-14T13:35:33.578Z",
+  "configFile": "s5b-mobility.json",
+  "config": {
+    "mode": "gauntlet",
+    "openings": {
+      "count": 64,
+      "turns": 4,
+      "seed": 6
+    },
+    "opponents": [
+      "Fortress",
+      "AllRounder",
+      "Lookahead"
+    ],
+    "base": {
+      "depth": 2,
+      "weights": {
+        "material": 100,
+        "vulnerability": -3,
+        "mobility": -1,
+        "strongPoints": 12,
+        "lineExposure": 9
+      }
+    },
+    "variants": [
+      {
+        "name": "s030 m-2",
+        "weights": {
+          "mobility": -2
+        }
+      },
+      {
+        "name": "s030 m0",
+        "weights": {
+          "mobility": 0
+        }
+      },
+      {
+        "name": "s030 m+1",
+        "weights": {
+          "mobility": 1
+        }
+      }
+    ]
+  },
+  "totalGames": 1536,
+  "elapsedMs": 213450,
+  "results": [
+    {
+      "name": "Base",
+      "isVariant": true,
+      "depth": 2,
+      "weights": {
+        "material": 100,
+        "vulnerability": -3,
+        "mobility": -1,
+        "strongPoints": 12,
+        "lineExposure": 9
+      },
+      "score": 0.6393229166666666,
+      "margin": 0.04802969952992952,
+      "winRate": 0.3307291666666667,
+      "drawRate": 0.6171875,
+      "lossRate": 0.052083333333333336,
+      "decisiveWinRate": 0.8639455782312925,
+      "wins": 127,
+      "draws": 237,
+      "losses": 20,
+      "turnLimitDraws": 0,
+      "msPerTurn": 6.933446371088365,
+      "vs": {
+        "Fortress": {
+          "wins": 32,
+          "draws": 89,
+          "losses": 7
+        },
+        "AllRounder": {
+          "wins": 25,
+          "draws": 99,
+          "losses": 4
+        },
+        "Lookahead": {
+          "wins": 70,
+          "draws": 49,
+          "losses": 9
+        }
+      }
+    },
+    {
+      "name": "s030 m-2",
+      "isVariant": true,
+      "depth": 2,
+      "weights": {
+        "material": 100,
+        "vulnerability": -3,
+        "mobility": -2,
+        "strongPoints": 12,
+        "lineExposure": 9
+      },
+      "score": 0.609375,
+      "margin": 0.04879921018868095,
+      "winRate": 0.2760416666666667,
+      "drawRate": 0.6666666666666666,
+      "lossRate": 0.057291666666666664,
+      "decisiveWinRate": 0.828125,
+      "wins": 106,
+      "draws": 256,
+      "losses": 22,
+      "turnLimitDraws": 0,
+      "msPerTurn": 7.423910592700779,
+      "vs": {
+        "Fortress": {
+          "wins": 21,
+          "draws": 97,
+          "losses": 10
+        },
+        "AllRounder": {
+          "wins": 17,
+          "draws": 109,
+          "losses": 2
+        },
+        "Lookahead": {
+          "wins": 68,
+          "draws": 50,
+          "losses": 10
+        }
+      }
+    },
+    {
+      "name": "s030 m0",
+      "isVariant": true,
+      "depth": 2,
+      "weights": {
+        "material": 100,
+        "vulnerability": -3,
+        "mobility": 0,
+        "strongPoints": 12,
+        "lineExposure": 9
+      },
+      "score": 0.5598958333333334,
+      "margin": 0.049650293153191395,
+      "winRate": 0.1953125,
+      "drawRate": 0.7291666666666666,
+      "lossRate": 0.07552083333333333,
+      "decisiveWinRate": 0.7211538461538461,
+      "wins": 75,
+      "draws": 280,
+      "losses": 29,
+      "turnLimitDraws": 0,
+      "msPerTurn": 1.5365221194810144,
+      "vs": {
+        "Fortress": {
+          "wins": 16,
+          "draws": 94,
+          "losses": 18
+        },
+        "AllRounder": {
+          "wins": 12,
+          "draws": 113,
+          "losses": 3
+        },
+        "Lookahead": {
+          "wins": 47,
+          "draws": 73,
+          "losses": 8
+        }
+      }
+    },
+    {
+      "name": "s030 m+1",
+      "isVariant": true,
+      "depth": 2,
+      "weights": {
+        "material": 100,
+        "vulnerability": -3,
+        "mobility": 1,
+        "strongPoints": 12,
+        "lineExposure": 9
+      },
+      "score": 0.4947916666666667,
+      "margin": 0.05000770226952532,
+      "winRate": 0.09114583333333333,
+      "drawRate": 0.8072916666666666,
+      "lossRate": 0.1015625,
+      "decisiveWinRate": 0.47297297297297297,
+      "wins": 35,
+      "draws": 310,
+      "losses": 39,
+      "turnLimitDraws": 0,
+      "msPerTurn": 5.8036673807430645,
+      "vs": {
+        "Fortress": {
+          "wins": 4,
+          "draws": 105,
+          "losses": 19
+        },
+        "AllRounder": {
+          "wins": 6,
+          "draws": 112,
+          "losses": 10
+        },
+        "Lookahead": {
+          "wins": 25,
+          "draws": 93,
+          "losses": 10
+        }
+      }
+    },
+    {
+      "name": "Fortress",
+      "isVariant": false,
+      "depth": 2,
+      "weights": {
+        "material": 100,
+        "vulnerability": 30,
+        "strongPoints": 5,
+        "lineExposure": 5
+      },
+      "score": 0.4814453125,
+      "margin": 0.04328045864965495,
+      "winRate": 0.10546875,
+      "drawRate": 0.751953125,
+      "lossRate": 0.142578125,
+      "decisiveWinRate": 0.4251968503937008,
+      "wins": 54,
+      "draws": 385,
+      "losses": 73,
+      "turnLimitDraws": 0,
+      "msPerTurn": 1.6732786534078545,
+      "vs": {
+        "Base": {
+          "wins": 7,
+          "draws": 89,
+          "losses": 32
+        },
+        "s030 m-2": {
+          "wins": 10,
+          "draws": 97,
+          "losses": 21
+        },
+        "s030 m0": {
+          "wins": 18,
+          "draws": 94,
+          "losses": 16
+        },
+        "s030 m+1": {
+          "wins": 19,
+          "draws": 105,
+          "losses": 4
+        }
+      }
+    },
+    {
+      "name": "AllRounder",
+      "isVariant": false,
+      "depth": 2,
+      "weights": {
+        "material": 100,
+        "vulnerability": 30,
+        "mobility": 2,
+        "strongPoints": 5,
+        "lineExposure": 5
+      },
+      "score": 0.4599609375,
+      "margin": 0.043171203264276925,
+      "winRate": 0.037109375,
+      "drawRate": 0.845703125,
+      "lossRate": 0.1171875,
+      "decisiveWinRate": 0.24050632911392406,
+      "wins": 19,
+      "draws": 433,
+      "losses": 60,
+      "turnLimitDraws": 0,
+      "msPerTurn": 7.119635409266355,
+      "vs": {
+        "Base": {
+          "wins": 4,
+          "draws": 99,
+          "losses": 25
+        },
+        "s030 m-2": {
+          "wins": 2,
+          "draws": 109,
+          "losses": 17
+        },
+        "s030 m0": {
+          "wins": 3,
+          "draws": 113,
+          "losses": 12
+        },
+        "s030 m+1": {
+          "wins": 10,
+          "draws": 112,
+          "losses": 6
+        }
+      }
+    },
+    {
+      "name": "Lookahead",
+      "isVariant": false,
+      "depth": 2,
+      "weights": {
+        "material": 100
+      },
+      "score": 0.3310546875,
+      "margin": 0.04076301221709954,
+      "winRate": 0.072265625,
+      "drawRate": 0.517578125,
+      "lossRate": 0.41015625,
+      "decisiveWinRate": 0.14979757085020243,
+      "wins": 37,
+      "draws": 265,
+      "losses": 210,
+      "turnLimitDraws": 0,
+      "msPerTurn": 0.4291671919440334,
+      "vs": {
+        "Base": {
+          "wins": 9,
+          "draws": 49,
+          "losses": 70
+        },
+        "s030 m-2": {
+          "wins": 10,
+          "draws": 50,
+          "losses": 68
+        },
+        "s030 m0": {
+          "wins": 8,
+          "draws": 73,
+          "losses": 47
+        },
+        "s030 m+1": {
+          "wins": 10,
+          "draws": 93,
+          "losses": 25
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+Tuning with s3b-attribution.json (gauntlet, 50 openings of 4 turns, each played with both colours, 3 workers)
+  1/900 games played  25/900 games played  54/900 games played  87/900 games played  109/900 games played  119/900 games played  130/900 games played  139/900 games played  156/900 games played  166/900 games played  180/900 games played  190/900 games played  197/900 games played  244/900 games played  307/900 games played  334/900 games played  366/900 games played  394/900 games played  408/900 games played  417/900 games played  431/900 games played  441/900 games played  454/900 games played  461/900 games played  471/900 games played  481/900 games played  493/900 games played  497/900 games played  520/900 games played  559/900 games played  608/900 games played  645/900 games played  678/900 games played  702/900 games played  714/900 games played  729/900 games played  736/900 games played  748/900 games played  760/900 games played  776/900 games played  783/900 games played  793/900 games played  796/900 games played  833/900 games played  885/900 games played  900/900 games played in 47.2s
+
+Score         = points per game (win 1, draw ½). ± is how much of that could be luck (95% confidence).
+Win/Draw/Loss = share of games with each result.
+Decisive      = share of the games with a winner that this bot won (ignores draws).
+
+Bot                            Score  ±     Win  Draw  Loss  Decisive  vs Fortress  vs AllRounder  vs Lookahead  ms/turn
+Old + Texel vuln v37 s15 l31   54.0%  5.6%  19%  69%   11%   63%       48.5%        49.0%          64.5%         1.0
+Base                           50.7%  5.7%  18%  66%   16%   52%       45.5%        50.0%          56.5%         1.0
+Old + Texel strong v6 s65 l31  47.0%  5.6%  15%  65%   21%   42%       43.0%        45.5%          52.5%         1.0
+
+Bots:
+  Old + Texel vuln v37 s15 l31: depth 2: material 100, vulnerability 37, strongPoints 15, lineExposure 31
+  Base: depth 2: material 100, vulnerability 37, strongPoints 20, lineExposure 44
+  Old + Texel strong v6 s65 l31: depth 2: material 100, vulnerability 6, strongPoints 65, lineExposure 31
+
+Saved results to tuning\results\2026-11-14T12-55-34-s3b-attribution.json
