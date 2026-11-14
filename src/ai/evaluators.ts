@@ -18,7 +18,7 @@ export const material: Evaluator = (board, pieceType) => {
  */
 export const vulnerability: Evaluator = (board, pieceType) => {
     const opponent = getOppositePieceType(pieceType);
-    return board.getCapturablePieces(pieceType).size - board.getCapturablePieces(opponent).size;
+    return board.countCapturablePieces(pieceType) - board.countCapturablePieces(opponent);
 };
 
 /**

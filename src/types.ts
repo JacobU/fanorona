@@ -64,6 +64,8 @@ export interface FullBoardState extends BoardState {
     startingPiecePositions: number[],
     rows: number,
     columns: number,
+    // How many made moves are still waiting to be unmade (should be 0 outside a search)
+    undoDepth: number,
 }
 
 export interface CompleteMove {

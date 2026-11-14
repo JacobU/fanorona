@@ -23,6 +23,29 @@ import {
  */
 export const NO_CAPTURE_DRAW_TURNS = 60;
 
+/**
+ * What one step (or ending a turn early) changed, so it can be undone exactly. Searches use these to try a move and
+ * take it back again, instead of saving and restoring the whole board.
+ */
+interface UndoRecord {
+    // The piece that moved and where from and to (mover is EMPTY when the record is for ending a turn early)
+    mover: PieceType,
+    from: number,
+    to: number,
+    // The opponent's pieces that were captured
+    captured: number[],
+    // Everything else as it was before the step. turnMoveIndexes is the array itself (finishTurn replaces it with a
+    // new one rather than changing it), so putting it back and trimming it to its old length restores it.
+    turnMoveIndexes: number[],
+    turnMoveLength: number,
+    currentlyMovingPiece: number | null,
+    turn: Turn,
+    turnsWithoutCapture: number,
+    attackOrWithdraw: AttackType,
+    numWhitePieces: number,
+    numBlackPieces: number,
+}
+
 export default class Board {
     private rows: number;
     private columns: number;
@@ -38,6 +61,13 @@ export default class Board {
     private currentTurn: Turn;
     private attackOrWithdraw: AttackType;
     private turnsWithoutCapture: number;
+    // Records of the steps made by makeCompleteMove, most recent last, and how many steps each complete move took
+    private undoStack: UndoRecord[] = [];
+    private completeMoveSteps: number[] = [];
+    // Scratch space for countCapturablePieces: a cell is marked when it holds the current call's number, so the marks
+    // never need clearing between calls
+    private captureMarks: Uint32Array | null = null;
+    private captureMarkNumber = 0;
 
     constructor(rows: number = 5, columns: number = 9, startingPieces?: string) {
         this.numWhitePieces = 0;
@@ -108,11 +138,13 @@ export default class Board {
         this.resetPiecePositions(this.startingPiecePositions);
         this.numWhitePieces = this.startingPiecePositions.filter(piece => piece === PieceType.WHITE).length;
         this.numBlackPieces = this.startingPiecePositions.filter(piece => piece === PieceType.BLACK).length;
-        this.turnMoveIndexes = []; 
+        this.turnMoveIndexes = [];
         this.currentlyMovingPiece = null;
         this.currentTurn = Turn.WHITE;
         this.attackOrWithdraw = AttackType.NONE;
         this.turnsWithoutCapture = 0;
+        this.undoStack = [];
+        this.completeMoveSteps = [];
     }
 
     /**
@@ -153,14 +185,32 @@ export default class Board {
             startingPiecePositions: [...this.startingPiecePositions],
             rows: this.rows,
             columns: this.columns,
+            undoDepth: this.undoStack.length,
         };
     }
 
     /**
      * @returns {Winner} the winner of the game, Winner.DRAW if NO_CAPTURE_DRAW_TURNS turns have passed without a capture,
-     * or Winner.NONE if the game isn't over yet.
+     * or Winner.NONE if the game isn't over yet. A player who can't move at the start of their turn has lost.
      */
     public getWinner(): Winner {
+        const winner = this.getWinnerByPiecesOrDraw();
+        if (winner !== Winner.NONE) {
+            return winner;
+        }
+        // Part way through a capture chain the player can always end their turn, so they can only be trapped between turns.
+        const sideToMove = this.currentTurn === Turn.WHITE ? PieceType.WHITE : PieceType.BLACK;
+        if (this.currentlyMovingPiece === null && !this.hasAnyMove(sideToMove)) {
+            return sideToMove === PieceType.WHITE ? Winner.BLACK : Winner.WHITE;
+        }
+        return Winner.NONE;
+    }
+
+    /**
+     * getWinner without the check for a trapped player. Move generation uses this because it runs very often, and a
+     * trapped player has no moves to generate anyway.
+     */
+    private getWinnerByPiecesOrDraw(): Winner {
         if (this.numBlackPieces === 0) {
             return Winner.WHITE;
         }
@@ -176,6 +226,19 @@ export default class Board {
     /**
      * @returns the number of turns in a row (counting both players) that have passed without a capture.
      */
+    /**
+     * Between turns, a player can move exactly when one of their pieces has an empty neighbour: that piece can then
+     * either capture or make a paika move.
+     */
+    private hasAnyMove(pieceType: PieceType): boolean {
+        for (let index = 0; index < this.board.length; index++) {
+            if (this.board[index].getPieceType() === pieceType && this.doesPieceHaveEmptyNeighbours(index)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public getTurnsWithoutCapture(): number {
         return this.turnsWithoutCapture;
     }
@@ -275,6 +338,13 @@ export default class Board {
      * @returns {boolean} whether the player can move again.
      */
     public performMove(index: number, direction: Direction, virtualMove: boolean = false): boolean {
+        return this.performStep(index, direction, virtualMove, null);
+    }
+
+    /**
+     * performMove, optionally filling in an undo record with what the step changed.
+     */
+    private performStep(index: number, direction: Direction, virtualMove: boolean, undo: UndoRecord | null): boolean {
         if (!(direction in Direction)) {
             throw new Error('Invalid direction when trying to move a piece.');
         }
@@ -310,7 +380,14 @@ export default class Board {
         // Work out what the move captures before making it (it doesn't depend on where the piece ends up)
         const captured = this.piecesCapturedByMove(index, pieceType, direction, attackType);
         // Set the new index after moving
+        const fromIndex = index;
         index = this.movePiece(pieceType, index, direction);
+        if (undo !== null) {
+            undo.mover = pieceType;
+            undo.from = fromIndex;
+            undo.to = index;
+            undo.captured = attackType === AttackType.NONE ? [] : captured;
+        }
         // Track where the piece is now, since only this piece can move again in this turn.
         this.currentlyMovingPiece = index;
         if (attackType !== AttackType.NONE) {
@@ -361,6 +438,108 @@ export default class Board {
         this.currentTurn = this.currentTurn ? Turn.WHITE : Turn.BLACK;
     }
 
+    /**
+     * Plays a complete turn like applyCompleteMove, but remembers what it changed so that unmakeCompleteMove can take
+     * it back. Used by the searches to try moves without copying the whole board.
+     * Every makeCompleteMove must be followed by an unmakeCompleteMove, in reverse order.
+     */
+    public makeCompleteMove(startIndex: number, move: CompleteMove): void {
+        const stepsBefore = this.undoStack.length;
+        let index = startIndex;
+        for (let i = 0; i < move.moveIndexes.length; i++) {
+            const nextIndex = move.moveIndexes[i];
+            const direction = getDirectionFromDeltaIndex(nextIndex - index, this.columns);
+            const canMoveAgain = this.makeStep(index, direction, move.moveTypes[i], false);
+            const isLastStep = i === move.moveIndexes.length - 1;
+            if (!canMoveAgain && !isLastStep) {
+                throw new Error('The complete move does not match the moves allowed by the board.');
+            }
+            // The move stops part way through a capture chain, so end the turn here.
+            if (canMoveAgain && isLastStep) {
+                if (!this.canEndTurn()) {
+                    throw new Error('The turn can only be ended in the middle of a capture chain.');
+                }
+                this.recordUndo();
+                this.finishTurn(true);
+            }
+            index = nextIndex;
+        }
+        this.completeMoveSteps.push(this.undoStack.length - stepsBefore);
+    }
+
+    /**
+     * Takes back the most recent makeCompleteMove, leaving the board exactly as it was before it.
+     */
+    public unmakeCompleteMove(): void {
+        const steps = this.completeMoveSteps.pop();
+        if (steps === undefined) {
+            throw new Error('There is nothing to undo.');
+        }
+        for (let i = 0; i < steps; i++) {
+            this.undoLastStep();
+        }
+    }
+
+    /**
+     * Saves everything a step can change (before it changes it) on the undo stack.
+     * @returns the record, for performStep to fill in with the piece that moved and what it captured.
+     */
+    private recordUndo(): UndoRecord {
+        const record: UndoRecord = {
+            mover: PieceType.EMPTY,
+            from: -1,
+            to: -1,
+            captured: [],
+            turnMoveIndexes: this.turnMoveIndexes,
+            turnMoveLength: this.turnMoveIndexes.length,
+            currentlyMovingPiece: this.currentlyMovingPiece,
+            turn: this.currentTurn,
+            turnsWithoutCapture: this.turnsWithoutCapture,
+            attackOrWithdraw: this.attackOrWithdraw,
+            numWhitePieces: this.numWhitePieces,
+            numBlackPieces: this.numBlackPieces,
+        };
+        this.undoStack.push(record);
+        return record;
+    }
+
+    /**
+     * One step of a turn that can be undone with undoLastStep. The approach-or-withdraw choice is set after the undo
+     * record is made, so undoing also puts the choice back to what it was.
+     * @returns whether the piece can move again (see performMove).
+     */
+    private makeStep(index: number, direction: Direction, attackType: AttackType, virtualMove: boolean): boolean {
+        const undo = this.recordUndo();
+        this.attackOrWithdraw = attackType;
+        return this.performStep(index, direction, virtualMove, undo);
+    }
+
+    /**
+     * Reverses the most recent step (or early end of a turn) on the undo stack.
+     */
+    private undoLastStep(): void {
+        const undo = this.undoStack.pop();
+        if (undo === undefined) {
+            throw new Error('There is nothing to undo.');
+        }
+        if (undo.mover !== PieceType.EMPTY) {
+            this.board[undo.to].setPieceType(PieceType.EMPTY);
+            this.board[undo.from].setPieceType(undo.mover);
+            const opponent = getOppositePieceType(undo.mover);
+            for (const index of undo.captured) {
+                this.board[index].setPieceType(opponent);
+            }
+        }
+        this.turnMoveIndexes = undo.turnMoveIndexes;
+        this.turnMoveIndexes.length = undo.turnMoveLength;
+        this.currentlyMovingPiece = undo.currentlyMovingPiece;
+        this.currentTurn = undo.turn;
+        this.turnsWithoutCapture = undo.turnsWithoutCapture;
+        this.attackOrWithdraw = undo.attackOrWithdraw;
+        this.numWhitePieces = undo.numWhitePieces;
+        this.numBlackPieces = undo.numBlackPieces;
+    }
+
     public getTurn() {
         return this.currentTurn;
     }
@@ -383,7 +562,7 @@ export default class Board {
      * @returns {Move[]} an array of possible moves.
      */
     public getPossibleMovesForCell(index: number): Move[] {
-        if (this.getWinner() !== Winner.NONE) return [];
+        if (this.getWinnerByPiecesOrDraw() !== Winner.NONE) return [];
 
         const pieceType = this.board[index].getPieceType();
         let moves: {index: number, direction: Direction }[] = this.getEmptyCellsThatHaventBeenVisited(index);
@@ -520,7 +699,7 @@ export default class Board {
      * @returns true if the piece has at least one legal move available.
      */
     private hasLegalMove(currentIndex: number, pieceType: PieceType, previousAttackdirection: Direction | null): boolean {
-        if (this.getWinner() !== Winner.NONE) return false;
+        if (this.getWinnerByPiecesOrDraw() !== Winner.NONE) return false;
         const emptyNeighbouringMoves = this.getEmptyNeighbouringCellsAsMoves(currentIndex);
     
         // If there are no empty neighbouring cells, the player cannot move
@@ -713,31 +892,26 @@ export default class Board {
             attackType: attackType,
         };
 
-        const boardState = this.saveBoardState();
-
-        // Get possible moves from the current index
-        const possibleMoves = this.getPossibleMovesForCell(index);
-
         // If the chain is complete, stop recursion
         if (node.isComplete) {
             return node;
         }
-    
-        // For each possible move, create a child node
+
+        // Get possible moves from the current index
+        const possibleMoves = this.getPossibleMovesForCell(index);
+
+        // For each possible move, create a child node. Each move is made, explored and then undone, so the board
+        // is back as it was before the next one is tried.
         for (const nextMove of possibleMoves) {
-            const localBoardState = this.saveBoardState();
-            this.setAttackOrWithdraw(nextMove.attackType);
-            this.performMove(index, nextMove.direction, true);
+            this.makeStep(index, nextMove.direction, nextMove.attackType, true);
             const childNode = this.buildMoveTreeForSinglePiece(
-                nextMove.index, 
-                pieceType, 
-                nextMove.direction, 
+                nextMove.index,
+                pieceType,
+                nextMove.direction,
                 nextMove.attackType);
-            this.resetBoardState(localBoardState);
+            this.undoLastStep();
             node.children.push(childNode);
         }
-        
-        this.resetBoardState(boardState);
 
         return node;
     }
@@ -789,6 +963,52 @@ export default class Board {
      */
     public getConnectedIndexes(index: number): readonly number[] {
         return this.tables.connected[index];
+    }
+
+    /**
+     * The same as getCapturablePieces(attacker).size, but much faster, because it walks the capture lines straight
+     * from the table without listing any moves. Used by the vulnerability evaluator, which runs at every position a
+     * search scores. Only reads the board.
+     * Between turns, the pieces that can be captured first are exactly those on a capture line from any of the
+     * attacker's pieces: if no piece can capture, there are none (only paika moves are possible).
+     * @param attacker the player who would be attacking.
+     * @returns how many of the defender's pieces could be captured with the first step of the attacker's turn.
+     */
+    public countCapturablePieces(attacker: PieceType): number {
+        // In the middle of a capture chain (which the evaluators never see), use the full version
+        if (this.currentlyMovingPiece !== null || this.turnMoveIndexes.length > 0) {
+            return this.getCapturablePieces(attacker).size;
+        }
+        // Once the game is over nobody can move, so nothing can be captured
+        if (this.getWinnerByPiecesOrDraw() !== Winner.NONE) return 0;
+
+        if (this.captureMarks === null) this.captureMarks = new Uint32Array(this.board.length);
+        const marks = this.captureMarks;
+        const mark = ++this.captureMarkNumber;
+        const neighbour = this.tables.neighbour;
+        const defender = getOppositePieceType(attacker);
+        let count = 0;
+        for (let index = 0; index < this.board.length; index++) {
+            if (this.board[index].getPieceType() !== attacker) continue;
+            for (const direction of this.tables.directions[index]) {
+                const moveIndex = neighbour[index * 8 + direction];
+                if (this.board[moveIndex].getPieceType() !== PieceType.EMPTY) continue;
+                // Approach: the line beyond the cell the piece moves to
+                let captured = neighbour[moveIndex * 8 + direction];
+                while (captured !== NO_NEIGHBOUR && this.board[captured].getPieceType() === defender) {
+                    if (marks[captured] !== mark) { marks[captured] = mark; count++; }
+                    captured = neighbour[captured * 8 + direction];
+                }
+                // Withdraw: the line behind the piece, away from the direction it moves
+                const behind = getOppositeDirection(direction);
+                captured = neighbour[index * 8 + behind];
+                while (captured !== NO_NEIGHBOUR && this.board[captured].getPieceType() === defender) {
+                    if (marks[captured] !== mark) { marks[captured] = mark; count++; }
+                    captured = neighbour[captured * 8 + behind];
+                }
+            }
+        }
+        return count;
     }
 
     /**

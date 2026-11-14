@@ -32,7 +32,7 @@ export function recordPosition(board: Board, sideToMove: PieceType): RecordedPos
     return {
         features: EVALUATOR_NAMES.map(name => EVALUATORS[name](board, sideToMove)),
         side: sideToMove === PieceType.WHITE ? 'WHITE' : 'BLACK',
-        quiet: board.getCapturablePieces(sideToMove).size === 0,
+        quiet: board.countCapturablePieces(sideToMove) === 0,
     };
 }
 

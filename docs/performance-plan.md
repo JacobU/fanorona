@@ -1,6 +1,6 @@
 # Search performance optimisation plan (TypeScript first)
 
-Status: planned 2026-11-14. Implement one step at a time, reporting after each.
+Status: planned 2026-11-14. Steps 0, 1, 2, 2b, 3 and 4 done on 2026-11-15 (see Progress below).
 
 **Decisions on 2026-11-15:**
 - **Doing Steps 0–3 only.**
@@ -39,6 +39,30 @@ saved in `docs/benchmarks/`.
 - **Step 2b (added and done 2026-11-15, after that profile):** `getPiecesThatPlayerCanMove`/`canPieceAttack` check each
   empty neighbour directly with the table instead of building move lists, and stop looking for paika-only pieces once one
   piece can attack. Checked against the plain rule in `tests/piecesThatCanMove.test.ts`. About 1.1x faster.
+- **Step 3 (done 2026-11-15):** `makeCompleteMove`/`unmakeCompleteMove` record what each step changed (the piece moved,
+  the captures and the turn state) and undo exactly that. They're used by the search and, step by step, by the move tree
+  builder, instead of copying the whole board. `performMove`, `applyCompleteMove`, `saveBoardState` and `resetBoardState`
+  are unchanged for the UI. The snapshot includes `undoDepth`, so every board-unchanged test also catches a move that
+  wasn't unmade. `tests/makeUnmake.test.ts` covers single steps, chains, early stops, wins, draws and nested sequences.
+  The typed-array copy of the pieces was left out (the user's decision). About 1.2x faster on endgames.
+  - Endgame profile after Step 3 (self time): getPossibleMovesForCell 23%, getPiecesThatPlayerCanMove 15%,
+    getCapturablePieces 9%, lineExposure 6%, garbage collection 5%, negamax 5%, undoLastStep 4%,
+    buildMoveTreeForSinglePiece 4%.
+  - Total-time profile (each including what it calls): vulnerability 46%, listing the search's moves 21%, the other
+    evaluators about 15%, make/unmake about 6%, negamax 5%, garbage collection 5%.
+- **Step 4 (added and done 2026-11-15, after that profile):**
+  - `Board.countCapturablePieces` walks every capture line straight from the table, listing no moves, and is used by
+    vulnerability and Texel. `getCapturablePieces` is unchanged and serves as the reference: the count matches it in
+    every test position.
+  - `negamax` tries longer capture chains first (`searchOptions.orderMoves`), but not at the root, so the root's move
+    order, scores and tied-best moves stay identical. A test checks this with ordering on and off.
+  - This is the exact-result part of Step 5's move ordering. Iterative deepening and the transposition table are still
+    not done. Ordering cut the opening nodes by 72%, but barely helped endgames, whose moves are mostly single steps.
+  - Openings got 3.6x faster and endgames 1.8x.
+- **Rule change (2026-11-15, not a speed-up):** a player who can't move at the start of their turn now loses. This is
+  checked in `Board.getWinner`, so the search, bot games and the UI all agree. Move generation still uses the cheaper
+  check without it. It costs about 3% on the endgame benchmark. The golden results were unaffected (no trapped
+  positions within depth 3), and so were the benchmark node counts.
 
 | Step | Openings: DeepFortress depth 4, 20 positions (median / 90% / worst ms) | Endgames: DeepFortressEndgame depth 6, 28 positions (median / 90% / worst ms) | Nodes (openings / endgames) |
 |---|---|---|---|
@@ -46,6 +70,9 @@ saved in `docs/benchmarks/`.
 | 1 (lookup tables) | 195 / 449 / 557 (4.5 s in total) | 168 / 1,944 / 2,682 (12.9 s in total) | 261,871 / 2,036,012 |
 | 2 (line-walk captures) | 138 / 344 / 391 (3.1 s in total) | 156 / 1,785 / 2,563 (12.1 s in total) | 261,871 / 2,036,012 |
 | 2b (pieces that can move) | 117 / 304 / 339 (2.7 s in total) | 147 / 1,628 / 2,324 (11.1 s in total) | 261,871 / 2,036,012 |
+| 3 (make/unmake) | 109 / 258 / 326 (2.5 s in total) | 110 / 1,284 / 2,222 (9.2 s in total) | 261,871 / 2,036,012 |
+| 4 (fast vulnerability count and move ordering) | 25 / 42 / 107 (0.7 s in total) | 71 / 741 / 961 (5.0 s in total) | 73,951 / 2,028,352 |
+| **Overall** | **11x / 15x / 7x faster (9x in total)** | **3.1x / 3.5x / 4.0x faster (3.6x in total)** | same decisions |
 
 Repeat runs vary by about 1–4%.
 

@@ -74,11 +74,8 @@ export function playGame(
     let turns = 0;
 
     while (board.getWinner() === Winner.NONE && turns < maxTurns) {
+        // (A player who can't move has lost, which getWinner already checks.)
         const isWhitesTurn = board.getTurn() === Turn.WHITE;
-        const pieceType = isWhitesTurn ? PieceType.WHITE : PieceType.BLACK;
-        if (board.getPiecesThatPlayerCanMove(pieceType).length === 0) {
-            return { result: isWhitesTurn ? 'BLACK' : 'WHITE', turns, whiteMs, blackMs };
-        }
 
         onTurnStart?.(board);
         const player = isWhitesTurn ? whitePlayer : blackPlayer;
