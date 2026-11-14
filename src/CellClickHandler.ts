@@ -27,15 +27,22 @@ export default class CellClickHandler {
         // 4. The player is in the middle of an attacking chain and clicks on anything besides a possible 
         //    move (given that you are not in the middle of selecting an approach/withdraw)
         // 5. The player is in the middle of choosing whether to attack or withdraw and clicks on anything besides those two indexes
-        if (this.board.getTurn() !== Turn.WHITE 
-            || (this.currentlySelectedCell === null && !this.board.getPiecesThatPlayerCanMove(this.playersPieceType).includes(index))
-            || (this.currentlySelectedCell !== null && !this.isSelectingAttackOrWithdraw &&
-                ((!this.possibleMoveIndexes.map(move => move.index).includes(index) && this.board.getPieceTypeAtIndex(index) === PieceType.EMPTY) 
-                    || this.board.getPieceTypeAtIndex(index) === PieceType.BLACK))
-            || ((this.inTheMiddleOfAttackingChain && this.currentlySelectedCell && !this.isSelectingAttackOrWithdraw) && !this.possibleMoveIndexes.map(move => move.index).includes(index))
-            || (this.isSelectingAttackOrWithdraw && !this.approachOrWithdrawPieces?.includes(index))
-        ) 
-        {
+        const isPossibleMove = this.possibleMoveIndexes.map(move => move.index).includes(index);
+        const isNotMyTurn = this.board.getTurn() !== Turn.WHITE;
+        const isSelectingNonMovablePiece = this.currentlySelectedCell === null
+            && !this.board.getPiecesThatPlayerCanMove(this.playersPieceType).includes(index);
+        const isInvalidMoveWhilePieceSelected = this.currentlySelectedCell !== null
+            && !this.isSelectingAttackOrWithdraw
+            && ((!isPossibleMove && this.board.getPieceTypeAtIndex(index) === PieceType.EMPTY)
+                || this.board.getPieceTypeAtIndex(index) === PieceType.BLACK);
+        const isLockedInChainClickingNonMove = this.inTheMiddleOfAttackingChain
+            && this.currentlySelectedCell !== null
+            && !this.isSelectingAttackOrWithdraw
+            && !isPossibleMove;
+        const isChoosingAttackTypeClickingWrong = this.isSelectingAttackOrWithdraw
+            && !this.approachOrWithdrawPieces?.includes(index);
+        if (isNotMyTurn || isSelectingNonMovablePiece || isInvalidMoveWhilePieceSelected
+            || isLockedInChainClickingNonMove || isChoosingAttackTypeClickingWrong) {
             return false;
         }
 

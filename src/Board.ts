@@ -269,7 +269,7 @@ export default class Board {
         index = this.movePiece(pieceType, index, direction);
         if (attackType !== AttackType.NONE) {
             this.removeAttackedPieces(index, pieceType, direction, attackType);
-            const canMoveAgain = this.canPlayerMoveAgain(index, pieceType, direction);
+            const canMoveAgain = this.canContinueAttackChain(index, pieceType, direction);
             if (canMoveAgain) {
                 return true;
             }
@@ -306,11 +306,7 @@ export default class Board {
         if (this.getWinner() !== Winner.NONE) return [];
 
         const pieceType = this.board[index].getPieceType();
-        // TODO FIGURE OUT WHY IN TREE THIS IS RETURNING MOVES THAT HAVE ALREADY BEEN MOVED TO
         let moves: {index: number, direction: Direction }[] = this.getEmptyCellsThatHaventBeenVisited(index);
-        //console.log("cells we have visited",this.turnMoveIndexes);
-        //console.log("cells that havent been visited or are around our piece", moves);
-        
 
         // Return early if there are no moves
         if (moves.length === 0) {
@@ -408,26 +404,35 @@ export default class Board {
     }
 
     /**
-     * Determines whether the player can move again. This move must be attacking and neither in the same direction or reaching the same spot as the piece
-     * has previously been in this turn. Assumes a move has already been made in the players turn.
-     * @param currentIndex the current index of the piece.
+     * Called after an attack has been made in performMove. Checks whether the piece can attack again
+     * in a new direction (continuing the chain). Always requires the next move to be an attack.
+     * @param currentIndex the current index of the piece after the last attack.
      * @param pieceType the piece type of the player.
-     * @param previousAttackdirection the direction the last move in the turn attacked.
-     * @returns true if the player can play another move.
+     * @param previousAttackdirection the direction of the attack just made.
+     * @returns true if the piece can continue attacking.
      */
-    private canPlayerMoveAgain(currentIndex: number, pieceType: PieceType, previousAttackdirection: Direction | null): boolean {
+    private canContinueAttackChain(currentIndex: number, pieceType: PieceType, previousAttackdirection: Direction | null): boolean {
         // We check that there is at least a single neighbour of the current index of the piece that meet all of the following criteria:
         // 1) EMPTY, 2) not the original index of the piece in this turn, 3) in a different direction the last directon's move,
         // and 4) are attacking moves.
         return this.getEmptyNeighbouringCellsAsMoves(currentIndex)
-            .some(move => 
+            .some(move =>
                 !this.turnMoveIndexes.includes(move.index) &&
                 move.direction !== previousAttackdirection &&
                 (!previousAttackdirection || move.direction !== getOppositeDirection(previousAttackdirection)) &&
                 (this.willMoveApproach(currentIndex, pieceType, move.direction) || this.willMoveWithdraw(currentIndex, pieceType, move.direction)));
     }
-    
-    private canPlayerMove(currentIndex: number, pieceType: PieceType, previousAttackdirection: Direction | null): boolean {
+
+    /**
+     * Called when building the move tree to decide whether a node has children. Allows paika (non-attacking)
+     * moves when previousAttackdirection is null (the first move of the turn). Use canContinueAttackChain
+     * in performMove instead — that call site always has a previous direction and always requires an attack.
+     * @param currentIndex the current index of the piece.
+     * @param pieceType the piece type of the player.
+     * @param previousAttackdirection the direction of the previous move, or null if this is the first move.
+     * @returns true if the piece has at least one legal move available.
+     */
+    private hasLegalMove(currentIndex: number, pieceType: PieceType, previousAttackdirection: Direction | null): boolean {
         const emptyNeighbouringMoves = this.getEmptyNeighbouringCellsAsMoves(currentIndex);
     
         // If there are no empty neighbouring cells, the player cannot move
@@ -589,7 +594,7 @@ export default class Board {
         const node: TreeNode<number> =  {
             value: index,
             children: [],
-            isComplete: !this.canPlayerMove(index, pieceType, previousMoveDirection),
+            isComplete: !this.hasLegalMove(index, pieceType, previousMoveDirection),
             attackType: attackType,
             rating: null,
         };

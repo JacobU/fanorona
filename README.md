@@ -6,3 +6,6 @@ Currently WIP for a web board game to play Fanorona (https://en.wikipedia.org/wi
 # Run (currently localhost)
 - Run `http-server` in the root directory
 - Navigate to localhost:8080 and then to the dist directory
+
+# Tests
+- Run `npm test`
