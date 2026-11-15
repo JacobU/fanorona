@@ -49,13 +49,17 @@ export default class GameSession {
     }
 
     /**
+     * @param botThinking whether the bot is choosing its move (it can take a few seconds on the hardest difficulty).
      * @returns text saying whose turn it is, or an empty string when no game is being played.
      */
-    public turnLabel(board: Board): string {
+    public turnLabel(board: Board, botThinking: boolean = false): string {
         if (this.mode === 'choosing') return '';
         const colour = turnColour(board);
         const label = `${colour === PieceType.WHITE ? 'White' : 'Black'} to move`;
-        if (this.mode === 'vsBot') return `${label} (${colour === this.humanColour ? 'you' : 'bot'})`;
+        if (this.mode === 'vsBot') {
+            if (colour === this.humanColour) return `${label} (you)`;
+            return `${label} (${botThinking ? 'bot is thinking…' : 'bot'})`;
+        }
         return label;
     }
 

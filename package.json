@@ -4,7 +4,7 @@
   "main": "src/index.js",
   "type": "module",
   "scripts": {
-    "build": "esbuild src/index.ts --bundle --outfile=dist/src/bundle.js --format=esm && cpx \"src/**/*.html\" dist/src/ && cpx \"src/assets/**/*\" dist/src/assets/",
+    "build": "esbuild src/index.ts --bundle --outfile=dist/src/bundle.js --format=esm && esbuild src/searchWorker.ts --bundle --outfile=dist/src/searchWorker.bundle.js --format=esm && cpx \"src/**/*.html\" dist/src/ && cpx \"src/assets/**/*\" dist/src/assets/",
     "build:src": "tsc -p tsconfig.json",
     "build:test": "tsc -p tsconfig.test.json",
     "test": "npm run build:src && npm run build:test && mocha 'dist/tests/**/*.js'",

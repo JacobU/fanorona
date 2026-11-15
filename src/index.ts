@@ -1,6 +1,7 @@
 import Board from './Board.js';
 import SearchBot from './ai/SearchBot.js';
-import { Fortress } from './ai/presets.js';
+import { BotPlayer, DIFFICULTIES, DIFFICULTY_NAMES, DifficultyName } from './ai/difficulties.js';
+import TurnPlanner from './TurnPlanner.js';
 import CellClickHandler from './CellClickHandler.js';
 import GameSession, { turnColour } from './GameSession.js';
 import { PieceType, Direction, Winner } from './types.js';
@@ -25,11 +26,16 @@ const cellClickHandler = new CellClickHandler(board);
 const session = new GameSession();
 cellClickHandler.setControlledColours(session.controlledColours());
 // A new bot is created for each vs Bot game, so nothing carries over between games
-let botPlayer: SearchBot | null = null;
+let botPlayer: BotPlayer | null = null;
+// The difficulty chosen for the current (or next) vs Bot game
+let selectedDifficulty: DifficultyName | null = null;
+// Chooses the search bots' turns in a background worker, so the page stays responsive while they think
+const turnPlanner = new TurnPlanner();
 
 const endTurnButton = document.getElementById('end-turn-button')!;
 const restartButton = document.getElementById('restart-button')!;
 const modeChoice = document.getElementById('mode-choice')!;
+const difficultyChoice = document.getElementById('difficulty-choice')!;
 const colourChoice = document.getElementById('colour-choice')!;
 const turnIndicator = document.getElementById('turn-indicator')!;
 const messageContainer = document.getElementById('message-container')!;
@@ -41,8 +47,12 @@ const RESTART_CONFIRM_MS = 3000;
 
 // True while a move is being processed or animated (including the bot's turn). All input is ignored meanwhile.
 let inputLocked = false;
-// True after choosing vs Bot, while the player picks which colour to play
+// True after choosing vs Bot, while the player picks the bot's difficulty
+let choosingDifficulty = false;
+// True after choosing the difficulty, while the player picks which colour to play
 let choosingColour = false;
+// True while the bot is choosing its move (shown in the turn indicator)
+let botThinking = false;
 // Set while Restart has been clicked once and is waiting for the confirming second click
 let restartConfirmTimer: ReturnType<typeof setTimeout> | null = null;
 
@@ -71,11 +81,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
 endTurnButton.addEventListener('click', onEndTurnClicked);
 restartButton.addEventListener('click', onRestartClicked);
-document.getElementById('vs-bot-button')!.addEventListener('click', () => { choosingColour = true; updateControls(); });
+document.getElementById('vs-bot-button')!.addEventListener('click', () => { choosingDifficulty = true; updateControls(); });
+// One button per difficulty, easiest first, placed before the Back button
+const difficultyBackButton = document.getElementById('difficulty-back-button')!;
+for (const name of DIFFICULTY_NAMES) {
+    const button = document.createElement('button');
+    button.className = 'board-button';
+    button.textContent = name;
+    button.title = DIFFICULTIES[name].description;
+    button.addEventListener('click', () => {
+        selectedDifficulty = name;
+        choosingDifficulty = false;
+        choosingColour = true;
+        updateControls();
+    });
+    difficultyChoice.insertBefore(button, difficultyBackButton);
+}
+difficultyBackButton.addEventListener('click', () => { choosingDifficulty = false; updateControls(); });
 document.getElementById('two-player-button')!.addEventListener('click', () => startGame('twoPlayer'));
 document.getElementById('play-white-button')!.addEventListener('click', () => startGame('vsBot', PieceType.WHITE));
 document.getElementById('play-black-button')!.addEventListener('click', () => startGame('vsBot', PieceType.BLACK));
-document.getElementById('colour-back-button')!.addEventListener('click', () => { choosingColour = false; updateControls(); });
+document.getElementById('colour-back-button')!.addEventListener('click', () => { choosingColour = false; choosingDifficulty = true; updateControls(); });
 
 // The board starts locked, showing the mode choice
 updateControls();
@@ -154,6 +180,7 @@ function returnToModeChoice() {
     cellClickHandler.reset();
     cellClickHandler.setControlledColours(session.controlledColours());
     botPlayer = null;
+    choosingDifficulty = false;
     choosingColour = false;
     board.reset();
     messageContainer.style.display = 'none';
@@ -172,7 +199,8 @@ function startGame(mode: 'vsBot' | 'twoPlayer', humanColour?: PieceType) {
     cellClickHandler.reset();
     cellClickHandler.setControlledColours(session.controlledColours());
     const botColour = session.botColour();
-    botPlayer = botColour === null ? null : new SearchBot(botColour, board, Fortress);
+    botPlayer = botColour === null ? null : DIFFICULTIES[selectedDifficulty!].create(botColour, board);
+    choosingDifficulty = false;
     choosingColour = false;
     board.reset();
     messageContainer.style.display = 'none';
@@ -214,10 +242,11 @@ function updateControls() {
     restartButton.classList.toggle('visible', !isChoosing);
     restartButton.classList.toggle('is-disabled', inputLocked);
     restartButton.textContent = gameOver ? PLAY_AGAIN_LABEL : restartConfirmTimer !== null ? RESTART_CONFIRM_LABEL : RESTART_LABEL;
-    modeChoice.hidden = !isChoosing || choosingColour;
+    modeChoice.hidden = !isChoosing || choosingDifficulty || choosingColour;
+    difficultyChoice.hidden = !isChoosing || !choosingDifficulty;
     colourChoice.hidden = !isChoosing || !choosingColour;
     turnIndicator.hidden = isChoosing || gameOver;
-    turnIndicator.textContent = session.turnLabel(board);
+    turnIndicator.textContent = session.turnLabel(board, botThinking);
 }
 
 /**
@@ -282,7 +311,21 @@ async function runBotTurnAndRefresh() {
     if (botPlayer !== null && botColour === turnColour(board)) {
         // Show that it's the bot's turn while it moves, and give the player a moment to see the last move first
         updateControls();
-        await sleep(BOT_TURN_PAUSE_MS);
+        if (botPlayer instanceof SearchBot) {
+            // Search bots choose their turn in the background, at the same time as the usual pause, so the
+            // quicker ones feel just as before and the page stays responsive while the hardest one thinks.
+            botThinking = true;
+            updateControls();
+            const [plannedTurn] = await Promise.all([
+                turnPlanner.plan(board.saveBoardState(), selectedDifficulty!, botColour!),
+                sleep(BOT_TURN_PAUSE_MS),
+            ]);
+            botThinking = false;
+            updateControls();
+            if (plannedTurn !== null) botPlayer.usePlannedTurn(plannedTurn);
+        } else {
+            await sleep(BOT_TURN_PAUSE_MS);
+        }
         let notFinishedTurn: boolean = true;
         while(notFinishedTurn) {
             const positionsBefore = board.getBoardPiecePositions();

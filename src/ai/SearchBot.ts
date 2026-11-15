@@ -36,6 +36,18 @@ export default class SearchBot {
         return this.preset.name;
     }
 
+    /**
+     * Plays this complete turn (chosen elsewhere, e.g. by planTurn in a Web Worker) from the next makeMove call,
+     * instead of searching for one. Only allowed at the start of a turn.
+     */
+    public usePlannedTurn(move: BestMove): void {
+        if (this.currentMove !== null) {
+            throw new Error(`${this.pieceTypeString} is part-way through a turn, so it can't start a planned one.`);
+        }
+        this.currentMove = move;
+        this.currentMoveIndex = 0;
+    }
+
     public makeMove() {
         this.playerIsMovingLog();
 

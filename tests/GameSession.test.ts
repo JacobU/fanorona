@@ -56,6 +56,17 @@ describe('GameSession tests', () => {
         expect(session.turnLabel(board)).to.equal('Black to move');
     });
 
+    it('should say when the bot is thinking, and only in vs Bot', () => {
+        const board = new Board(5, 5, '1000000000000000000000002');
+        const session = new GameSession();
+        session.start('vsBot', PieceType.BLACK);
+        expect(session.turnLabel(board, true)).to.equal('White to move (bot is thinking…)');
+        expect(session.turnLabel(board, false)).to.equal('White to move (bot)');
+        const twoPlayer = new GameSession();
+        twoPlayer.start('twoPlayer');
+        expect(twoPlayer.turnLabel(board, true)).to.equal('White to move');
+    });
+
     it('should require a colour for vs Bot', () => {
         expect(() => new GameSession().start('vsBot')).to.throw();
     });

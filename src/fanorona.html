@@ -50,7 +50,7 @@
             margin-bottom: 12px;
         }
 
-        #mode-choice, #colour-choice {
+        #mode-choice, #difficulty-choice, #colour-choice {
             display: flex;
             align-items: center;
             gap: 12px;
@@ -284,6 +284,10 @@
         <div id="mode-choice">
             <button id="vs-bot-button" class="board-button">vs Bot</button>
             <button id="two-player-button" class="board-button">2 Player</button>
+        </div>
+        <!-- The difficulty buttons are added by index.ts, from the list of difficulties in ai/difficulties.ts -->
+        <div id="difficulty-choice" hidden>
+            <button id="difficulty-back-button" class="board-button small">Back</button>
         </div>
         <div id="colour-choice" hidden>
             <button id="play-white-button" class="board-button">Play as White</button>
