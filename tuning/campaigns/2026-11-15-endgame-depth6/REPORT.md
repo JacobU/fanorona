@@ -2,8 +2,8 @@
 
 This follows `docs/endgame-tuning-handoff.md`. The plan is in `~/.claude/plans/read-through-the-docs-endgame-tuning-han-ticklish-teapot.md`.
 
-**Status (paused 2026-11-15):** stages 0 and 1 are done, and stage 3 rounds 1–2 (the depth-4 screen) are done. Paused
-before round 3 (depth-4 refinement) and the depth-6 confirmation. **No presets have been changed.**
+**Status:** stages 0–1 and stage 3 rounds 1–2 (the depth-4 screen) are done. Stage 4 (the depth-6 round robin) chunks 1–2
+and the depth-6-against-weak-bots run are done. Waiting for the user to choose the next check. Round 3 (the depth-4 refinement) is on hold. **No presets have been changed.**
 
 ## Picking this up again
 1. **The code changes from stage 1 are uncommitted** (on `main`, on top of `4185a5b`).
@@ -236,6 +236,246 @@ weights, so this shows trends only):
 - **Round 3, a refinement grid at depth 4:** e ∈ {0, 10} × c ∈ {20, 40, 70} × s ∈ {0, +10} (12 bots), plus r43, r02, r17,
   r09, Current and Base, on 64 new starts. About 2300 games, about 15 minutes.
 - **Then depth-6 confirmation:** the best 2 against Current and Base, in 30-minute chunks.
+
+## Stage 4: depth-6 confirmation, a round robin from endgame starts (`e4a-d6-roundrobin.json`, `e4a-output.txt`)
+**Decision (user):** the candidates must also play each other, not only DeepFortressEndgame, so the results show general
+strength rather than skill at beating one opponent. Round 3 (the depth-4 refinement) was skipped for now.
+
+- **The bots,** all with Fortress weights, depth 4 and endgame depth 6:
+  - **r43** (e7 c21 s15 v−1 l2): this is "Base" in the output, because a config with no grid always plays its base;
+  - **r02** (e8 c37 s1 v−24 l0): l0 is set explicitly, because variant endgame weights are merged onto the base's;
+  - **DeepFortressEndgame** (the current preset, e40 c20).
+- **Chunk 1:** 12 endgame starts (seed 3401) × 2 colours × 3 pairings = 72 games. It also measures the real depth-6 speed.
+  Later chunks will be sized to fit 30 minutes, use new seeds, and be pooled.
+
+### Chunk 1 results (72 games in 14.1 min, so about 11.7 s per game and about 150 games per 30 min; ± about 14%)
+
+| Bot | Score | W-D-L % | vs r43 | vs r02 | vs DFE | Converts | Holds | ms/turn |
+|---|---|---|---|---|---|---|---|---|
+| r43 ("Base") | 53.1% | 29-48-23 | – | 50.0% (5-14-5) | 56.3% (9-9-6) | 54% | 54% | 680 |
+| r02 | 52.1% | 29-46-25 | 50.0% | – | 54.2% (9-8-7) | 54% | 50% | 585 |
+| DeepFortressEndgame | 44.8% | 27-35-38 | 43.8% | 45.8% | – | 54% | **33%** | 451 |
+
+**First look** (too few games to be sure):
+- **The depth-4 finding repeats at depth 6:** the current preset defends badly from behind.
+  - DFE holds 33% of the games it starts behind (0 wins, 8 draws, 16 losses).
+  - r43 holds 54% and r02 holds 50%.
+  - All three convert equally well (54%).
+- **r43 and r02 are level head to head** (5-14-5).
+- **Depth 6 converts more than depth 4** (54% against about 47–50%). That's expected, since a deeper search finds more
+  winning lines.
+- **Chunk 2** (`e4b-d6-roundrobin.json`): 22 new starts (seed 3402), 132 games, about 26 min. It will be pooled with
+  chunk 1.
+
+### Chunk 2 (`e4b-d6-roundrobin.json`: 22 new starts, seed 3402, 132 games in 22.8 min) and the pooled results
+
+| Bot | Chunk 2 | **Pooled (136 games each, ± 8.4%)** | W-D-L | vs r43 | vs r02 | vs DFE | Converts | Holds |
+|---|---|---|---|---|---|---|---|---|
+| r02 | 53.4% | **52.9%** | 36-72-28 | 55.1% (17-41-10) | – | 50.7% (19-31-18) | 51% | 60% |
+| r43 ("Base") | 46.0% | **48.5%** | 28-76-32 | – | 44.9% (10-41-17) | 52.2% (18-35-15) | 40% | 53% |
+| DeepFortressEndgame | 50.6% | **48.5%** | 33-66-37 | 47.8% (15-35-18) | 49.3% (18-31-19) | – | 47% | 49% |
+
+**Chunk 2 didn't repeat chunk 1.**
+- The current preset scored 50.6%, and its Holds rose from 33% to 57%.
+- r43 dropped to 46%.
+- Pooled, **all three bots are within noise of each other at depth 6** (48.5–52.9%, ± 8.4%). So the clear depth-4 picture
+  doesn't show up here, at least not at this game count.
+
+**Possible causes:**
+1. **Noise.**
+   - The depth-4 gap between the leaders and Current was about 6–7 points, which is smaller than the ± here.
+   - Chunk 1's large hold gap came from only 24 games per bot.
+2. **Deeper search makes the evaluation matter less.** The 2026-11-14 campaigns saw the same thing: weights mattered much
+   less at depth 4 than at depth 2. At depth 6 the search finds the tactics itself, so the positional endgame terms have
+   less to add.
+3. **A different yardstick.**
+   - At depth 4, every bot played DeepFortress (no endgame weights). Current scored 54% there and the leaders about 60%.
+   - That *indirect* gap of about 6 points was never measured head to head. Here r43 against Current is 52.2%
+     head to head.
+
+**How to check** (the user decides):
+- **A cheap depth-4 head-to-head** (r43, r02 and Current in a round robin at endgame depth 4, about 2000 games in a few
+  minutes). If the gap is also small at depth 4 head to head, cause 3 is the main one. If it's clear at depth 4 but not
+  at depth 6, cause 2 is.
+- **Or more depth-6 chunks:** 2 more chunks (about 50 min) would bring the ± to about 6%.
+
+### Depth-6 bots against weak bots (`e4c-d6-vs-weak.json`, `e4c-output.txt`)
+- **Requested by the user,** to see how the depth-6 bots do against bad players.
+- **The match-up:** r43 ("Base"), r02 and Current (= DeepFortressEndgame) against Greedy (depth 1, material only),
+  Lookahead (depth 2, material only) and Fortress (depth 2).
+- **The games:** a gauntlet, so the weak bots don't play each other. 14 new starts (seed 3403) × 2 colours × 9 pairings =
+  252 games.
+
+**Results** (252 games in 8.0 min; each depth-6 bot played 84 games):
+
+| Depth-6 bot | Score | W-D-L | vs Greedy | vs Lookahead | vs Fortress | Converts | Holds | Wins from behind |
+|---|---|---|---|---|---|---|---|---|
+| r43 ("Base") | 95.2% | 78-4-2 | 100% (28-0-0) | 93% (26-0-2) | 93% (24-4-0) | 98% | 95% | 37 of 42 |
+| r02 | 95.2% | 77-6-1 | 100% (28-0-0) | 93% (25-2-1) | 93% (24-4-0) | 95% | 98% | 37 of 42 |
+| Current | 95.2% | 78-4-2 | 100% (28-0-0) | 96% (27-0-1) | 89% (23-4-1) | 98% | 95% | 37 of 42 |
+
+**The weak bots' side:**
+
+| Weak bot | When ahead (W-D-L) | When behind (W-D-L) |
+|---|---|---|
+| Fortress | 1-8-33 | 0-4-38 |
+| Lookahead | 4-2-36 | 0-0-42 |
+| Greedy | 0-0-42 | 0-0-42 |
+
+**Findings:**
+- **Depth 6 crushes the weak bots from any start.** The depth-6 bots win about 88% of the games they *start 1–2 pieces
+  behind*.
+- **The weak bots throw away almost every lead.** Fortress won only 1 of 42 games it started ahead.
+- **The endgame weights make no difference here.** All three depth-6 bots scored exactly 95.2%, so against weak players
+  the depth does all the work.
+- The 1–2 piece lead in the starts is small compared with the gap between depth 6 and depth 1–2.
+- **For the user (the browser game plays Fortress):** in the endgame, depth matters far more than any of the endgame
+  weights tested.
+
+### Search time by depth (the 28 benchmark endgame positions, `tests/golden/benchmark-positions.json`; DeepFortressEndgame's evaluator; one thread)
+
+| Depth | Total | Mean | Median | 90th percentile | Worst | Growth on the previous depth |
+|---|---|---|---|---|---|---|
+| 4 | 0.2 s | 8 ms | 4 ms | 22 ms | 43 ms | |
+| 5 | 1.1 s | 38 ms | 17 ms | 137 ms | 202 ms | ×5 |
+| 6 | 5.1 s | 184 ms | 74 ms | 738 ms | 1.0 s | ×4.6 |
+| 7 | 31.7 s | 1.1 s | 354 ms | 3.7 s | 8.9 s | ×6.2 |
+| **8** | **146.7 s** | **5.2 s** | **1.2 s** | **23.7 s** | **38.0 s** | ×4.6 (×29 over depth 6) |
+
+**What this means for real games:**
+- In real games, depth-6 moves took about 400–680 ms on average (stage 0 and stage 4), against 184 ms for the benchmark
+  mean. Game positions with 9–10 pieces are harder than the average benchmark position.
+- So **depth 8 in games is likely to be about 10–20 s per move on average, with some moves taking a minute or more.**
+- A depth-8 tuning game (about 100 depth-8 moves) would take about 15–30 min per worker. That's only about 5–10 games per
+  30-minute run, which is too few to test.
+- The measuring script is a scratchpad copy of `RunBenchmark.ts`'s timing loop, with the depth as a parameter. It isn't
+  saved in the repo.
+
+## Current pick: r02 (2026-11-15, provisional, not yet tested in whole games)
+
+**Why r02:** it's the only candidate at or above 50% in every comparison so far.
+
+| Test | r02 | r43 | Current (e40 c20) | No endgame weights |
+|---|---|---|---|---|
+| Depth 4, against DeepFortress (176 games each) | 60.2% | 61.1% | 54.0% | 50.0% |
+| Depth 6, round robin (136 games each, ± 8.4%) | **52.9%** | 48.5% | 48.5% | – |
+| Depth 6, head to head | beats r43 55.1%; level with Current 50.7% | | | |
+| Depth 6, Holds (not lost from behind) in the round robin | **60%** | 53% | 49% | – |
+| Depth 6 against Greedy / Lookahead / Fortress | 95.2% | 95.2% | 95.2% | – |
+
+**Honest caveats:**
+- At depth 6, r02's lead over Current is inside the noise.
+- Its main advantage is losing less often from behind.
+- It hasn't been tested in whole games from the start (stage 5).
+
+**How r02 plays through a game:**
+- Its endgame weights (e8 c37 s1 v−24 l0) are *added* to Fortress's weights.
+- They fade in as the board empties, using the default thresholds (10 and 6).
+
+| Pieces on the board (both colours) | Search depth | Blend | material | vulnerability | strongPoints | lineExposure | edgeExposure | centrality |
+|---|---|---|---|---|---|---|---|---|
+| 11 or more (opening and middlegame) | 4 | 0 | 100 | 30 | 5 | 5 | 0 | 0 |
+| 10 | **6** | 0 | 100 | 30 | 5 | 5 | 0 | 0 |
+| 9 | 6 | 0.25 | 100 | 24 | 5.25 | 5 | 2 | 9.25 |
+| 8 | 6 | 0.5 | 100 | 18 | 5.5 | 5 | 4 | 18.5 |
+| 7 | 6 | 0.75 | 100 | 12 | 5.75 | 5 | 6 | 27.75 |
+| 6 or fewer | 6 | 1 | 100 | 6 | 6 | 5 | 8 | 37 |
+
+**What changes in the endgame:**
+- **Centrality becomes the main positional term.** Each step a piece sits further from the edge is worth 0.37 of a piece.
+- **Vulnerability falls from 30 to 6.** At depth 6 the search sees most captures itself, so the static "could be captured
+  next turn" count matters less.
+- **edgeExposure stays small** (8, against Current's 40). Weighting it heavily seems to make the side behind take risks to
+  push enemy pieces to the edge, which is why Current loses more often from behind.
+- **strongPoints and lineExposure stay as they are.**
+
+**Checked in a real game** (scratchpad script, not saved in the repo):
+- One whole game, r02 against DeepFortressEndgame from a random opening, logging every turn.
+- Depth 4 was used down to 11 pieces, and depth 6 from 10 pieces (turn 81) onwards.
+- The blend went 0 → 0.25 → 0.5 → 0.75 → 1 at 9, 8, 7 and 6 pieces.
+- r02's evaluator matched the hand-computed blended weights on all 276 turns.
+- This is also covered by `tests/endgame.test.ts`.
+
+**Note on "depth 6 for all moves":**
+- By design, the bots search depth 6 only from 10 pieces down. Before that they use depth 4.
+- 10 pieces arrives early in most games (turn 9–17), so most moves of a typical game are at depth 6 anyway. In the traced
+  game it was turns 81–276, about 70% of them.
+- Depth 6 in the opening and middlegame hasn't been timed. Opening positions have far more moves, so it would be much
+  slower than depth 6 in the endgame.
+
+## Depth 6 on every move (r02's weights), timed (single thread; scratchpad scripts, not in the repo)
+**From the starting position and after openings:**
+- The standard start: 0.30 s at depth 6 (0.03 s at depth 4). There are only a few legal first moves.
+- The 20 benchmark positions after 4-turn openings: mean 0.40 s, median 0.31 s, worst 1.21 s (depth 4: mean 0.03 s).
+
+**Three whole games, depth 6 on both sides throughout:**
+
+| Pieces left | Moves | Mean | Median | 90th percentile | Worst |
+|---|---|---|---|---|---|
+| 31–44 | 9 | 0.56 s | 0.51 s | 0.94 s | 0.94 s |
+| 21–30 | 7 | 0.09 s | 0.06 s | 0.15 s | 0.15 s |
+| 11–20 | 11 | 0.03 s | 0.02 s | 0.08 s | 0.15 s |
+| ≤10 | 209 | 0.82 s | 0.51 s | 1.96 s | 5.91 s |
+| **All** | 236 | **0.75 s** | | 1.83 s | **5.91 s** (99th percentile 3.92 s) |
+
+**Findings:**
+- **Depth 6 for the whole game is feasible.**
+- The opening and middlegame are fast: captures are compulsory, so there are few choices, and the board thins out
+  quickly.
+- Nearly all the time goes on the endgame, where the bots already search at depth 6.
+
+## Difficulty levels (added 2026-11-15 at the user's request; tests first in `tests/difficulties.test.ts`)
+`src/ai/difficulties.ts` exports `DIFFICULTIES` and `DIFFICULTY_NAMES`.
+- **Each difficulty has:** a `name`, a `description`, its `preset` (`null` for random), and
+  `create(pieceType, board)`.
+- `create` returns a `BotPlayer` with the same `makeMove()` that `src/index.ts` uses. The browser still plays Fortress;
+  the UI for choosing a difficulty is for later.
+
+| Level | Bot | Search |
+|---|---|---|
+| Easy | Random (`BotRandomPlayer`) | none |
+| Medium | Fortress | depth 2 |
+| Hard | DeepFortress | depth 4 all game |
+| Impossible | **Deep6Central** (new preset): Fortress weights, plus r02's endgame weights (e8 c37 s1 v−24) blended in from 10 pieces to 6 | **depth 6 on every move** |
+
+- **Why Hard is DeepFortress:** DeepFortressEndgame already switches to depth 6 in the endgame, so it would be too close
+  to Impossible.
+- **Deep6Central is left out of `ALL_PRESETS`,** so the "every preset plays a full game" test and the default tournament
+  stay fast. That also means `findBuiltInSpec` (tuning configs) can't find it by name. Use `depth: 6` with its weights in
+  a config instead.
+- **Not yet measured:** how much stronger depth 6 for the whole game is than DeepFortressEndgame (depth 4, then depth 6
+  from 10 pieces).
+
+## Impossible against Hard in whole games (`e5a-impossible-vs-hard.json`, `e5a-output.txt`)
+- **The bots:**
+  - Impossible: Deep6Central's settings, "depth=6" in the output (a one-value depth grid, so the bot isn't called
+    "Base");
+  - Hard: DeepFortress.
+- **The games:** 40 paired random 4-turn openings (seed 3501, at most 2 pieces of imbalance), each played with both
+  colours. 80 games in 13.6 min (about 10 s per game with 3 workers). No game hit the turn limit.
+
+| Bot | Score | ± | W-D-L | Decisive | ms/turn |
+|---|---|---|---|---|---|
+| **Impossible (depth 6 all game)** | **70.6%** | 10.0% | 37-39-4 | 90% | 691 |
+| Hard (DeepFortress, depth 4) | 29.4% | | 4-39-37 | 10% | 13 |
+
+**Split by who was ahead after the opening:**
+
+| Impossible started | W-D-L |
+|---|---|
+| Ahead | 13-18-1 |
+| Behind | 14-16-2 |
+| Level | 10-5-1 |
+
+**Findings:**
+- **Impossible is clearly stronger than Hard.** 70.6% ± 10%, and it lost only 4 of 80 games.
+- **Half the games are still drawn.** When something is decided, Impossible wins 9 times in 10.
+- **It wins from behind as often as from ahead** (14 against 13), so the opening imbalance hardly matters at this gap in
+  depth.
+- **Speed:** 0.69 s per move on average with 3 games running at once, against 13 ms for Hard.
+- **For comparison:** in stage 0, DeepFortressEndgame (depth 4, then 6 from 10 pieces) scored 55% ± 22% against
+  DeepFortress over 20 games. That's too few games to say whether depth 6 on every move beats depth 6 only in the
+  endgame. A direct Deep6Central against DeepFortressEndgame match would answer it.
 
 ## Summary so far (for a quick restart)
 - **What helps at endgame depth 4:**

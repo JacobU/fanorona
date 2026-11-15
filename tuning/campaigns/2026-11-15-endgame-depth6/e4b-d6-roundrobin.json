@@ -1,0 +1,14 @@
+{
+  "mode": "roundRobin",
+  "endgameStarts": { "count": 22, "seed": 3402 },
+  "opponents": ["DeepFortressEndgame"],
+  "base": {
+    "depth": 4,
+    "weights": { "material": 100, "vulnerability": 30, "strongPoints": 5, "lineExposure": 5 },
+    "endgameWeights": { "edgeExposure": 7, "centrality": 21, "strongPoints": 15, "vulnerability": -1, "lineExposure": 2 },
+    "endgameDepth": 6
+  },
+  "variants": [
+    { "name": "r02", "endgameWeights": { "edgeExposure": 8, "centrality": 37, "strongPoints": 1, "vulnerability": -24, "lineExposure": 0 } }
+  ]
+}

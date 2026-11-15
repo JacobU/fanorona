@@ -1,0 +1,123 @@
+{
+  "date": "2026-11-15T05:28:15.534Z",
+  "configFile": "e5a-impossible-vs-hard.json",
+  "config": {
+    "mode": "gauntlet",
+    "openings": {
+      "count": 40,
+      "turns": 4,
+      "seed": 3501
+    },
+    "opponents": [
+      "DeepFortress"
+    ],
+    "base": {
+      "depth": 6,
+      "weights": {
+        "material": 100,
+        "vulnerability": 30,
+        "strongPoints": 5,
+        "lineExposure": 5
+      },
+      "endgameWeights": {
+        "edgeExposure": 8,
+        "centrality": 37,
+        "strongPoints": 1,
+        "vulnerability": -24
+      }
+    },
+    "grid": {
+      "depth": [
+        6
+      ]
+    }
+  },
+  "totalGames": 80,
+  "elapsedMs": 813240,
+  "results": [
+    {
+      "name": "depth=6",
+      "isVariant": true,
+      "depth": 6,
+      "weights": {
+        "material": 100,
+        "vulnerability": 30,
+        "strongPoints": 5,
+        "lineExposure": 5
+      },
+      "endgameWeights": {
+        "edgeExposure": 8,
+        "centrality": 37,
+        "strongPoints": 1,
+        "vulnerability": -24
+      },
+      "score": 0.70625,
+      "margin": 0.0998111928530563,
+      "winRate": 0.4625,
+      "drawRate": 0.4875,
+      "lossRate": 0.05,
+      "decisiveWinRate": 0.9024390243902439,
+      "wins": 37,
+      "draws": 39,
+      "losses": 4,
+      "turnLimitDraws": 0,
+      "msPerTurn": 690.9638185080265,
+      "vs": {
+        "DeepFortress": {
+          "wins": 37,
+          "draws": 39,
+          "losses": 4
+        }
+      },
+      "ahead": {
+        "wins": 13,
+        "draws": 18,
+        "losses": 1
+      },
+      "behind": {
+        "wins": 14,
+        "draws": 16,
+        "losses": 2
+      }
+    },
+    {
+      "name": "DeepFortress",
+      "isVariant": false,
+      "depth": 4,
+      "weights": {
+        "material": 100,
+        "vulnerability": 30,
+        "strongPoints": 5,
+        "lineExposure": 5
+      },
+      "score": 0.29375,
+      "margin": 0.09981119285305631,
+      "winRate": 0.05,
+      "drawRate": 0.4875,
+      "lossRate": 0.4625,
+      "decisiveWinRate": 0.0975609756097561,
+      "wins": 4,
+      "draws": 39,
+      "losses": 37,
+      "turnLimitDraws": 0,
+      "msPerTurn": 13.408043349130876,
+      "vs": {
+        "depth=6": {
+          "wins": 4,
+          "draws": 39,
+          "losses": 37
+        }
+      },
+      "ahead": {
+        "wins": 2,
+        "draws": 16,
+        "losses": 14
+      },
+      "behind": {
+        "wins": 1,
+        "draws": 18,
+        "losses": 13
+      }
+    }
+  ]
+}

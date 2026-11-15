@@ -1,0 +1,200 @@
+{
+  "date": "2026-11-15T04:26:59.875Z",
+  "configFile": "e4b-d6-roundrobin.json",
+  "config": {
+    "mode": "roundRobin",
+    "endgameStarts": {
+      "count": 22,
+      "seed": 3402
+    },
+    "opponents": [
+      "DeepFortressEndgame"
+    ],
+    "base": {
+      "depth": 4,
+      "weights": {
+        "material": 100,
+        "vulnerability": 30,
+        "strongPoints": 5,
+        "lineExposure": 5
+      },
+      "endgameWeights": {
+        "edgeExposure": 7,
+        "centrality": 21,
+        "strongPoints": 15,
+        "vulnerability": -1,
+        "lineExposure": 2
+      },
+      "endgameDepth": 6
+    },
+    "variants": [
+      {
+        "name": "r02",
+        "endgameWeights": {
+          "edgeExposure": 8,
+          "centrality": 37,
+          "strongPoints": 1,
+          "vulnerability": -24,
+          "lineExposure": 0
+        }
+      }
+    ]
+  },
+  "totalGames": 132,
+  "elapsedMs": 1367329,
+  "results": [
+    {
+      "name": "r02",
+      "isVariant": true,
+      "depth": 4,
+      "weights": {
+        "material": 100,
+        "vulnerability": 30,
+        "strongPoints": 5,
+        "lineExposure": 5
+      },
+      "endgameWeights": {
+        "edgeExposure": 8,
+        "centrality": 37,
+        "strongPoints": 1,
+        "vulnerability": -24,
+        "lineExposure": 0
+      },
+      "endgameDepth": 6,
+      "score": 0.5340909090909091,
+      "margin": 0.10422524398554665,
+      "winRate": 0.25,
+      "drawRate": 0.5681818181818182,
+      "lossRate": 0.18181818181818182,
+      "decisiveWinRate": 0.5789473684210527,
+      "wins": 22,
+      "draws": 50,
+      "losses": 16,
+      "turnLimitDraws": 0,
+      "msPerTurn": 378.9402421645019,
+      "vs": {
+        "Base": {
+          "wins": 12,
+          "draws": 27,
+          "losses": 5
+        },
+        "DeepFortressEndgame": {
+          "wins": 10,
+          "draws": 23,
+          "losses": 11
+        }
+      },
+      "ahead": {
+        "wins": 22,
+        "draws": 21,
+        "losses": 1
+      },
+      "behind": {
+        "wins": 0,
+        "draws": 29,
+        "losses": 15
+      }
+    },
+    {
+      "name": "DeepFortressEndgame",
+      "isVariant": false,
+      "depth": 4,
+      "weights": {
+        "material": 100,
+        "vulnerability": 30,
+        "strongPoints": 5,
+        "lineExposure": 5
+      },
+      "endgameWeights": {
+        "edgeExposure": 40,
+        "centrality": 20
+      },
+      "endgameDepth": 6,
+      "score": 0.5056818181818182,
+      "margin": 0.10446160568084326,
+      "winRate": 0.22727272727272727,
+      "drawRate": 0.5568181818181818,
+      "lossRate": 0.2159090909090909,
+      "decisiveWinRate": 0.5128205128205128,
+      "wins": 20,
+      "draws": 49,
+      "losses": 19,
+      "turnLimitDraws": 0,
+      "msPerTurn": 376.5823716757472,
+      "vs": {
+        "Base": {
+          "wins": 9,
+          "draws": 26,
+          "losses": 9
+        },
+        "r02": {
+          "wins": 11,
+          "draws": 23,
+          "losses": 10
+        }
+      },
+      "ahead": {
+        "wins": 19,
+        "draws": 25,
+        "losses": 0
+      },
+      "behind": {
+        "wins": 1,
+        "draws": 24,
+        "losses": 19
+      }
+    },
+    {
+      "name": "Base",
+      "isVariant": true,
+      "depth": 4,
+      "weights": {
+        "material": 100,
+        "vulnerability": 30,
+        "strongPoints": 5,
+        "lineExposure": 5
+      },
+      "endgameWeights": {
+        "edgeExposure": 7,
+        "centrality": 21,
+        "strongPoints": 15,
+        "vulnerability": -1,
+        "lineExposure": 2
+      },
+      "endgameDepth": 6,
+      "score": 0.4602272727272727,
+      "margin": 0.104137315862441,
+      "winRate": 0.1590909090909091,
+      "drawRate": 0.6022727272727273,
+      "lossRate": 0.23863636363636365,
+      "decisiveWinRate": 0.4,
+      "wins": 14,
+      "draws": 53,
+      "losses": 21,
+      "turnLimitDraws": 0,
+      "msPerTurn": 474.906571741779,
+      "vs": {
+        "r02": {
+          "wins": 5,
+          "draws": 27,
+          "losses": 12
+        },
+        "DeepFortressEndgame": {
+          "wins": 9,
+          "draws": 26,
+          "losses": 9
+        }
+      },
+      "ahead": {
+        "wins": 14,
+        "draws": 30,
+        "losses": 0
+      },
+      "behind": {
+        "wins": 0,
+        "draws": 23,
+        "losses": 21
+      }
+    }
+  ]
+}

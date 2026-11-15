@@ -1,0 +1,371 @@
+{
+  "date": "2026-11-15T04:35:09.604Z",
+  "configFile": "e4c-d6-vs-weak.json",
+  "config": {
+    "mode": "gauntlet",
+    "endgameStarts": {
+      "count": 14,
+      "seed": 3403
+    },
+    "opponents": [
+      "Greedy",
+      "Lookahead",
+      "Fortress"
+    ],
+    "base": {
+      "depth": 4,
+      "weights": {
+        "material": 100,
+        "vulnerability": 30,
+        "strongPoints": 5,
+        "lineExposure": 5
+      },
+      "endgameWeights": {
+        "edgeExposure": 7,
+        "centrality": 21,
+        "strongPoints": 15,
+        "vulnerability": -1,
+        "lineExposure": 2
+      },
+      "endgameDepth": 6
+    },
+    "variants": [
+      {
+        "name": "r02",
+        "endgameWeights": {
+          "edgeExposure": 8,
+          "centrality": 37,
+          "strongPoints": 1,
+          "vulnerability": -24,
+          "lineExposure": 0
+        }
+      },
+      {
+        "name": "Current",
+        "endgameWeights": {
+          "edgeExposure": 40,
+          "centrality": 20,
+          "strongPoints": 0,
+          "vulnerability": 0,
+          "lineExposure": 0
+        }
+      }
+    ]
+  },
+  "totalGames": 252,
+  "elapsedMs": 478087,
+  "results": [
+    {
+      "name": "Base",
+      "isVariant": true,
+      "depth": 4,
+      "weights": {
+        "material": 100,
+        "vulnerability": 30,
+        "strongPoints": 5,
+        "lineExposure": 5
+      },
+      "endgameWeights": {
+        "edgeExposure": 7,
+        "centrality": 21,
+        "strongPoints": 15,
+        "vulnerability": -1,
+        "lineExposure": 2
+      },
+      "endgameDepth": 6,
+      "score": 0.9523809523809523,
+      "margin": 0.045542003404264904,
+      "winRate": 0.9285714285714286,
+      "drawRate": 0.047619047619047616,
+      "lossRate": 0.023809523809523808,
+      "decisiveWinRate": 0.975,
+      "wins": 78,
+      "draws": 4,
+      "losses": 2,
+      "turnLimitDraws": 0,
+      "msPerTurn": 416.60539804878033,
+      "vs": {
+        "Greedy": {
+          "wins": 28,
+          "draws": 0,
+          "losses": 0
+        },
+        "Lookahead": {
+          "wins": 26,
+          "draws": 0,
+          "losses": 2
+        },
+        "Fortress": {
+          "wins": 24,
+          "draws": 4,
+          "losses": 0
+        }
+      },
+      "ahead": {
+        "wins": 41,
+        "draws": 1,
+        "losses": 0
+      },
+      "behind": {
+        "wins": 37,
+        "draws": 3,
+        "losses": 2
+      }
+    },
+    {
+      "name": "r02",
+      "isVariant": true,
+      "depth": 4,
+      "weights": {
+        "material": 100,
+        "vulnerability": 30,
+        "strongPoints": 5,
+        "lineExposure": 5
+      },
+      "endgameWeights": {
+        "edgeExposure": 8,
+        "centrality": 37,
+        "strongPoints": 1,
+        "vulnerability": -24,
+        "lineExposure": 0
+      },
+      "endgameDepth": 6,
+      "score": 0.9523809523809523,
+      "margin": 0.045542003404264904,
+      "winRate": 0.9166666666666666,
+      "drawRate": 0.07142857142857142,
+      "lossRate": 0.011904761904761904,
+      "decisiveWinRate": 0.9871794871794872,
+      "wins": 77,
+      "draws": 6,
+      "losses": 1,
+      "turnLimitDraws": 0,
+      "msPerTurn": 286.55010536764723,
+      "vs": {
+        "Greedy": {
+          "wins": 28,
+          "draws": 0,
+          "losses": 0
+        },
+        "Lookahead": {
+          "wins": 25,
+          "draws": 2,
+          "losses": 1
+        },
+        "Fortress": {
+          "wins": 24,
+          "draws": 4,
+          "losses": 0
+        }
+      },
+      "ahead": {
+        "wins": 40,
+        "draws": 2,
+        "losses": 0
+      },
+      "behind": {
+        "wins": 37,
+        "draws": 4,
+        "losses": 1
+      }
+    },
+    {
+      "name": "Current",
+      "isVariant": true,
+      "depth": 4,
+      "weights": {
+        "material": 100,
+        "vulnerability": 30,
+        "strongPoints": 5,
+        "lineExposure": 5
+      },
+      "endgameWeights": {
+        "edgeExposure": 40,
+        "centrality": 20,
+        "strongPoints": 0,
+        "vulnerability": 0,
+        "lineExposure": 0
+      },
+      "endgameDepth": 6,
+      "score": 0.9523809523809523,
+      "margin": 0.045542003404264904,
+      "winRate": 0.9285714285714286,
+      "drawRate": 0.047619047619047616,
+      "lossRate": 0.023809523809523808,
+      "decisiveWinRate": 0.975,
+      "wins": 78,
+      "draws": 4,
+      "losses": 2,
+      "turnLimitDraws": 0,
+      "msPerTurn": 308.98790034293563,
+      "vs": {
+        "Greedy": {
+          "wins": 28,
+          "draws": 0,
+          "losses": 0
+        },
+        "Lookahead": {
+          "wins": 27,
+          "draws": 0,
+          "losses": 1
+        },
+        "Fortress": {
+          "wins": 23,
+          "draws": 4,
+          "losses": 1
+        }
+      },
+      "ahead": {
+        "wins": 41,
+        "draws": 1,
+        "losses": 0
+      },
+      "behind": {
+        "wins": 37,
+        "draws": 3,
+        "losses": 2
+      }
+    },
+    {
+      "name": "Fortress",
+      "isVariant": false,
+      "depth": 2,
+      "weights": {
+        "material": 100,
+        "vulnerability": 30,
+        "strongPoints": 5,
+        "lineExposure": 5
+      },
+      "score": 0.08333333333333333,
+      "margin": 0.05910599393055258,
+      "winRate": 0.011904761904761904,
+      "drawRate": 0.14285714285714285,
+      "lossRate": 0.8452380952380952,
+      "decisiveWinRate": 0.013888888888888888,
+      "wins": 1,
+      "draws": 12,
+      "losses": 71,
+      "turnLimitDraws": 0,
+      "msPerTurn": 0.2018455187398356,
+      "vs": {
+        "Base": {
+          "wins": 0,
+          "draws": 4,
+          "losses": 24
+        },
+        "r02": {
+          "wins": 0,
+          "draws": 4,
+          "losses": 24
+        },
+        "Current": {
+          "wins": 1,
+          "draws": 4,
+          "losses": 23
+        }
+      },
+      "ahead": {
+        "wins": 1,
+        "draws": 8,
+        "losses": 33
+      },
+      "behind": {
+        "wins": 0,
+        "draws": 4,
+        "losses": 38
+      }
+    },
+    {
+      "name": "Lookahead",
+      "isVariant": false,
+      "depth": 2,
+      "weights": {
+        "material": 100
+      },
+      "score": 0.05952380952380952,
+      "margin": 0.05059827255139433,
+      "winRate": 0.047619047619047616,
+      "drawRate": 0.023809523809523808,
+      "lossRate": 0.9285714285714286,
+      "decisiveWinRate": 0.04878048780487805,
+      "wins": 4,
+      "draws": 2,
+      "losses": 78,
+      "turnLimitDraws": 0,
+      "msPerTurn": 0.10799198931851711,
+      "vs": {
+        "Base": {
+          "wins": 2,
+          "draws": 0,
+          "losses": 26
+        },
+        "r02": {
+          "wins": 1,
+          "draws": 2,
+          "losses": 25
+        },
+        "Current": {
+          "wins": 1,
+          "draws": 0,
+          "losses": 27
+        }
+      },
+      "ahead": {
+        "wins": 4,
+        "draws": 2,
+        "losses": 36
+      },
+      "behind": {
+        "wins": 0,
+        "draws": 0,
+        "losses": 42
+      }
+    },
+    {
+      "name": "Greedy",
+      "isVariant": false,
+      "depth": 1,
+      "weights": {
+        "material": 100
+      },
+      "score": 0,
+      "margin": 0,
+      "winRate": 0,
+      "drawRate": 0,
+      "lossRate": 1,
+      "decisiveWinRate": 0,
+      "wins": 0,
+      "draws": 0,
+      "losses": 84,
+      "turnLimitDraws": 0,
+      "msPerTurn": 0.019627224435700325,
+      "vs": {
+        "Base": {
+          "wins": 0,
+          "draws": 0,
+          "losses": 28
+        },
+        "r02": {
+          "wins": 0,
+          "draws": 0,
+          "losses": 28
+        },
+        "Current": {
+          "wins": 0,
+          "draws": 0,
+          "losses": 28
+        }
+      },
+      "ahead": {
+        "wins": 0,
+        "draws": 0,
+        "losses": 42
+      },
+      "behind": {
+        "wins": 0,
+        "draws": 0,
+        "losses": 42
+      }
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "mode": "gauntlet",
+  "endgameStarts": { "count": 14, "seed": 3403 },
+  "opponents": ["Greedy", "Lookahead", "Fortress"],
+  "base": {
+    "depth": 4,
+    "weights": { "material": 100, "vulnerability": 30, "strongPoints": 5, "lineExposure": 5 },
+    "endgameWeights": { "edgeExposure": 7, "centrality": 21, "strongPoints": 15, "vulnerability": -1, "lineExposure": 2 },
+    "endgameDepth": 6
+  },
+  "variants": [
+    { "name": "r02", "endgameWeights": { "edgeExposure": 8, "centrality": 37, "strongPoints": 1, "vulnerability": -24, "lineExposure": 0 } },
+    { "name": "Current", "endgameWeights": { "edgeExposure": 40, "centrality": 20, "strongPoints": 0, "vulnerability": 0, "lineExposure": 0 } }
+  ]
+}

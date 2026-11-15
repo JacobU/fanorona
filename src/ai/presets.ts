@@ -126,6 +126,17 @@ export const DeepFortressEndgame = createPreset('DeepFortressEndgame', 4,
     'DeepFortress, also pushing opponent pieces to the edge and searching 6 turns ahead once few pieces are left.',
     FORTRESS_ENDGAME);
 
+// The best endgame settings from tuning so far ("r02" in tuning/campaigns/2026-11-15-endgame-depth6/REPORT.md):
+// as the board empties, mostly keep our pieces central, with only a little push towards putting theirs on the edge,
+// and rely less on the vulnerability count (the deep search sees those captures itself).
+// It searches 6 turns ahead on every move, which takes about 0.75 s per move on average.
+export const Deep6Central = createPreset('Deep6Central', 6,
+    Fortress.weights,
+    'Fortress, searching 6 turns ahead on every move, and keeping its pieces central once few pieces are left.',
+    { endgameWeights: { edgeExposure: 8, centrality: 37, strongPoints: 1, vulnerability: -24 } });
+
+// Deep6Central is left out of this list because its depth 6 search makes tournaments and tests that play every
+// preset much slower.
 export const ALL_PRESETS: BotPreset[] = [
     Greedy, Lookahead, Guardian, Sentinel, Positional, Fortress,
     DeepSentinel, DeepPositional, DeepFortress, FortressEndgame, DeepFortressEndgame,
