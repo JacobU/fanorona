@@ -4,7 +4,7 @@ import { totalPieces } from './endgame.js';
 import { Fortress } from './presets.js';
 import { seededRng } from './random.js';
 import { Candidate, Rng, chooseMove } from './Search.js';
-import { applyOpening, generateOpenings } from './tuning/Openings.js';
+import { applyOpening, generateOpenings } from './openings.js';
 
 /*
  * Fixed, seeded positions for the board-unchanged tests, the golden results and the benchmark. Each position is

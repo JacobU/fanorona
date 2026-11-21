@@ -7,6 +7,7 @@ import GameSession, { turnColour } from './GameSession.js';
 import { PieceType, Direction, Winner } from './types.js';
 import { drawBoard, animatePieceMove } from './DrawBoardAndPieces.js';
 import { BOT_CHAIN_PAUSE_MS, BOT_TURN_PAUSE_MS, sleep } from './animationHelpers.js';
+import { highlightPossibleMoves, highlightMoveablePieces, highlightApproachOrWithdrawPieces, removeAllHighlighting } from './boardHighlights.js';
 
 // Set up the canvas and context
 const canvas = document.getElementById("fanoronaBoard") as HTMLCanvasElement;
@@ -39,6 +40,7 @@ const difficultyChoice = document.getElementById('difficulty-choice')!;
 const colourChoice = document.getElementById('colour-choice')!;
 const turnIndicator = document.getElementById('turn-indicator')!;
 const messageContainer = document.getElementById('message-container')!;
+const canvasContainer = document.getElementById('canvas-container')!;
 const RESTART_LABEL = 'Restart';
 const RESTART_CONFIRM_LABEL = 'Confirm restart?';
 // Once the game is over there's nothing to lose, so the Restart button becomes a one-click Play Again
@@ -86,7 +88,8 @@ document.getElementById('vs-bot-button')!.addEventListener('click', () => { choo
 const difficultyBackButton = document.getElementById('difficulty-back-button')!;
 for (const name of DIFFICULTY_NAMES) {
     const button = document.createElement('button');
-    button.className = 'board-button';
+    // Pulses like the other choices before a game
+    button.className = 'board-button pulse-target';
     button.textContent = name;
     button.title = DIFFICULTIES[name].description;
     button.addEventListener('click', () => {
@@ -105,57 +108,6 @@ document.getElementById('colour-back-button')!.addEventListener('click', () => {
 
 // The board starts locked, showing the mode choice
 updateControls();
-
-function highlightPossibleMoves(possibleMoves: number[]) {
-    const buttons = document.querySelectorAll('.grid-container button');
-
-    // Display all possible moves
-    for (let i = 0; i < possibleMoves.length; i++) {
-        const button = buttons[possibleMoves[i]];
-        if (button) {
-            button.classList.add('possibleMove');
-        }
-    }
-}
-
-function highlightMoveablePieces(moveablePieces: number[]) {
-    const buttons = document.querySelectorAll('.grid-container button');
-
-    // Display all moveable pieces
-    for (let i = 0; i < moveablePieces.length; i++) {
-        const button = buttons[moveablePieces[i]];
-        if (button) {
-            button.classList.add('moveablePiece');
-        }
-    }
-}
-
-function highlightApproachOrWithdrawPieces(highlightApproachOrWithdrawPieces: number[]) {
-    const buttons = document.querySelectorAll('.grid-container button');
-
-    // Display the two pieces that players can choose to attack
-    for (let i = 0; i < highlightApproachOrWithdrawPieces.length; i++) {
-        const button = buttons[highlightApproachOrWithdrawPieces[i]];
-        if (button) {
-            button.classList.add('approachOrWithdraw');
-        }
-    }
-}
-
-function removeAllHighlighting() {
-    const buttonsWithMoveablePiece = document.querySelectorAll('.grid-container button.moveablePiece');
-    buttonsWithMoveablePiece.forEach(button => {
-        button.classList.remove('moveablePiece');
-    });
-    const possibleMoves = document.querySelectorAll('.grid-container button.possibleMove');
-    possibleMoves.forEach(button => {
-        button.classList.remove('possibleMove');
-    });
-    const approachOrWithdrawPieces = document.querySelectorAll('.grid-container button.approachOrWithdraw');
-    approachOrWithdrawPieces.forEach(button => {
-        button.classList.remove('approachOrWithdraw');
-    });
-}
 
 function pieceImage(pieceType: PieceType): HTMLImageElement {
     return pieceType === PieceType.WHITE ? lightPiece : darkPiece;
@@ -245,6 +197,8 @@ function updateControls() {
     modeChoice.hidden = !isChoosing || choosingDifficulty || choosingColour;
     difficultyChoice.hidden = !isChoosing || !choosingDifficulty;
     colourChoice.hidden = !isChoosing || !choosingColour;
+    // Grey out the board until a game starts, so it's clear one of the choices has to be picked first
+    canvasContainer.classList.toggle('board-inactive', isChoosing);
     turnIndicator.hidden = isChoosing || gameOver;
     turnIndicator.textContent = session.turnLabel(board, botThinking);
 }

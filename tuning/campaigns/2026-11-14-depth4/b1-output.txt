@@ -1,22 +1,0 @@
-Tuning with b1-candidates.json (gauntlet, 12 games per pair, 3 workers)
-  1/120 games played  3/120 games played  4/120 games played  5/120 games played  7/120 games played  9/120 games played  10/120 games played  11/120 games played  12/120 games played  13/120 games played  14/120 games played  15/120 games played  16/120 games played  17/120 games played  20/120 games played  22/120 games played  23/120 games played  25/120 games played  26/120 games played  27/120 games played  28/120 games played  30/120 games played  32/120 games played  33/120 games played  34/120 games played  35/120 games played  36/120 games played  37/120 games played  39/120 games played  40/120 games played  41/120 games played  42/120 games played  43/120 games played  45/120 games played  46/120 games played  47/120 games played  48/120 games played  49/120 games played  50/120 games played  51/120 games played  52/120 games played  54/120 games played  55/120 games played  56/120 games played  57/120 games played  58/120 games played  59/120 games played  60/120 games played  62/120 games played  63/120 games played  64/120 games played  66/120 games played  67/120 games played  68/120 games played  69/120 games played  70/120 games played  71/120 games played  72/120 games played  73/120 games played  74/120 games played  75/120 games played  76/120 games played  77/120 games played  78/120 games played  79/120 games played  80/120 games played  81/120 games played  82/120 games played  83/120 games played  84/120 games played  85/120 games played  86/120 games played  87/120 games played  89/120 games played  90/120 games played  91/120 games played  92/120 games played  93/120 games played  94/120 games played  95/120 games played  96/120 games played  97/120 games played  99/120 games played  101/120 games played  102/120 games played  103/120 games played  104/120 games played  106/120 games played  107/120 games played  108/120 games played  109/120 games played  111/120 games played  112/120 games played  113/120 games played  114/120 games played  115/120 games played  116/120 games played  117/120 games played  119/120 games played  120/120 games played in 452.4s
-
-Score         = points per game (win 1, draw ½). ± is how much of that could be luck (95% confidence).
-Win/Draw/Loss = share of games with each result.
-Decisive      = share of the games with a winner that this bot won (ignores draws).
-
-Bot               Score  ±      Win  Draw  Loss  Decisive  vs DeepFortress  vs DeepPositional  ms/turn
-d4 v6 m0 s15 l31  62.5%  19.4%  50%  25%   25%   67%       41.7%            83.3%              53.5
-d4 v4 m0 s0 l29   47.9%  20.0%  8%   79%   13%   40%       41.7%            54.2%              115.5
-Base              45.8%  19.9%  13%  67%   21%   38%       50.0%            41.7%              44.8
-d4 v0 m2 s12 l17  45.8%  19.9%  4%   83%   13%   25%       37.5%            54.2%              302.1
-d4 v0 m0 s12 l33  37.5%  19.4%  0%   75%   25%   0%        25.0%            50.0%              38.2
-
-Bots:
-  d4 v6 m0 s15 l31: depth 4: material 100, vulnerability 6, strongPoints 15, lineExposure 31
-  d4 v4 m0 s0 l29: depth 4: material 100, vulnerability 4, lineExposure 29
-  Base: depth 4: material 100, strongPoints 20, lineExposure 40
-  d4 v0 m2 s12 l17: depth 4: material 100, mobility 2, strongPoints 12, lineExposure 17
-  d4 v0 m0 s12 l33: depth 4: material 100, strongPoints 12, lineExposure 33
-
-Saved results to tuning\results\2026-11-14T12-32-59-b1-candidates.json

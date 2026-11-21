@@ -1,14 +1,0 @@
-Tuning with e5a-impossible-vs-hard.json (gauntlet, 40 openings of 4 turns, each played with both colours, 3 workers)
-  1/80 games played  3/80 games played  4/80 games played  5/80 games played  6/80 games played  7/80 games played  8/80 games played  9/80 games played  10/80 games played  11/80 games played  12/80 games played  14/80 games played  15/80 games played  16/80 games played  17/80 games played  18/80 games played  19/80 games played  20/80 games played  22/80 games played  23/80 games played  24/80 games played  25/80 games played  26/80 games played  27/80 games played  28/80 games played  29/80 games played  30/80 games played  31/80 games played  32/80 games played  34/80 games played  35/80 games played  36/80 games played  38/80 games played  39/80 games played  40/80 games played  41/80 games played  42/80 games played  43/80 games played  44/80 games played  45/80 games played  46/80 games played  48/80 games played  49/80 games played  50/80 games played  51/80 games played  52/80 games played  53/80 games played  54/80 games played  55/80 games played  56/80 games played  57/80 games played  58/80 games played  60/80 games played  61/80 games played  62/80 games played  63/80 games played  64/80 games played  65/80 games played  66/80 games played  67/80 games played  68/80 games played  70/80 games played  71/80 games played  72/80 games played  73/80 games played  74/80 games played  75/80 games played  76/80 games played  78/80 games played  79/80 games played  80/80 games played in 813.2s
-
-Score         = points per game (win 1, draw ½). ± is how much of that could be luck (95% confidence).
-Win/Draw/Loss = share of games with each result.
-Decisive      = share of the games with a winner that this bot won (ignores draws).
-
-Bot      Score  ±      Win  Draw  Loss  Decisive  vs DeepFortress  ms/turn
-depth=6  70.6%  10.0%  46%  49%   5%    90%       70.6%            691.0
-
-Bots:
-  depth=6: depth 6: material 100, vulnerability 30, strongPoints 5, lineExposure 5; endgame: vulnerability -24, strongPoints 1, edgeExposure 8, centrality 37
-
-Saved results to tuning\results\2026-11-15T05-28-15-e5a-impossible-vs-hard.json

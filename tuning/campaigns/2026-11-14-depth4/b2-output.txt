@@ -1,20 +1,0 @@
-Tuning with b2-refine.json (gauntlet, 16 games per pair, 3 workers)
-  1/64 games played  2/64 games played  3/64 games played  6/64 games played  8/64 games played  10/64 games played  11/64 games played  12/64 games played  13/64 games played  14/64 games played  16/64 games played  18/64 games played  20/64 games played  21/64 games played  22/64 games played  23/64 games played  24/64 games played  26/64 games played  27/64 games played  29/64 games played  30/64 games played  31/64 games played  32/64 games played  34/64 games played  35/64 games played  37/64 games played  38/64 games played  39/64 games played  40/64 games played  41/64 games played  42/64 games played  44/64 games played  45/64 games played  46/64 games played  47/64 games played  48/64 games played  49/64 games played  50/64 games played  51/64 games played  52/64 games played  53/64 games played  54/64 games played  55/64 games played  56/64 games played  57/64 games played  58/64 games played  60/64 games played  61/64 games played  64/64 games played in 183.7s
-
-Score         = points per game (win 1, draw ½). ± is how much of that could be luck (95% confidence).
-Win/Draw/Loss = share of games with each result.
-Decisive      = share of the games with a winner that this bot won (ignores draws).
-
-Bot               Score  ±      Win  Draw  Loss  Decisive  vs DeepFortress  ms/turn
-Base              56.3%  24.3%  44%  25%   31%   58%       56.3%            43.4
-d4 v0 m0 s20 l40  46.9%  24.5%  31%  31%   38%   45%       46.9%            27.8
-d4 v4 m0 s31 l23  25.0%  21.2%  0%   50%   50%   0%        25.0%            109.3
-d4 v5 m0 s5 l12   21.9%  20.3%  0%   44%   56%   0%        21.9%            89.6
-
-Bots:
-  Base: depth 4: material 100, vulnerability 6, strongPoints 15, lineExposure 31
-  d4 v0 m0 s20 l40: depth 4: material 100, strongPoints 20, lineExposure 40
-  d4 v4 m0 s31 l23: depth 4: material 100, vulnerability 4, strongPoints 31, lineExposure 23
-  d4 v5 m0 s5 l12: depth 4: material 100, vulnerability 5, strongPoints 5, lineExposure 12
-
-Saved results to tuning\results\2026-11-14T12-36-29-b2-refine.json

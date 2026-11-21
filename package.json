@@ -4,19 +4,14 @@
   "main": "src/index.js",
   "type": "module",
   "scripts": {
-    "build": "esbuild src/index.ts --bundle --outfile=dist/src/bundle.js --format=esm && esbuild src/searchWorker.ts --bundle --outfile=dist/src/searchWorker.bundle.js --format=esm && cpx \"src/**/*.html\" dist/src/ && cpx \"src/assets/**/*\" dist/src/assets/",
+    "build": "esbuild src/index.ts --bundle --outfile=dist/src/bundle.js --format=esm && esbuild src/searchWorker.ts --bundle --outfile=dist/src/searchWorker.bundle.js --format=esm && esbuild src/tutorial/tutorial.ts --bundle --outfile=dist/src/tutorial.bundle.js --format=esm && cpx \"src/**/*.html\" dist/src/ && cpx \"src/**/*.css\" dist/src/ && cpx \"src/assets/**/*\" dist/src/assets/",
     "build:src": "tsc -p tsconfig.json",
     "build:test": "tsc -p tsconfig.test.json",
     "test": "npm run build:src && npm run build:test && mocha 'dist/tests/**/*.js'",
     "test:full": "npm run build:src && npm run build:test && mocha 'dist/tests/**/*.js'",
     "golden": "npm run build:src && node dist/src/RunGolden.js",
     "bench": "npm run build:src && node dist/src/RunBenchmark.js",
-    "start": "node --loader ts-node/esm src/FanoronaBotsGame.ts",
-    "tournament": "npm run build:src && node dist/src/RunTournament.js",
-    "tune": "npm run build:src && node dist/src/RunTuning.js",
-    "texel": "npm run build:src && node dist/src/RunTexel.js",
-    "halving": "npm run build:src && node dist/src/RunHalving.js",
-    "cmaes": "npm run build:src && node dist/src/RunCmaes.js"
+    "start": "npm run build && npx serve dist/src"
   },
   "keywords": [],
   "author": "",

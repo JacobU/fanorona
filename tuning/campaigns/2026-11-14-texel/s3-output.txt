@@ -1,18 +1,0 @@
-Tuning with s3-validate.json (gauntlet, 50 openings of 4 turns, each played with both colours, 3 workers)
-  1/900 games played  23/900 games played  57/900 games played  93/900 games played  110/900 games played  119/900 games played  134/900 games played  143/900 games played  160/900 games played  171/900 games played  185/900 games played  199/900 games played  236/900 games played  292/900 games played  311/900 games played  330/900 games played  346/900 games played  367/900 games played  388/900 games played  401/900 games played  409/900 games played  418/900 games played  427/900 games played  435/900 games played  445/900 games played  452/900 games played  459/900 games played  467/900 games played  478/900 games played  488/900 games played  495/900 games played  499/900 games played  521/900 games played  544/900 games played  560/900 games played  578/900 games played  603/900 games played  632/900 games played  665/900 games played  699/900 games played  710/900 games played  724/900 games played  733/900 games played  741/900 games played  754/900 games played  767/900 games played  773/900 games played  783/900 games played  790/900 games played  805/900 games played  838/900 games played  891/900 games played  900/900 games played in 54.7s
-
-Score         = points per game (win 1, draw ½). ± is how much of that could be luck (95% confidence).
-Win/Draw/Loss = share of games with each result.
-Decisive      = share of the games with a winner that this bot won (ignores draws).
-
-Bot                           Score  ±     Win  Draw  Loss  Decisive  vs Fortress  vs AllRounder  vs Lookahead  ms/turn
-Old tuned v6 m0 s15 l31       56.5%  5.6%  24%  65%   11%   69%       51.5%        49.0%          69.0%         1.0
-Base                          46.2%  5.6%  13%  66%   21%   39%       40.0%        46.0%          52.5%         0.9
-Texel quiet v369 m21 s75 l41  39.0%  5.5%  10%  58%   32%   24%       35.5%        42.5%          39.0%         3.1
-
-Bots:
-  Old tuned v6 m0 s15 l31: depth 2: material 100, vulnerability 6, strongPoints 15, lineExposure 31
-  Base: depth 2: material 100, vulnerability 37, strongPoints 65, lineExposure 44
-  Texel quiet v369 m21 s75 l41: depth 2: material 100, vulnerability 369, mobility 21, strongPoints 75, lineExposure 41
-
-Saved results to tuning\results\2026-11-14T12-54-12-s3-validate.json

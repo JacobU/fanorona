@@ -1,14 +1,0 @@
-Tuning with e0-baseline.json (gauntlet, 10 openings of 4 turns, each played with both colours, 3 workers)
-  1/20 games played  2/20 games played  3/20 games played  4/20 games played  6/20 games played  7/20 games played  8/20 games played  10/20 games played  11/20 games played  12/20 games played  13/20 games played  14/20 games played  15/20 games played  16/20 games played  18/20 games played  19/20 games played  20/20 games played in 313.0s
-
-Score         = points per game (win 1, draw ½). ± is how much of that could be luck (95% confidence).
-Win/Draw/Loss = share of games with each result.
-Decisive      = share of the games with a winner that this bot won (ignores draws).
-
-Bot   Score  ±      Win  Draw  Loss  Decisive  vs DeepFortress  ms/turn
-Base  55.0%  21.8%  30%  50%   20%   60%       55.0%            645.6
-
-Bots:
-  Base: depth 4: material 100, vulnerability 30, strongPoints 5, lineExposure 5; endgame: edgeExposure 40, centrality 20; endgame depth 6
-
-Saved results to tuning\results\2026-11-14T17-25-57-e0-baseline.json

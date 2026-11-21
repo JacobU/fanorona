@@ -4,8 +4,7 @@ import Board, { NO_CAPTURE_DRAW_TURNS } from '../src/Board.js';
 import { material, vulnerability, strongPoints, lineExposure } from '../src/ai/evaluators.js';
 import { weighted } from '../src/ai/Evaluator.js';
 import { chooseMove, getBestMoveSimple, WIN_SCORE } from '../src/ai/Search.js';
-import { ALL_PRESETS, EVALUATOR_NAMES, Fortress } from '../src/ai/presets.js';
-import { RandomContestant, contestantFromPreset, playGame } from '../src/ai/Tournament.js';
+import { ALL_PRESETS, EVALUATOR_NAMES, Fortress, evaluatorFromWeights } from '../src/ai/presets.js';
 
 const moveKey = (m: { startIndex: number, move: { moveIndexes: number[] } }) => `${m.startIndex}:${m.move.moveIndexes.join(',')}`;
 
@@ -173,13 +172,10 @@ describe('Search tests', () => {
     });
 });
 
-describe('Tournament tests', () => {
-    it('every preset should be able to play a full game', function () {
-        // The depth 4 presets take a few seconds per game.
-        this.timeout(60000);
-        for (const preset of ALL_PRESETS) {
-            const stats = playGame(contestantFromPreset(preset), RandomContestant);
-            expect(['WHITE', 'BLACK', 'DRAW']).to.include(stats.result);
-        }
+describe('Preset tests', () => {
+    it('evaluatorFromWeights should weight each named evaluator', () => {
+        const board = new Board(3, 3, '210200201');
+        const evaluator = evaluatorFromWeights({ material: 10, lineExposure: 3, strongPoints: 0 });
+        expect(evaluator(board, PieceType.WHITE)).to.equal(10 * material(board, PieceType.WHITE) + 3 * lineExposure(board, PieceType.WHITE));
     });
 });

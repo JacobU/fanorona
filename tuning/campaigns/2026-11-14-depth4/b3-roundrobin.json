@@ -1,6 +1,0 @@
-{
-  "mode": "roundRobin",
-  "gamesPerPair": 12,
-  "opponents": ["DeepFortress", "DeepSentinel", "DeepPositional"],
-  "base": { "depth": 4, "weights": { "material": 100, "vulnerability": 6, "mobility": 0, "strongPoints": 15, "lineExposure": 31 } }
-}

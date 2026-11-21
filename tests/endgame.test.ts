@@ -8,8 +8,6 @@ import {
     createPreset, evaluatorFromWeights,
 } from '../src/ai/presets.js';
 import { ENDGAME_FULL_PIECES, ENDGAME_START_PIECES, endgameFactor, searchDepthFor, totalPieces } from '../src/ai/endgame.js';
-import { BotSpec, findBuiltInSpec, presetFromSpec, specFromPreset } from '../src/ai/tuning/BotSpec.js';
-import { buildVariants } from '../src/ai/tuning/TuningConfig.js';
 
 /**
  * Builds a board of the given size with white and black pieces at the given indexes (everything else empty).
@@ -284,65 +282,6 @@ describe('Endgame blending tests', () => {
         }
     });
 });
-
-describe('Endgame BotSpec tests', () => {
-    it('specFromPreset should carry the endgame settings', () => {
-        const spec = specFromPreset(FortressEndgame);
-        expect(spec).to.deep.equal({
-            kind: 'search', name: 'FortressEndgame', depth: 2, weights: Fortress.weights,
-            endgameWeights: { edgeExposure: 40, centrality: 20 }, endgameDepth: 6,
-        });
-        // The spec gets its own copy of the weights.
-        if (spec.kind === 'search') expect(spec.endgameWeights).to.not.equal(FortressEndgame.endgameWeights);
-        expect(findBuiltInSpec('fortressendgame')).to.deep.equal(spec);
-    });
-
-    it('specFromPreset should not add endgame fields to presets without them', () => {
-        expect(specFromPreset(Fortress)).to.deep.equal({ kind: 'search', name: 'Fortress', depth: 2, weights: Fortress.weights });
-    });
-
-    it('should round trip the endgame settings through presetFromSpec', () => {
-        const spec: BotSpec = {
-            kind: 'search', name: 'Test', depth: 3, weights: { material: 100 },
-            endgameWeights: { centrality: 7 }, endgameDepth: 5,
-        };
-        const preset = presetFromSpec(spec);
-        expect(preset.endgameWeights).to.deep.equal({ centrality: 7 });
-        expect(preset.endgameDepth).to.equal(5);
-        expect(specFromPreset(preset)).to.deep.equal(spec);
-        const board = boardWithPieces(4);
-        expect(preset.evaluator(board, PieceType.WHITE)).to.equal(100 * material(board, PieceType.WHITE) + 7 * centrality(board, PieceType.WHITE));
-
-        const plain: BotSpec = { kind: 'search', name: 'Plain', depth: 2, weights: { material: 100 } };
-        expect(specFromPreset(presetFromSpec(plain))).to.deep.equal(plain);
-    });
-
-    it('tuning configs should pass endgame settings from the base and variants to the bots', () => {
-        const variants = buildVariants({
-            base: { depth: 2, weights: { material: 100 }, endgameWeights: { edgeExposure: 40 }, endgameDepth: 6 },
-            variants: [
-                { name: 'More centrality', endgameWeights: { centrality: 20 } },
-                { name: 'Shallow endgame', endgameDepth: 4 },
-            ],
-        });
-        expect(variants).to.deep.equal([
-            { kind: 'search', name: 'Base', depth: 2, weights: { material: 100 }, endgameWeights: { edgeExposure: 40 }, endgameDepth: 6 },
-            { kind: 'search', name: 'More centrality', depth: 2, weights: { material: 100 }, endgameWeights: { edgeExposure: 40, centrality: 20 }, endgameDepth: 6 },
-            { kind: 'search', name: 'Shallow endgame', depth: 2, weights: { material: 100 }, endgameWeights: { edgeExposure: 40 }, endgameDepth: 4 },
-        ]);
-    });
-
-    it('tuning configs without endgame settings should build the same bots as before', () => {
-        expect(buildVariants({ base: { depth: 2, weights: { material: 100 } } })).to.deep.equal([
-            { kind: 'search', name: 'Base', depth: 2, weights: { material: 100 } },
-        ]);
-    });
-
-    it('tuning configs should reject unknown evaluators in endgame weights', () => {
-        expect(() => buildVariants({ base: { weights: {}, endgameWeights: { edgy: 1 } as any } })).to.throw('Unknown evaluator "edgy"');
-    });
-});
-
 describe('Per-bot endgame threshold tests', () => {
     const endgameWeights = { edgeExposure: 40, centrality: 20 };
 
@@ -386,28 +325,5 @@ describe('Per-bot endgame threshold tests', () => {
     it('should reject thresholds where full is not below start', () => {
         expect(() => createPreset('Bad', 2, Fortress.weights, '', { endgameWeights, endgameStart: 6, endgameFull: 6 })).to.throw('endgameFull');
         expect(() => createPreset('Bad', 2, Fortress.weights, '', { endgameWeights, endgameStart: 5 })).to.throw('endgameFull');
-    });
-
-    it('should round trip the thresholds through BotSpec', () => {
-        const spec: BotSpec = {
-            kind: 'search', name: 'Test', depth: 4, weights: { material: 100 },
-            endgameWeights: { centrality: 7 }, endgameDepth: 6, endgameStart: 8, endgameFull: 4,
-        };
-        const preset = presetFromSpec(spec);
-        expect(preset.endgameStart).to.equal(8);
-        expect(preset.endgameFull).to.equal(4);
-        expect(specFromPreset(preset)).to.deep.equal(spec);
-    });
-
-    it('tuning configs should pass thresholds from the base and variants to the bots', () => {
-        const variants = buildVariants({
-            base: { depth: 4, weights: { material: 100 }, endgameWeights: { edgeExposure: 40 }, endgameDepth: 6, endgameStart: 10, endgameFull: 6 },
-            variants: [{ name: 'Late', endgameStart: 8, endgameFull: 4 }],
-        });
-        expect(variants[0]).to.deep.include({ endgameStart: 10, endgameFull: 6 });
-        expect(variants[1]).to.deep.equal({
-            kind: 'search', name: 'Late', depth: 4, weights: { material: 100 },
-            endgameWeights: { edgeExposure: 40 }, endgameDepth: 6, endgameStart: 8, endgameFull: 4,
-        });
     });
 });

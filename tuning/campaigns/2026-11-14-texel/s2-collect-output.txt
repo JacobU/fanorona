@@ -1,4 +1,0 @@
-Collecting positions from 600 games between Greedy, Guardian, Lookahead, Sentinel, Strangler, Positional, AllRounder, Fortress (3 workers)
-  1/600 games played  15/600 games played  31/600 games played  59/600 games played  83/600 games played  102/600 games played  128/600 games played  148/600 games played  171/600 games played  187/600 games played  210/600 games played  228/600 games played  255/600 games played  299/600 games played  323/600 games played  344/600 games played  371/600 games played  397/600 games played  414/600 games played  442/600 games played  470/600 games played  487/600 games played  506/600 games played  519/600 games played  538/600 games played  553/600 games played  577/600 games played  600/600 games played in 29.1s
-Saved 42537 positions (36443 quiet) to s2-depth2-positions.json
-Results: white won 181, black won 166, drawn 253

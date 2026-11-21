@@ -47,7 +47,7 @@ describe('Difficulty level tests', () => {
         expect(searchDepthFor(Deep6Central, endgameBoard())).to.equal(6);
     });
 
-    it('Deep6Central should not be in ALL_PRESETS, so the default tournaments and the quick tests stay fast', () => {
+    it('Deep6Central should not be in ALL_PRESETS, so the quick tests stay fast', () => {
         expect(ALL_PRESETS).to.not.include(Deep6Central);
     });
 

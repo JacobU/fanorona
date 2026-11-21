@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fanorona Tutorial</title>
+    <!-- The look shared with the game page: buttons, the board grid and its highlights -->
+    <link rel="stylesheet" href="./styles.css">
+    <style>
+        /* The tutorial is taller than the game page, so let it grow and scroll on small screens */
+        body {
+            height: auto;
+            min-height: 100vh;
+            padding: 16px 0;
+            box-sizing: border-box;
+        }
+
+        /* Row above the explanation: how far through the tutorial the player is, and the way back to the game */
+        #tutorial-header {
+            width: 900px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        /* Small capitals, like the game's turn indicator */
+        #tutorial-progress {
+            margin: 0;
+            font-size: 18px;
+            font-weight: bold;
+            font-variant: small-caps;
+            letter-spacing: 2px;
+        }
+
+        /* The explanation for the step. It has a fixed height so the board doesn't move between steps. */
+        #tutorial-panel {
+            width: 900px;
+            height: 170px;
+            box-sizing: border-box;
+            padding: 16px 28px;
+            margin-bottom: 16px;
+        }
+
+        #tutorial-title {
+            margin: 0 0 8px;
+            font-size: 22px;
+            font-variant: small-caps;
+            letter-spacing: 2px;
+        }
+
+        #tutorial-text {
+            margin: 0 0 10px;
+            font-size: 16px;
+            line-height: 1.45;
+        }
+
+        /* A hint after a wrong click, or the success message once the step is done */
+        #tutorial-feedback {
+            margin: 0;
+            font-size: 16px;
+            min-height: 1.45em;
+        }
+
+        #tutorial-feedback.hint {
+            font-style: italic;
+            color: #a0522d;
+        }
+
+        #tutorial-feedback.success {
+            font-weight: bold;
+            color: #2e7d32;
+        }
+
+        /* The arrows are drawn on this canvas, over the board and under the grid of buttons */
+        #tutorialOverlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* Back and Reset on the left; End turn and Next on the right */
+        #tutorial-controls {
+            width: 900px;
+            display: flex;
+            justify-content: space-between;
+            margin-top: 12px;
+        }
+
+        #tutorial-controls > div {
+            display: flex;
+            gap: 12px;
+        }
+
+        /* End turn is only shown when the step asks for it, and keeps its space when hidden */
+        #end-turn-button {
+            visibility: hidden;
+        }
+
+        #end-turn-button.visible {
+            visibility: visible;
+        }
+    </style>
+</head>
+<body>
+    <div id="tutorial-header">
+        <p id="tutorial-progress"></p>
+        <a class="board-button small" href="./index.html">Back to game</a>
+    </div>
+
+    <div id="tutorial-panel" class="framed-panel">
+        <h2 id="tutorial-title"></h2>
+        <p id="tutorial-text"></p>
+        <p id="tutorial-feedback"></p>
+    </div>
+
+    <div id="canvas-container">
+        <canvas id="fanoronaBoard" width="900" height="500"></canvas>
+        <canvas id="tutorialOverlay" width="900" height="500"></canvas>
+        <div class="grid-container">
+            <!-- Generate 9x5 grid buttons -->
+            <script>
+            for (let i = 0; i < 45; i++) {
+                document.write(`<button id="btn-${i}"></button>`);
+            }
+            </script>
+        </div>
+    </div>
+
+    <div id="tutorial-controls">
+        <div>
+            <button id="back-button" class="board-button">Back</button>
+            <button id="reset-button" class="board-button">Reset step</button>
+        </div>
+        <div>
+            <button id="end-turn-button" class="board-button">End turn</button>
+            <button id="next-button" class="board-button">Next</button>
+            <a id="play-link" class="board-button" href="./index.html" hidden>Play a game</a>
+        </div>
+    </div>
+
+    <script type="module" src="./tutorial.bundle.js"></script>
+</body>
+</html>

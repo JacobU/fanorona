@@ -4,7 +4,6 @@ import { PieceType, Turn, Winner } from '../src/types.js';
 import { material } from '../src/ai/evaluators.js';
 import { Fortress } from '../src/ai/presets.js';
 import { WIN_SCORE, findBestMoves } from '../src/ai/Search.js';
-import { contestantFromPreset, playGame } from '../src/ai/Tournament.js';
 import { boardFromPosition } from '../src/ai/testPositions.js';
 import { loadGolden } from './helpers/golden.js';
 
@@ -96,11 +95,5 @@ describe('A player who cannot move loses', () => {
             if (lost) trapped++;
         }
         expect(trapped, 'trapped positions checked').to.equal(3);
-    });
-
-    it('should still let bot games finish normally', function () {
-        this.timeout(30_000);
-        const stats = playGame(contestantFromPreset(Fortress), contestantFromPreset(Fortress), 300, () => 0.5);
-        expect(['WHITE', 'BLACK', 'DRAW']).to.include(stats.result);
     });
 });

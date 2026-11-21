@@ -2,7 +2,7 @@ import { Rng } from './Search.js';
 
 /**
  * A small, fast random number generator (mulberry32) that always produces the same sequence for the same seed.
- * Used so that tuning runs can be repeated exactly (e.g. the same set of openings every time).
+ * Used so that test positions and searches can be repeated exactly (e.g. the same set of openings every time).
  */
 export function seededRng(seed: number): Rng {
     let state = seed >>> 0;

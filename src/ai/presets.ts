@@ -3,8 +3,7 @@ import { material, vulnerability, strongPoints, lineExposure, edgeExposure, cent
 import { ENDGAME_FULL_PIECES, ENDGAME_START_PIECES, blendEndgame } from './endgame.js';
 
 /**
- * Every evaluator that can be weighted, by name. Add new evaluators here to make them available to presets
- * and to the tuning script.
+ * Every evaluator that can be weighted, by name. Add new evaluators here to make them available to presets.
  */
 export const EVALUATORS = { material, vulnerability, strongPoints, lineExposure, edgeExposure, centrality };
 
@@ -67,8 +66,9 @@ export function createPreset(name: string, depth: number, weights: Weights, desc
     return preset;
 }
 
-// Weights are integers (to avoid floating point ties being missed) and are just starting guesses to be tuned
-// by running tournaments (see RunTuning.ts). Material is weighted heavily so the other metrics mostly act as tie-breakers.
+// Weights are integers (to avoid floating point ties being missed) and were tuned by running bot tournaments (the
+// tuning code has since been removed; it's in the git history). Material is weighted heavily so the other metrics
+// mostly act as tie-breakers.
 const MATERIAL = 100;
 const VULNERABILITY = 30;
 const STRONG_POINTS = 5;
@@ -126,7 +126,8 @@ export const DeepFortressEndgame = createPreset('DeepFortressEndgame', 4,
     'DeepFortress, also pushing opponent pieces to the edge and searching 6 turns ahead once few pieces are left.',
     FORTRESS_ENDGAME);
 
-// The best endgame settings from tuning so far ("r02" in tuning/campaigns/2026-11-15-endgame-depth6/REPORT.md):
+// The best endgame settings from tuning ("r02" in tuning/campaigns/2026-11-15-endgame-depth6/REPORT.md, which is
+// now only in the git history):
 // as the board empties, mostly keep our pieces central, with only a little push towards putting theirs on the edge,
 // and rely less on the vulnerability count (the deep search sees those captures itself).
 // It searches 6 turns ahead on every move, which takes about 0.75 s per move on average.
@@ -135,8 +136,7 @@ export const Deep6Central = createPreset('Deep6Central', 6,
     'Fortress, searching 6 turns ahead on every move, and keeping its pieces central once few pieces are left.',
     { endgameWeights: { edgeExposure: 8, centrality: 37, strongPoints: 1, vulnerability: -24 } });
 
-// Deep6Central is left out of this list because its depth 6 search makes tournaments and tests that play every
-// preset much slower.
+// Deep6Central is left out of this list because its depth 6 search makes tests that play every preset much slower.
 export const ALL_PRESETS: BotPreset[] = [
     Greedy, Lookahead, Guardian, Sentinel, Positional, Fortress,
     DeepSentinel, DeepPositional, DeepFortress, FortressEndgame, DeepFortressEndgame,

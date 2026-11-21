@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fanorona Board</title>
+    <!-- The look shared with the tutorial page: buttons, the board grid and its highlights -->
+    <link rel="stylesheet" href="./styles.css">
+    <style>
+        /* Row above the board: the vs Bot / 2 Player choice before a game, and whose turn it is during one.
+           It has a fixed height so the board doesn't move when its contents change. */
+        #top-controls {
+            width: 900px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 12px;
+        }
+
+        #mode-choice, #difficulty-choice, #colour-choice {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        /* Whose turn it is, in the same small capitals as the buttons */
+        #turn-indicator {
+            margin: 0;
+            font-family: var(--ui-font);
+            font-size: 18px;
+            font-weight: bold;
+            font-variant: small-caps;
+            letter-spacing: 2px;
+            color: var(--ui-text);
+        }
+
+        /* Row under the board for controls, with Restart on the left and End turn on the right */
+        #board-controls {
+            width: 900px;
+            display: flex;
+            justify-content: space-between;
+            margin-top: 12px;
+            margin-bottom: 20px;
+        }
+
+        /* The End turn button is only made visible when the player can stop a capture chain,
+           and keeps its space when hidden so the page doesn't jump around. */
+        #end-turn-button {
+            visibility: hidden;
+        }
+
+        #end-turn-button.visible {
+            visibility: visible;
+        }
+
+        /* Restart is only shown during a game, and also keeps its space when hidden */
+        #restart-button {
+            visibility: hidden;
+        }
+
+        #restart-button.visible {
+            visibility: visible;
+        }
+
+        #message-container {
+            display: none; /* Initially hidden */
+            align-items: center;
+            justify-content: center;
+            width: 900px;
+            height: 100px;
+            margin: 20px auto;
+            background-color: var(--frame-fill);
+            /* The same double frame as the buttons */
+            border: 2px solid var(--frame-outer);
+            border-radius: 4px;
+            box-shadow: inset 0 0 0 4px var(--frame-fill), inset 0 0 0 5.5px var(--frame-inner), 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        /* "You won!" / "You lost!" message, in the same small capitals as the buttons */
+        #game-message {
+            flex-grow: 1;
+            text-align: center;
+            font-family: var(--ui-font);
+            font-size: 24px;
+            font-weight: bold;
+            font-variant: small-caps;
+            letter-spacing: 2px;
+            color: var(--ui-text);
+        }
+
+    </style>
+</head>
+<body>
+    <div id="top-controls">
+        <div id="mode-choice">
+            <!-- The choices pulse (and the board is greyed out) so it's clear one of them has to be picked first -->
+            <button id="vs-bot-button" class="board-button pulse-target">vs Bot</button>
+            <button id="two-player-button" class="board-button pulse-target">2 Player</button>
+            <a id="tutorial-link" class="board-button pulse-target" href="./tutorial.html">Tutorial</a>
+        </div>
+        <!-- The difficulty buttons are added by index.ts, from the list of difficulties in ai/difficulties.ts -->
+        <div id="difficulty-choice" hidden>
+            <button id="difficulty-back-button" class="board-button small">Back</button>
+        </div>
+        <div id="colour-choice" hidden>
+            <button id="play-white-button" class="board-button pulse-target">Play as Light</button>
+            <button id="play-black-button" class="board-button pulse-target">Play as Dark</button>
+            <button id="colour-back-button" class="board-button small">Back</button>
+        </div>
+        <p id="turn-indicator" hidden></p>
+    </div>
+
+    <div id="canvas-container">
+        <canvas id="fanoronaBoard" width="900" height="500"></canvas>
+        <div class="grid-container">
+            <!-- Generate 9x5 grid buttons -->
+            <script>
+            for (let i = 0; i < 45; i++) {
+                document.write(`<button id="btn-${i}"></button>`);
+            }
+            </script>
+        </div>
+    </div>
+
+    <div id="board-controls">
+        <button id="restart-button" class="board-button">Restart</button>
+        <button id="end-turn-button" class="board-button">End turn</button>
+    </div>
+
+    <div id="message-container" style="display: none;">
+        <p id="game-message"></p>
+    </div>
+
+    <script type="module" src="./bundle.js"></script>
+</body>
+</html>
